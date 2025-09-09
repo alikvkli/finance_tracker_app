@@ -34,22 +34,38 @@ class CategoryModel extends Equatable {
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
-    return CategoryModel(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      nameTr: json['name_tr'] as String,
-      nameEn: json['name_en'] as String,
-      type: json['type'] as String,
-      icon: json['icon'] as String,
-      color: json['color'] as String,
-      parentId: json['parent_id'] as int?,
-      sortOrder: json['sort_order'] as int,
-      isActive: json['is_active'] as bool,
-      isDefault: json['is_default'] as bool,
-      description: json['description'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-    );
+    try {
+      print('🔄 CategoryModel.fromJson - Parsing category:');
+      print('   ID: ${json['id']}');
+      print('   Name: ${json['name']}');
+      print('   Type: ${json['type']}');
+      print('   Created At: ${json['created_at']}');
+      print('   Updated At: ${json['updated_at']}');
+      
+      return CategoryModel(
+        id: (json['id'] is int) ? json['id'] as int : int.parse(json['id'].toString()),
+        name: json['name'] as String,
+        nameTr: json['name_tr'] as String,
+        nameEn: json['name_en'] as String,
+        type: json['type'] as String,
+        icon: json['icon'] as String,
+        color: json['color'] as String,
+        parentId: json['parent_id'] != null 
+            ? ((json['parent_id'] is int) ? json['parent_id'] as int : int.parse(json['parent_id'].toString()))
+            : null,
+        sortOrder: (json['sort_order'] is int) ? json['sort_order'] as int : int.parse(json['sort_order'].toString()),
+        isActive: json['is_active'] as bool,
+        isDefault: json['is_default'] as bool,
+        description: json['description'] as String?,
+        createdAt: DateTime.parse(json['created_at'] as String),
+        updatedAt: DateTime.parse(json['updated_at'] as String),
+      );
+    } catch (e, stackTrace) {
+      print('❌ CategoryModel.fromJson - Error: $e');
+      print('❌ Stack trace: $stackTrace');
+      print('❌ JSON data: $json');
+      rethrow;
+    }
   }
 
   Map<String, dynamic> toJson() {

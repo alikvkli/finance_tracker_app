@@ -7,10 +7,19 @@ import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
 import 'shared/services/storage_service.dart';
+import 'shared/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configureDependencies();
+  
+  // OneSignal'i başlat
+  final notificationService = getIt<NotificationService>();
+  await notificationService.initialize();
+  
+  // OneSignal'in tam olarak yüklenmesi için kısa bir bekleme
+  await Future.delayed(const Duration(seconds: 2));
+  
   runApp(const ProviderScope(child: MyApp()));
 }
 

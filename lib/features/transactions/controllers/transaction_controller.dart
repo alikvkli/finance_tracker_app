@@ -92,11 +92,6 @@ class TransactionController extends StateNotifier<TransactionState> {
   }
 
   Future<void> loadTransactions() async {
-    print('📡 loadTransactions called');
-    print('   selectedStartDate: ${state.selectedStartDate}');
-    print('   selectedEndDate: ${state.selectedEndDate}');
-    print('   searchQuery: ${state.searchQuery}');
-    print('   selectedCategoryId: ${state.selectedCategoryId}');
     
     state = state.copyWith(isLoading: true, error: null);
 
@@ -108,6 +103,12 @@ class TransactionController extends StateNotifier<TransactionState> {
         categoryId: state.selectedCategoryId,
       );
 
+      print('📊 Transaction Controller - Response received:');
+      print('   Success: ${response.success}');
+      print('   Message: ${response.message}');
+      print('   Data count: ${response.data.length}');
+      print('   Pagination: ${response.pagination.total} total items');
+
       final income = response.data
           .where((t) => t.isIncome)
           .fold(0.0, (sum, t) => sum + t.amountAsDouble);
@@ -116,6 +117,10 @@ class TransactionController extends StateNotifier<TransactionState> {
           .where((t) => t.isExpense)
           .fold(0.0, (sum, t) => sum + t.amountAsDouble);
 
+      print('   Calculated Income: $income');
+      print('   Calculated Expense: $expense');
+      print('   Calculated Balance: ${income - expense}');
+
       state = state.copyWith(
         transactions: response.data,
         isLoading: false,
@@ -123,7 +128,10 @@ class TransactionController extends StateNotifier<TransactionState> {
         totalExpense: expense,
         balance: income - expense,
       );
+      
+      print('✅ Transaction Controller - State updated successfully');
     } catch (e) {
+      print('❌ Transaction Controller - Error: $e');
       state = state.copyWith(
         isLoading: false,
         error: e.toString().replaceFirst('Exception: ', ''),

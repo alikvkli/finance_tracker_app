@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'injection.config.dart';
 import '../constants/api_config.dart';
 import '../../shared/services/storage_service.dart';
+import '../../shared/services/notification_service.dart';
 import '../../features/auth/services/auth_service.dart';
 import '../../features/transactions/services/transaction_service.dart';
 
@@ -42,4 +43,8 @@ final authServiceProvider = Provider<AuthService>((ref) {
 
 final transactionServiceProvider = Provider<TransactionService>((ref) {
   return TransactionService(getIt<Dio>(), ref.watch(storageServiceProvider));
+});
+
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  return getIt<NotificationService>();
 });

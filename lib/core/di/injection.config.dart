@@ -15,6 +15,10 @@ import 'package:finance_tracker_app/features/auth/services/auth_service.dart'
     as _i924;
 import 'package:finance_tracker_app/features/onboarding/controllers/onboarding_controller.dart'
     as _i552;
+import 'package:finance_tracker_app/features/transactions/services/transaction_service.dart'
+    as _i6;
+import 'package:finance_tracker_app/shared/services/notification_service.dart'
+    as _i992;
 import 'package:finance_tracker_app/shared/services/storage_service.dart'
     as _i329;
 import 'package:get_it/get_it.dart' as _i174;
@@ -32,14 +36,20 @@ extension GetItInjectableX on _i174.GetIt {
       environment,
       environmentFilter,
     );
+    gh.singleton<_i992.NotificationService>(() => _i992.NotificationService());
     gh.singleton<_i329.StorageService>(
         () => _i329.StorageService(gh<_i460.SharedPreferences>()));
     gh.singleton<_i924.AuthService>(() => _i924.AuthService(gh<_i361.Dio>()));
+    gh.factory<_i6.TransactionService>(() => _i6.TransactionService(
+          gh<_i361.Dio>(),
+          gh<_i329.StorageService>(),
+        ));
     gh.factory<_i552.OnboardingController>(
         () => _i552.OnboardingController(gh<_i329.StorageService>()));
     gh.factory<_i170.AuthController>(() => _i170.AuthController(
           gh<_i924.AuthService>(),
           gh<_i329.StorageService>(),
+          gh<_i992.NotificationService>(),
         ));
     return this;
   }

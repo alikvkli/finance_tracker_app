@@ -17,8 +17,10 @@ class LoginRequest extends Equatable {
       'password': password,
     };
     
+    
     if (oneSignalId != null && oneSignalId!.isNotEmpty) {
       json['onesignal_id'] = oneSignalId!;
+    } else {
     }
     
     return json;

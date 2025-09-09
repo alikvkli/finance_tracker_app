@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../../core/di/injection.dart';
 import '../../../shared/services/storage_service.dart';
+import '../../../shared/services/notification_service.dart';
 import '../models/login_request.dart';
 import '../models/register_request.dart';
 import '../models/user_model.dart';
@@ -12,8 +13,9 @@ import '../services/auth_service.dart';
 class AuthController extends StateNotifier<AuthState> {
   final AuthService _authService;
   final StorageService _storageService;
+  final NotificationService _notificationService;
   
-  AuthController(this._authService, this._storageService) : super(const AuthState());
+  AuthController(this._authService, this._storageService, this._notificationService) : super(const AuthState());
   
   Future<void> register({
     required String email,
@@ -67,13 +69,25 @@ class AuthController extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, errors: []);
     
     try {
+      // OneSignal ID'yi al veya mevcut olanı kullan
+      String? finalOneSignalId = oneSignalId ?? _notificationService.playerId;
+      
+      // Eğer OneSignal ID yoksa, yeniden almaya çalış
+      if (finalOneSignalId == null || finalOneSignalId.isEmpty) {
+        finalOneSignalId = await _notificationService.refreshPlayerId();
+      }
+            
       final request = LoginRequest(
         email: email,
         password: password,
-        oneSignalId: oneSignalId,
+        oneSignalId: finalOneSignalId,
       );
       
+      
       final response = await _authService.login(request);
+      
+      // OneSignal external user ID'yi ayarla
+      await _notificationService.setExternalUserId(response.user.userId.toString());
       
       // Save auth data
       await _storageService.saveAuthToken(response.token);
@@ -112,6 +126,9 @@ class AuthController extends StateNotifier<AuthState> {
   }
   
   Future<void> logout() async {
+    // OneSignal external user ID'yi kaldır
+    await _notificationService.removeExternalUserId();
+    
     await _storageService.clearAuthData();
     state = const AuthState();
   }

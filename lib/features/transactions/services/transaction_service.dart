@@ -22,6 +22,7 @@ class TransactionService {
   }) async {
     try {
       final token = _storageService.getAuthToken();
+      print('🔑 TransactionService - Auth Token: ${token != null ? "Present" : "NULL"}');
       if (token == null) {
         throw Exception('Kullanıcı oturumu bulunamadı');
       }
@@ -67,12 +68,32 @@ class TransactionService {
       print('✅ API Response - getTransactions:');
       print('   Status Code: ${response.statusCode}');
       print('   Data Type: ${response.data.runtimeType}');
+      print('   Full Response: ${response.data}');
+      
       if (response.data is Map<String, dynamic>) {
         final data = response.data as Map<String, dynamic>;
         print('   Response Keys: ${data.keys.toList()}');
+        
+        if (data.containsKey('success')) {
+          print('   Success: ${data['success']}');
+        }
+        
+        if (data.containsKey('message')) {
+          print('   Message: ${data['message']}');
+        }
+        
         if (data.containsKey('data')) {
           final transactions = data['data'] as List<dynamic>;
           print('   Transaction Count: ${transactions.length}');
+          
+          if (transactions.isNotEmpty) {
+            print('   First Transaction: ${transactions.first}');
+          }
+        }
+        
+        if (data.containsKey('pagination')) {
+          final pagination = data['pagination'] as Map<String, dynamic>;
+          print('   Pagination: $pagination');
         }
       }
 
