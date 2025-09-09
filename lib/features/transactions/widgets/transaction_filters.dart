@@ -24,7 +24,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
   void initState() {
     super.initState();
     _loadCategories();
-    
+
     // Initialize search controller and date range with current values
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final transactionState = ref.read(transactionControllerProvider);
@@ -93,11 +93,13 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -105,10 +107,14 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                 // Search Bar
                 Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -117,17 +123,23 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     decoration: InputDecoration(
                       hintText: 'İşlem ara...',
                       hintStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                       prefixIcon: Icon(
                         Icons.search,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
                               icon: Icon(
                                 Icons.clear,
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
                               onPressed: () {
                                 _searchController.clear();
@@ -138,7 +150,10 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                             )
                           : null,
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                     ),
                     onChanged: (value) {
                       // Don't apply filter immediately, just update local state
@@ -149,44 +164,22 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     },
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Date Range Filter
                 _buildDateRangeSection(context),
-                
+
                 const SizedBox(height: 20),
-                
-                // Category Filter Header
-                Row(
-                  children: [
-                    Icon(
-                      Icons.category,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Kategoriler',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-                
-                const SizedBox(height: 12),
-                
+
                 // Category Filter
                 if (_isLoadingCategories)
                   const Center(child: CircularProgressIndicator())
                 else
                   _buildCategorySections(context, transactionState),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Action Buttons
                 Row(
                   children: [
@@ -201,7 +194,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                               _localSearchQuery = null;
                               _localSelectedCategoryId = null;
                             });
-                            ref.read(transactionControllerProvider.notifier).clearFilters(); // This now resets date range too
+                            ref
+                                .read(transactionControllerProvider.notifier)
+                                .clearFilters(); // This now resets date range too
                             Navigator.pop(context);
                           },
                           style: OutlinedButton.styleFrom(
@@ -223,32 +218,48 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                           ),
                         ),
                       ),
-                    
+
                     if (_hasActiveFilters()) const SizedBox(width: 12),
-                    
+
                     // Apply Button
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
                           // Apply all filter changes
-                          if (_selectedStartDate != null && _selectedEndDate != null) {
-                            ref.read(transactionControllerProvider.notifier).updateDateRange(_selectedStartDate!, _selectedEndDate!);
+                          if (_selectedStartDate != null &&
+                              _selectedEndDate != null) {
+                            ref
+                                .read(transactionControllerProvider.notifier)
+                                .updateDateRange(
+                                  _selectedStartDate!,
+                                  _selectedEndDate!,
+                                );
                           }
-                          
+
                           // Apply search query
-                          ref.read(transactionControllerProvider.notifier).updateSearchQuery(_localSearchQuery);
-                          
+                          ref
+                              .read(transactionControllerProvider.notifier)
+                              .updateSearchQuery(_localSearchQuery);
+
                           // Apply category filter
                           if (_localSelectedCategoryId != null) {
-                            ref.read(transactionControllerProvider.notifier).updateCategoryFilter(_localSelectedCategoryId!);
+                            ref
+                                .read(transactionControllerProvider.notifier)
+                                .updateCategoryFilter(
+                                  _localSelectedCategoryId!,
+                                );
                           } else {
-                            ref.read(transactionControllerProvider.notifier).clearCategoryFilter();
+                            ref
+                                .read(transactionControllerProvider.notifier)
+                                .clearCategoryFilter();
                           }
-                          
+
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
@@ -296,19 +307,20 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             ),
             const Spacer(),
             TextButton(
-              onPressed: () => _selectCurrentMonth(),
-              child: const Text('Bu Ay'),
-            ),
-            const SizedBox(width: 8),
-            TextButton(
               onPressed: () => _selectPreviousMonth(),
               child: const Text('Önceki Ay'),
             ),
+
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: () => _selectCurrentMonth(),
+              child: const Text('Bu Ay'),
+            ),
           ],
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Date Range Buttons
         if (_selectedStartDate != null && _selectedEndDate != null)
           Row(
@@ -334,14 +346,20 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     );
   }
 
-  Widget _buildDateSelector(String title, DateTime selectedDate, Function(DateTime) onChanged) {
+  Widget _buildDateSelector(
+    String title,
+    DateTime selectedDate,
+    Function(DateTime) onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 12,
           ),
         ),
@@ -362,7 +380,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.3),
               ),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -379,14 +399,16 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     '${selectedDate.day.toString().padLeft(2, '0')}/'
                     '${selectedDate.month.toString().padLeft(2, '0')}/'
                     '${selectedDate.year}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontSize: 12,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(fontSize: 12),
                   ),
                 ),
                 Icon(
                   Icons.arrow_drop_down,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.5),
                   size: 16,
                 ),
               ],
@@ -409,7 +431,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     final now = DateTime.now();
     final previousMonth = now.month == 1 ? 12 : now.month - 1;
     final previousYear = now.month == 1 ? now.year - 1 : now.year;
-    
+
     setState(() {
       _selectedStartDate = DateTime(previousYear, previousMonth, 1);
       _selectedEndDate = DateTime(previousYear, previousMonth + 1, 0);
@@ -420,24 +442,72 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     final now = DateTime.now();
     final currentMonthStart = DateTime(now.year, now.month, 1);
     final currentMonthEnd = DateTime(now.year, now.month + 1, 0);
-    
-    return _localSearchQuery != null || 
-           _localSelectedCategoryId != null ||
-           (_selectedStartDate != null && _selectedStartDate != currentMonthStart) ||
-           (_selectedEndDate != null && _selectedEndDate != currentMonthEnd);
+
+    return _localSearchQuery != null ||
+        _localSelectedCategoryId != null ||
+        (_selectedStartDate != null &&
+            _selectedStartDate != currentMonthStart) ||
+        (_selectedEndDate != null && _selectedEndDate != currentMonthEnd);
   }
 
-  Widget _buildCategorySections(BuildContext context, TransactionState transactionState) {
+  Widget _buildCategorySections(
+    BuildContext context,
+    TransactionState transactionState,
+  ) {
     // Kategorileri type'a göre ayır
-    final incomeCategories = _categories.where((c) => c.type == 'income').toList();
-    final expenseCategories = _categories.where((c) => c.type == 'expense').toList();
+    final incomeCategories = _categories
+        .where((c) => c.type == 'income')
+        .toList();
+    final expenseCategories = _categories
+        .where((c) => c.type == 'expense')
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Kategori Header with Info
+        Row(
+          children: [
+            Icon(
+              Icons.category_outlined,
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Kategoriler',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const Spacer(),
+            if (_localSelectedCategoryId != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Tekrar tıklayarak kaldır',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+
         // Gelir Kategorileri
         if (incomeCategories.isNotEmpty) ...[
-          _buildCategorySectionHeader(context, 'Gelir Kategorileri', Icons.trending_up, Colors.green),
+          _buildCategorySectionHeader(context, 'Gelir Kategorileri', Icons.trending_up, Colors.green[600]!),
           const SizedBox(height: 8),
           _buildCategoryList(context, incomeCategories, transactionState),
           const SizedBox(height: 16),
@@ -445,7 +515,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
         
         // Gider Kategorileri
         if (expenseCategories.isNotEmpty) ...[
-          _buildCategorySectionHeader(context, 'Gider Kategorileri', Icons.trending_down, Colors.red),
+          _buildCategorySectionHeader(context, 'Gider Kategorileri', Icons.trending_down, Colors.red[600]!),
           const SizedBox(height: 8),
           _buildCategoryList(context, expenseCategories, transactionState),
         ],
@@ -453,21 +523,21 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     );
   }
 
-
   Widget _buildCategorySectionHeader(BuildContext context, String title, IconData icon, Color color) {
     return Row(
       children: [
         Icon(
           icon,
-          size: 18,
+          size: 16,
           color: color,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 6),
         Text(
           title,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
             color: color,
+            fontSize: 13,
           ),
         ),
       ],
@@ -476,7 +546,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
 
   Widget _buildCategoryList(BuildContext context, List<CategoriesApiModel> categories, TransactionState transactionState) {
     return SizedBox(
-      height: 60,
+      height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -484,34 +554,43 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
         itemBuilder: (context, index) {
           final category = categories[index];
           final isSelected = _localSelectedCategoryId == category.id;
-          final categoryColor = Color(int.parse(category.color.replaceFirst('#', '0xFF')));
+          final categoryColor = Color(
+            int.parse(category.color.replaceFirst('#', '0xFF')),
+          );
 
           return Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 8),
             child: GestureDetector(
               onTap: () {
-                // Don't apply filter immediately, just update local state
-                // Filter will be applied when "Filtreleri Uygula" is pressed
                 setState(() {
                   if (_localSelectedCategoryId == category.id) {
-                    _localSelectedCategoryId = null; // Deselect if already selected
+                    _localSelectedCategoryId =
+                        null; // Deselect if already selected
                   } else {
-                    _localSelectedCategoryId = category.id; // Select new category
+                    _localSelectedCategoryId =
+                        category.id; // Select new category
                   }
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? categoryColor.withValues(alpha: 0.15)
-                      : Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(20),
+                      : Theme.of(
+                          context,
+                        ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: isSelected
                         ? categoryColor
-                        : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-                    width: isSelected ? 2 : 1,
+                        : Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.2),
+                    width: isSelected ? 1.5 : 1,
                   ),
                 ),
                 child: Row(
@@ -519,20 +598,26 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                   children: [
                     Icon(
                       _getIconData(category.icon),
-                      size: 18,
+                      size: 16,
                       color: isSelected
                           ? categoryColor
-                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 4),
                     Text(
                       category.nameTr,
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: isSelected
                             ? categoryColor
-                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                        fontSize: 13,
+                            : Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.7),
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -544,6 +629,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
       ),
     );
   }
+
 
   IconData _getIconData(String iconName) {
     switch (iconName) {
