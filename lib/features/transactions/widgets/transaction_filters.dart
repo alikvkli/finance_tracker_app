@@ -299,6 +299,11 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
               onPressed: () => _selectCurrentMonth(),
               child: const Text('Bu Ay'),
             ),
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: () => _selectPreviousMonth(),
+              child: const Text('Önceki Ay'),
+            ),
           ],
         ),
         
@@ -397,6 +402,17 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     setState(() {
       _selectedStartDate = DateTime(now.year, now.month, 1);
       _selectedEndDate = DateTime(now.year, now.month + 1, 0);
+    });
+  }
+
+  void _selectPreviousMonth() {
+    final now = DateTime.now();
+    final previousMonth = now.month == 1 ? 12 : now.month - 1;
+    final previousYear = now.month == 1 ? now.year - 1 : now.year;
+    
+    setState(() {
+      _selectedStartDate = DateTime(previousYear, previousMonth, 1);
+      _selectedEndDate = DateTime(previousYear, previousMonth + 1, 0);
     });
   }
 

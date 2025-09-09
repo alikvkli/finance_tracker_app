@@ -152,27 +152,99 @@ class _SwipeableTransactionCard extends ConsumerWidget {
         // Onay dialog'u göster
         return await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('İşlemi Sil'),
-            content: Text(
-              'Bu işlemi silmek istediğinizden emin misiniz?\n\n'
-              '${transaction.category.nameTr}\n'
-              '${transaction.isIncome ? '+' : '-'}${_formatAmount(transaction.amountAsDouble)} ₺',
+          barrierDismissible: true,
+          builder: (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('İptal'),
+            elevation: 8,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
               ),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red[600],
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Sil'),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Simple Icon
+                  Icon(
+                    Icons.delete_outline,
+                    color: Colors.red[600],
+                    size: 32,
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Title
+                  Text(
+                    'İşlemi Sil',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Transaction Info - Minimal
+                  Text(
+                    '${transaction.category.nameTr} • ${_formatAmount(transaction.amountAsDouble)} ₺',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Action Buttons - Minimal
+                  Row(
+                    children: [
+                      // Cancel Button
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text(
+                            'İptal',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                      
+                      // Delete Button
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text(
+                            'Sil',
+                            style: TextStyle(
+                              color: Colors.red[600],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },
@@ -200,6 +272,63 @@ class _SwipeableTransactionCard extends ConsumerWidget {
       return '${(amount / 1000).toStringAsFixed(1)}K';
     } else {
       return amount.toStringAsFixed(0);
+    }
+  }
+
+  IconData _getCategoryIcon(String iconName) {
+    switch (iconName) {
+      case 'home':
+        return Icons.home;
+      case 'salary':
+        return Icons.work;
+      case 'business':
+        return Icons.business;
+      case 'trending_up':
+        return Icons.trending_up;
+      case 'work':
+        return Icons.work_outline;
+      case 'more':
+        return Icons.more_horiz;
+      case 'receipt':
+        return Icons.receipt;
+      case 'restaurant':
+        return Icons.restaurant;
+      case 'directions_car':
+        return Icons.directions_car;
+      case 'local_hospital':
+        return Icons.local_hospital;
+      case 'school':
+        return Icons.school;
+      case 'movie':
+        return Icons.movie;
+      case 'credit_card':
+        return Icons.credit_card;
+      case 'account_balance':
+        return Icons.account_balance;
+      case 'checkroom':
+        return Icons.checkroom;
+      case 'shopping_cart':
+        return Icons.shopping_cart;
+      case 'fastfood':
+        return Icons.fastfood;
+      case 'local_cafe':
+        return Icons.local_cafe;
+      case 'flash_on':
+        return Icons.flash_on;
+      case 'water_drop':
+        return Icons.water_drop;
+      case 'local_fire_department':
+        return Icons.local_fire_department;
+      case 'wifi':
+        return Icons.wifi;
+      case 'phone':
+        return Icons.phone;
+      case 'currency_bitcoin':
+        return Icons.currency_bitcoin;
+      case 'receipt_long':
+        return Icons.receipt_long;
+      default:
+        return Icons.category;
     }
   }
 }
