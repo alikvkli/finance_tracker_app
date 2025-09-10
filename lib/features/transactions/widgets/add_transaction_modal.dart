@@ -669,7 +669,7 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
         Row(
           children: [
             Icon(
-              Icons.attach_money,
+              Icons.money_outlined,
               size: 20,
               color: Theme.of(context).colorScheme.primary,
             ),

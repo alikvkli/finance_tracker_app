@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction_model.dart';
 import '../controllers/transaction_controller.dart';
+import '../../../shared/widgets/transaction_skeleton.dart';
 
 class TransactionList extends ConsumerWidget {
   const TransactionList({super.key});
@@ -13,9 +14,7 @@ class TransactionList extends ConsumerWidget {
  
 
     if (transactionState.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const TransactionsPageSkeleton();
     }
 
     if (transactionState.error != null) {
@@ -278,6 +277,13 @@ class _SwipeableTransactionCard extends ConsumerWidget {
     }
   }
 
+}
+
+class _TransactionCard extends StatelessWidget {
+  final TransactionModel transaction;
+
+  const _TransactionCard({required this.transaction});
+
   IconData _getCategoryIcon(String iconName) {
     switch (iconName) {
       case 'home':
@@ -308,24 +314,32 @@ class _SwipeableTransactionCard extends ConsumerWidget {
         return Icons.credit_card;
       case 'account_balance':
         return Icons.account_balance;
-      case 'checkroom':
-        return Icons.checkroom;
       case 'shopping_cart':
         return Icons.shopping_cart;
-      case 'fastfood':
-        return Icons.fastfood;
-      case 'local_cafe':
-        return Icons.local_cafe;
-      case 'flash_on':
-        return Icons.flash_on;
+      case 'flight':
+        return Icons.flight;
+      case 'fitness_center':
+        return Icons.fitness_center;
+      case 'sports_soccer':
+        return Icons.sports_soccer;
+      case 'music_note':
+        return Icons.music_note;
+      case 'book':
+        return Icons.book;
+      case 'gavel':
+        return Icons.gavel;
+      case 'build':
+        return Icons.build;
+      case 'computer':
+        return Icons.computer;
+      case 'phone':
+        return Icons.phone;
+      case 'wifi':
+        return Icons.wifi;
       case 'water_drop':
         return Icons.water_drop;
       case 'local_fire_department':
         return Icons.local_fire_department;
-      case 'wifi':
-        return Icons.wifi;
-      case 'phone':
-        return Icons.phone;
       case 'currency_bitcoin':
         return Icons.currency_bitcoin;
       case 'receipt_long':
@@ -334,12 +348,6 @@ class _SwipeableTransactionCard extends ConsumerWidget {
         return Icons.category;
     }
   }
-}
-
-class _TransactionCard extends StatelessWidget {
-  final TransactionModel transaction;
-
-  const _TransactionCard({required this.transaction});
 
   @override
   Widget build(BuildContext context) {
@@ -454,32 +462,6 @@ class _TransactionCard extends StatelessWidget {
     }
   }
 
-  IconData _getCategoryIcon(String iconName) {
-    switch (iconName.toLowerCase()) {
-      case 'home':
-        return Icons.home;
-      case 'salary':
-        return Icons.work;
-      case 'food':
-        return Icons.restaurant;
-      case 'transport':
-        return Icons.directions_car;
-      case 'shopping':
-        return Icons.shopping_bag;
-      case 'entertainment':
-        return Icons.movie;
-      case 'health':
-        return Icons.health_and_safety;
-      case 'education':
-        return Icons.school;
-      case 'travel':
-        return Icons.flight;
-      case 'gift':
-        return Icons.card_giftcard;
-      default:
-        return Icons.category;
-    }
-  }
 
   String _formatDate(DateTime date) {
     final months = [

@@ -4,6 +4,7 @@ import '../../transactions/widgets/dashboard_transaction_list.dart';
 import '../../transactions/widgets/add_transaction_modal.dart';
 import '../controllers/dashboard_controller.dart';
 import '../../../shared/widgets/bottom_navigation.dart';
+import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../core/routing/app_router.dart';
 import '../../auth/controllers/auth_controller.dart';
 
@@ -56,7 +57,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     BuildContext context,
     DashboardState dashboardState,
   ) {
-    final authState = ref.watch(authControllerProvider);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
@@ -151,50 +151,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
-  Widget _buildMonthInfo(BuildContext context, DashboardState dashboardState) {
-    final now = DateTime.now();
-    final monthNames = [
-      'Ocak',
-      'Şubat',
-      'Mart',
-      'Nisan',
-      'Mayıs',
-      'Haziran',
-      'Temmuz',
-      'Ağustos',
-      'Eylül',
-      'Ekim',
-      'Kasım',
-      'Aralık',
-    ];
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.2),
-              width: 1,
-            ),
-          ),
-          child: Text(
-            monthNames[now.month - 1],
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildFlatFinancialOverview(
     BuildContext context,
@@ -516,7 +472,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     .refreshDashboard();
               },
               child: dashboardState.isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const DashboardTransactionSkeleton()
                   : dashboardState.error != null
                   ? _buildErrorWidget(context, ref, dashboardState.error!)
                   : dashboardState.transactions.isEmpty

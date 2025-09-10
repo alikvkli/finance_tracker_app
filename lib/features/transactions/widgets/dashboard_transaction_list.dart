@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction_model.dart';
 import '../../home/controllers/dashboard_controller.dart';
+import '../../../shared/widgets/transaction_skeleton.dart';
 
 class DashboardTransactionList extends ConsumerWidget {
   const DashboardTransactionList({super.key});
@@ -11,9 +12,7 @@ class DashboardTransactionList extends ConsumerWidget {
     final dashboardState = ref.watch(dashboardControllerProvider);
 
     if (dashboardState.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const DashboardTransactionSkeleton();
     }
 
     if (dashboardState.error != null) {
