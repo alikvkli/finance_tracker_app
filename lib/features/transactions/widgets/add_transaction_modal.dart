@@ -5,6 +5,7 @@ import '../models/add_transaction_request.dart';
 import '../controllers/transaction_controller.dart';
 import '../providers/category_provider.dart';
 import '../../home/controllers/dashboard_controller.dart';
+import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../core/di/injection.dart';
 
 class AddTransactionModal extends ConsumerStatefulWidget {
@@ -48,8 +49,9 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
   Future<void> _submitTransaction() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCategory == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lütfen bir kategori seçin')),
+      CustomSnackBar.showError(
+        context,
+        message: 'Lütfen bir kategori seçin',
       );
       return;
     }
@@ -57,8 +59,9 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
     // Tekrarlayan işlem validation
     if (_isRecurring) {
       if (_recurringEndDate == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Tekrarlayan işlem için bitiş tarihi seçmelisiniz')),
+        CustomSnackBar.showError(
+          context,
+          message: 'Tekrarlayan işlem için bitiş tarihi seçmelisiniz',
         );
         return;
       }
@@ -102,14 +105,16 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
       
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('İşlem başarıyla eklendi')),
+        CustomSnackBar.showSuccess(
+          context,
+          message: 'İşlem başarıyla eklendi',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
+        CustomSnackBar.showError(
+          context,
+          message: e.toString(),
         );
       }
     } finally {
@@ -265,7 +270,7 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
                       Text(
                         'Yeni İşlem',
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),

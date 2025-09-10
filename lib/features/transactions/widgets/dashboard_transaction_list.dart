@@ -56,7 +56,7 @@ class DashboardTransactionList extends ConsumerWidget {
             Text(
               'Bir hata oluştu',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
@@ -98,7 +98,7 @@ class DashboardTransactionList extends ConsumerWidget {
             Text(
               'Henüz işlem yok',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
@@ -201,7 +201,7 @@ class _TransactionCard extends StatelessWidget {
               Text(
                 '${transaction.isIncome ? '+' : '-'}${_formatAmount(transaction.amountAsDouble)} ₺',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: transaction.isIncome
                       ? Colors.green[600]
                       : Colors.red[600],

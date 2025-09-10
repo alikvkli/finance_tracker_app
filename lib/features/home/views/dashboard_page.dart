@@ -82,7 +82,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 child: Text(
                   'Finans Takip',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 24,
                   ),
@@ -498,7 +498,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               'Bir hata oluştu',
               style: Theme.of(
                 context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(
@@ -546,7 +546,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               'Henüz işlem yok',
               style: Theme.of(
                 context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(

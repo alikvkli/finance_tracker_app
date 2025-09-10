@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction_model.dart';
 import '../controllers/transaction_controller.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
+import '../../../shared/widgets/custom_snackbar.dart';
 
 class TransactionList extends ConsumerWidget {
   const TransactionList({super.key});
@@ -52,7 +53,7 @@ class TransactionList extends ConsumerWidget {
             Text(
               'Bir hata oluştu',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
@@ -94,7 +95,7 @@ class TransactionList extends ConsumerWidget {
             Text(
               'Henüz işlem yok',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 8),
@@ -255,12 +256,9 @@ class _SwipeableTransactionCard extends ConsumerWidget {
         ref.read(transactionControllerProvider.notifier).deleteTransaction(transaction.id);
         
         // Başarı mesajı göster
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('İşlem başarıyla silindi'),
-            backgroundColor: Colors.green[600],
-            duration: const Duration(seconds: 2),
-          ),
+        CustomSnackBar.showSuccess(
+          context,
+          message: 'İşlem başarıyla silindi',
         );
       },
       child: _TransactionCard(transaction: transaction),
@@ -424,7 +422,7 @@ class _TransactionCard extends StatelessWidget {
               Text(
                 '${transaction.isIncome ? '+' : '-'}${_formatAmount(transaction.amountAsDouble)} ₺',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                   color: transaction.isIncome
                       ? Colors.green[600]
                       : Colors.red[600],

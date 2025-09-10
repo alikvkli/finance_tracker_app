@@ -75,7 +75,7 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                 child: Text(
                   'İşlemler',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 24,
                   ),
