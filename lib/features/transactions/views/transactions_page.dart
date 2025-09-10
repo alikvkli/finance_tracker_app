@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/transaction_controller.dart';
 import '../widgets/transaction_list.dart';
-import '../widgets/month_selector.dart';
-import '../widgets/transaction_filters.dart';
-import '../widgets/add_transaction_modal.dart';
-import '../../../shared/widgets/bottom_navigation.dart';
 import '../../../core/routing/app_router.dart';
 import '../../auth/controllers/auth_controller.dart';
 
@@ -17,7 +13,6 @@ class TransactionsPage extends ConsumerStatefulWidget {
 }
 
 class _TransactionsPageState extends ConsumerState<TransactionsPage> {
-  int _currentIndex = 1; // İşlemler sayfası aktif
 
   @override
   void initState() {
@@ -30,8 +25,6 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final transactionState = ref.watch(transactionControllerProvider);
-  
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
@@ -48,21 +41,6 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
               ),
             ),
           ],
-        ),
-      ),
-      bottomNavigationBar: CustomBottomNavigation(
-        currentIndex: _currentIndex,
-        onTap: _onItemTapped,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showFilterBottomSheet(context),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-        elevation: 4,
-        shape: const CircleBorder(),
-        child: const Icon(
-          Icons.tune_rounded,
-          size: 24,
         ),
       ),
     );
@@ -348,48 +326,9 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
     }
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-    
-    // Handle navigation
-    switch (index) {
-      case 0:
-        // Navigate to dashboard
-        Navigator.pushReplacementNamed(context, AppRouter.dashboard);
-        break;
-      case 1:
-        // Already on transactions
-        break;
-      case 2:
-        // Add transaction
-        _showAddTransactionModal(context);
-        break;
-    }
-  }
 
 
-  void _showFilterBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-      ),
-      builder: (context) => const TransactionFilters(),
-    );
-  }
 
-  void _showAddTransactionModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const AddTransactionModal(),
-    );
-  }
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(

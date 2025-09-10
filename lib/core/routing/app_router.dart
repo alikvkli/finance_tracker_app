@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import '../../features/onboarding/views/onboarding_page.dart';
 import '../../features/auth/views/auth_page.dart';
 import '../../features/auth/views/login_page.dart';
-import '../../features/home/views/dashboard_page.dart';
-import '../../features/transactions/views/transactions_page.dart';
+import '../../features/main/views/main_page.dart';
 
 class AppRouter {
   static const String onboarding = '/onboarding';
@@ -38,12 +37,12 @@ class AppRouter {
       case home:
       case dashboard:
         return MaterialPageRoute(
-          builder: (_) => const DashboardPage(),
+          builder: (_) => const MainPage(initialTab: 0),
           settings: settings,
         );
       case transactions:
         return MaterialPageRoute(
-          builder: (_) => const TransactionsPage(),
+          builder: (_) => const MainPage(initialTab: 1),
           settings: settings,
         );
       default:

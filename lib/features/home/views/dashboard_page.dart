@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../transactions/widgets/dashboard_transaction_list.dart';
-import '../../transactions/widgets/add_transaction_modal.dart';
 import '../controllers/dashboard_controller.dart';
-import '../../../shared/widgets/bottom_navigation.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../core/routing/app_router.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 class DashboardPage extends ConsumerStatefulWidget {
-  const DashboardPage({super.key});
+  final VoidCallback? onNavigateToTransactions;
+  
+  const DashboardPage({
+    super.key,
+    this.onNavigateToTransactions,
+  });
 
   @override
   ConsumerState<DashboardPage> createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends ConsumerState<DashboardPage> {
-  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -45,10 +47,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: CustomBottomNavigation(
-        currentIndex: _currentIndex,
-        onTap: _onItemTapped,
       ),
     );
   }
@@ -430,9 +428,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRouter.transactions);
-                  },
+                  onPressed: widget.onNavigateToTransactions,
                   icon: Icon(
                     Icons.arrow_forward,
                     size: 18,
@@ -568,35 +564,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
 
-    // Handle navigation
-    switch (index) {
-      case 0:
-        // Already on dashboard
-        break;
-      case 1:
-        // Navigate to transactions
-        Navigator.pushNamed(context, AppRouter.transactions);
-        break;
-      case 2:
-        // Add transaction
-        _showAddTransactionModal(context);
-        break;
-    }
-  }
-
-  void _showAddTransactionModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const AddTransactionModal(),
-    );
-  }
 
   void _showLogoutDialog(BuildContext context) {
     showDialog(
