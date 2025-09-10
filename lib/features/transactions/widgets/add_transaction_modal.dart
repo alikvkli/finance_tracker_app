@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/categories_api_model.dart';
 import '../models/add_transaction_request.dart';
 import '../controllers/transaction_controller.dart';
+import '../providers/category_provider.dart';
 import '../../home/controllers/dashboard_controller.dart';
 import '../../../core/di/injection.dart';
 
@@ -25,15 +26,15 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
   String _recurringType = 'daily';
   DateTime? _recurringEndDate;
   
-  List<CategoriesApiModel> _categories = [];
-  bool _isLoading = false;
   bool _isSubmitting = false;
-  String? _error;
 
   @override
   void initState() {
     super.initState();
-    _loadCategories();
+    // Kategorileri yükle (cache'den veya API'den)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(categoryProvider.notifier).loadCategories();
+    });
   }
 
   @override
@@ -43,26 +44,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
     super.dispose();
   }
 
-  Future<void> _loadCategories() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final transactionService = ref.read(transactionServiceProvider);
-      final response = await transactionService.getCategories();
-      setState(() {
-        _categories = response.data;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
 
   Future<void> _submitTransaction() async {
     if (!_formKey.currentState!.validate()) return;
@@ -115,6 +96,9 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
       // Hem dashboard hem de transactions listesini yenile
       await ref.read(transactionControllerProvider.notifier).refreshTransactions();
       await ref.read(dashboardControllerProvider.notifier).refreshDashboard();
+      
+      // Kategorileri yenile (yeni kategori eklenmiş olabilir)
+      ref.read(categoryProvider.notifier).refreshCategories();
       
       if (mounted) {
         Navigator.pop(context);
@@ -214,6 +198,10 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
 
   @override
   Widget build(BuildContext context) {
+    final categories = ref.watch(categoriesProvider);
+    final isLoading = ref.watch(categoriesLoadingProvider);
+    final error = ref.watch(categoriesErrorProvider);
+    
     return Container(
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.85,
@@ -310,18 +298,18 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
           
           // Content
           Expanded(
-            child: _isLoading
+            child: isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _error != null
-                    ? _buildErrorWidget()
-                    : _buildForm(),
+                : error != null
+                    ? _buildErrorWidget(error)
+                    : _buildForm(categories),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildErrorWidget() {
+  Widget _buildErrorWidget(String error) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -342,7 +330,7 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
             ),
             const SizedBox(height: 8),
             Text(
-              _error!,
+              error,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
@@ -350,7 +338,9 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: _loadCategories,
+              onPressed: () {
+                ref.read(categoryProvider.notifier).loadCategories(forceRefresh: true);
+              },
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
             ),
@@ -360,7 +350,7 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
     );
   }
 
-  Widget _buildForm() {
+  Widget _buildForm(List<CategoriesApiModel> categories) {
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -376,8 +366,8 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
               _buildTypeSelector(),
               const SizedBox(height: 20),
               
-              // Category Selector
-              _buildCategorySelector(),
+            // Category Selector
+            _buildCategorySelector(categories),
               const SizedBox(height: 20),
               
               // Amount
@@ -472,8 +462,8 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
     );
   }
 
-  Widget _buildCategorySelector() {
-    final filteredCategories = _categories.where((cat) => cat.type == _selectedType).toList();
+  Widget _buildCategorySelector(List<CategoriesApiModel> categories) {
+    final filteredCategories = categories.where((cat) => cat.type == _selectedType).toList();
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

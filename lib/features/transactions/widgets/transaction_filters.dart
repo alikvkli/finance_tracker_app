@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/transaction_controller.dart';
 import '../models/categories_api_model.dart';
-import '../../../core/di/injection.dart';
+import '../providers/category_provider.dart';
 
 class TransactionFilters extends ConsumerStatefulWidget {
   const TransactionFilters({super.key});
@@ -13,8 +13,6 @@ class TransactionFilters extends ConsumerStatefulWidget {
 
 class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
   final TextEditingController _searchController = TextEditingController();
-  List<CategoriesApiModel> _categories = [];
-  bool _isLoadingCategories = false;
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
   String? _localSearchQuery;
@@ -23,7 +21,10 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
   @override
   void initState() {
     super.initState();
-    _loadCategories();
+    // Kategorileri yükle (cache'den veya API'den)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(categoryProvider.notifier).loadCategories();
+    });
 
     // Initialize search controller and date range with current values
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -46,28 +47,12 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     super.dispose();
   }
 
-  Future<void> _loadCategories() async {
-    setState(() {
-      _isLoadingCategories = true;
-    });
-
-    try {
-      final transactionService = ref.read(transactionServiceProvider);
-      final response = await transactionService.getCategories();
-      setState(() {
-        _categories = response.data;
-        _isLoadingCategories = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoadingCategories = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final transactionState = ref.watch(transactionControllerProvider);
+    final categories = ref.watch(categoriesProvider);
+    final isLoadingCategories = ref.watch(categoriesLoadingProvider);
 
     return Container(
       constraints: BoxConstraints(
@@ -174,10 +159,10 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                 const SizedBox(height: 20),
 
                 // Category Filter
-                if (_isLoadingCategories)
+                if (isLoadingCategories)
                   const Center(child: CircularProgressIndicator())
                 else
-                  _buildCategorySections(context, transactionState),
+                  _buildCategorySections(context, transactionState, categories),
 
                 const SizedBox(height: 20),
 
@@ -454,12 +439,13 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
   Widget _buildCategorySections(
     BuildContext context,
     TransactionState transactionState,
+    List<CategoriesApiModel> categories,
   ) {
     // Kategorileri type'a göre ayır
-    final incomeCategories = _categories
+    final incomeCategories = categories
         .where((c) => c.type == 'income')
         .toList();
-    final expenseCategories = _categories
+    final expenseCategories = categories
         .where((c) => c.type == 'expense')
         .toList();
 
