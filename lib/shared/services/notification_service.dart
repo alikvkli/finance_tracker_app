@@ -13,23 +13,18 @@ class NotificationService {
     if (_isInitialized) return;
     
     try {
-      print('OneSignal başlatılıyor...');
       
       // OneSignal'i başlat
       OneSignal.initialize(_appId);
       
       // Permission iste
       final permission = await OneSignal.Notifications.requestPermission(true);
-      print('OneSignal permission: $permission');
       
       // Player ID'yi al
       _playerId = await OneSignal.User.getOnesignalId();
-      print('OneSignal Player ID: $_playerId');
       
       _isInitialized = true;
-      print('OneSignal başarıyla başlatıldı');
     } catch (e) {
-      print('OneSignal başlatma hatası: $e');
       throw NotificationException('OneSignal başlatılamadı: $e');
     }
   }
@@ -40,12 +35,9 @@ class NotificationService {
   /// Player ID'yi yeniden alır
   Future<String?> refreshPlayerId() async {
     try {
-      print('OneSignal Player ID yenileniyor...');
       _playerId = await OneSignal.User.getOnesignalId();
-      print('Yeni OneSignal Player ID: $_playerId');
       return _playerId;
     } catch (e) {
-      print('OneSignal Player ID alma hatası: $e');
       throw NotificationException('Player ID alınamadı: $e');
     }
   }
@@ -53,11 +45,8 @@ class NotificationService {
   /// Kullanıcıya external user ID atar
   Future<void> setExternalUserId(String externalUserId) async {
     try {
-      print('OneSignal External User ID ayarlanıyor: $externalUserId');
       await OneSignal.login(externalUserId);
-      print('OneSignal External User ID başarıyla ayarlandı');
     } catch (e) {
-      print('OneSignal External User ID ayarlama hatası: $e');
       throw NotificationException('External user ID atanamadı: $e');
     }
   }
@@ -95,12 +84,6 @@ class NotificationService {
     try {
       OneSignal.Notifications.addForegroundWillDisplayListener((event) {
         // Notification received in foreground
-        print('Notification received: ${event.notification.title}');
-      });
-      
-      OneSignal.Notifications.addClickListener((event) {
-        // Notification clicked
-        print('Notification clicked: ${event.notification.title}');
       });
     } catch (e) {
       print('Error setting up notification listeners: $e');

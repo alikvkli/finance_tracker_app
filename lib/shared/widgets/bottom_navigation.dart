@@ -82,6 +82,7 @@ class CustomBottomNavigation extends StatelessWidget {
                     ? Theme.of(context).colorScheme.primary
                     : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 12
               ),
             ),
           ],

@@ -22,10 +22,8 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
   @override
   void initState() {
     super.initState();
-    print('🏠 TransactionsPage - initState called');
     // Load transactions when the page is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('🏠 TransactionsPage - PostFrameCallback executing loadTransactions');
       ref.read(transactionControllerProvider.notifier).loadTransactions();
     });
   }
@@ -33,12 +31,7 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
   @override
   Widget build(BuildContext context) {
     final transactionState = ref.watch(transactionControllerProvider);
-    
-    print('🏠 TransactionsPage - Building widget:');
-    print('   isLoading: ${transactionState.isLoading}');
-    print('   error: ${transactionState.error}');
-    print('   transactions count: ${transactionState.transactions.length}');
-
+  
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
@@ -103,7 +96,7 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
               Expanded(
                 child: Text(
                   'İşlemler',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 24,

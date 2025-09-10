@@ -37,7 +37,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           children: [
             // Modern Header
             _buildModernHeader(context, dashboardState),
-            
+
             // Recent Transactions Section
             Expanded(
               child: _buildRecentTransactionsSection(context, dashboardState),
@@ -52,9 +52,12 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
-  Widget _buildModernHeader(BuildContext context, DashboardState dashboardState) {
+  Widget _buildModernHeader(
+    BuildContext context,
+    DashboardState dashboardState,
+  ) {
     final authState = ref.watch(authControllerProvider);
-    
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       decoration: BoxDecoration(
@@ -87,7 +90,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   ),
                 ),
               ),
-              
+
               // Action Buttons
               Row(
                 children: [
@@ -98,7 +101,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     },
                     icon: Icon(
                       Icons.notifications_outlined,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                       size: 22,
                     ),
                     tooltip: 'Bildirimler',
@@ -110,15 +115,17 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(width: 4),
-                  
+
                   // Logout Button
                   IconButton(
                     onPressed: () => _showLogoutDialog(context),
                     icon: Icon(
                       Icons.logout_rounded,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                       size: 22,
                     ),
                     tooltip: 'Çıkış Yap',
@@ -134,10 +141,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 24),
-          
-          
+
           // Flat Financial Overview
           _buildFlatFinancialOverview(context, dashboardState),
         ],
@@ -148,10 +154,20 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   Widget _buildMonthInfo(BuildContext context, DashboardState dashboardState) {
     final now = DateTime.now();
     final monthNames = [
-      'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık',
     ];
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -161,7 +177,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -178,14 +196,17 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
-  Widget _buildFlatFinancialOverview(BuildContext context, DashboardState dashboardState) {
+  Widget _buildFlatFinancialOverview(
+    BuildContext context,
+    DashboardState dashboardState,
+  ) {
     return Column(
       children: [
         // Net Balance - Primary Focus
         _buildFlatNetBalanceSection(context, dashboardState.balance),
-        
+
         const SizedBox(height: 32),
-        
+
         // Income & Expense - Secondary
         Row(
           children: [
@@ -201,7 +222,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             Container(
               width: 1,
               height: 40,
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.1),
             ),
             Expanded(
               child: _buildFlatStatItem(
@@ -220,28 +243,32 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
 
   Widget _buildFlatNetBalanceSection(BuildContext context, double balance) {
     final isPositive = balance >= 0;
-    final color = isPositive ? const Color(0xFF059669) : const Color(0xFFDC2626);
-    
+    final color = isPositive
+        ? const Color(0xFF059669)
+        : const Color(0xFFDC2626);
+
     return Column(
       children: [
         // Current Month Badge
         _buildCurrentMonthBadge(context),
-        
+
         const SizedBox(height: 16),
-        
+
         // Net Balance Label
         Text(
           'Net Bakiye',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 13,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.3,
           ),
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Net Balance Amount with Icon
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -259,7 +286,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             ),
             const SizedBox(width: 8),
             Icon(
-              isPositive ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+              isPositive
+                  ? Icons.trending_up_rounded
+                  : Icons.trending_down_rounded,
               color: color,
               size: 20,
             ),
@@ -269,32 +298,36 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
-  Widget _buildFlatStatItem(BuildContext context, String label, String amount, IconData icon, Color color) {
+  Widget _buildFlatStatItem(
+    BuildContext context,
+    String label,
+    String amount,
+    IconData icon,
+    Color color,
+  ) {
     return Column(
       children: [
         // Icon and Label Row
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: color,
-              size: 16,
-            ),
+            Icon(icon, color: color, size: 16),
             const SizedBox(width: 6),
             Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ],
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Amount
         Text(
           amount,
@@ -311,10 +344,20 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   Widget _buildCurrentMonthBadge(BuildContext context) {
     final now = DateTime.now();
     final monthNames = [
-      'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık',
     ];
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -338,10 +381,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
 
   String _formatAmount(double amount) {
     if (amount == 0) return '₺0,00';
-    
+
     // Negatif değerleri pozitif yap
     final absAmount = amount.abs();
-    
+
     if (absAmount >= 1000000) {
       return '₺${(absAmount / 1000000).toStringAsFixed(1)}M';
     } else if (absAmount >= 1000) {
@@ -351,7 +394,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     }
   }
 
-  Widget _buildRecentTransactionsSection(BuildContext context, DashboardState dashboardState) {
+  Widget _buildRecentTransactionsSection(
+    BuildContext context,
+    DashboardState dashboardState,
+  ) {
     return Container(
       margin: const EdgeInsets.only(top: 16),
       decoration: BoxDecoration(
@@ -372,10 +418,14 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
               border: Border(
                 bottom: BorderSide(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),
@@ -385,7 +435,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -402,7 +454,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                       Text(
                         'Son İşlemler',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
@@ -410,7 +463,11 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                       Text(
                         'Son 30 günün işlemleri',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
@@ -429,34 +486,42 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     'Tümünü Gör',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   style: TextButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          
+
           // Transaction List
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                ref.read(dashboardControllerProvider.notifier).refreshDashboard();
+                ref
+                    .read(dashboardControllerProvider.notifier)
+                    .refreshDashboard();
               },
               child: dashboardState.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : dashboardState.error != null
-                      ? _buildErrorWidget(context, ref, dashboardState.error!)
-                      : dashboardState.transactions.isEmpty
-                          ? _buildEmptyWidget(context)
-                          : const DashboardTransactionList(),
+                  ? _buildErrorWidget(context, ref, dashboardState.error!)
+                  : dashboardState.transactions.isEmpty
+                  ? _buildEmptyWidget(context)
+                  : const DashboardTransactionList(),
             ),
           ),
         ],
@@ -479,23 +544,27 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             const SizedBox(height: 16),
             Text(
               'Bir hata oluştu',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               error,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
                 ref.read(dashboardControllerProvider.notifier).clearError();
-                ref.read(dashboardControllerProvider.notifier).loadDashboardData();
+                ref
+                    .read(dashboardControllerProvider.notifier)
+                    .loadDashboardData();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
@@ -516,21 +585,25 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             Icon(
               Icons.receipt_long_outlined,
               size: 64,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
               'Henüz işlem yok',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               'Son 30 günde herhangi bir işlem bulunamadı',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -543,7 +616,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     setState(() {
       _currentIndex = index;
     });
-    
+
     // Handle navigation
     switch (index) {
       case 0:
@@ -574,9 +647,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       context: context,
       barrierDismissible: true,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 20,
         child: Container(
           padding: const EdgeInsets.all(24),
@@ -612,9 +683,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   size: 36,
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Title
               Text(
                 'Çıkış Yap',
@@ -623,21 +694,23 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Description
               Text(
                 'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.5,
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Action Buttons
               Row(
                 children: [
@@ -647,7 +720,9 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                       onPressed: () => Navigator.of(context).pop(),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.3),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -657,22 +732,26 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                       child: Text(
                         'İptal',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                         ),
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(width: 12),
-                  
+
                   // Logout Button
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
-                        await ref.read(authControllerProvider.notifier).logout();
+                        await ref
+                            .read(authControllerProvider.notifier)
+                            .logout();
                         if (mounted) {
                           Navigator.pushNamedAndRemoveUntil(
                             context,
@@ -708,4 +787,3 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 }
-

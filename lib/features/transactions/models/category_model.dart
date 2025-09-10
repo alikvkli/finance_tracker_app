@@ -35,13 +35,7 @@ class CategoryModel extends Equatable {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     try {
-      print('🔄 CategoryModel.fromJson - Parsing category:');
-      print('   ID: ${json['id']}');
-      print('   Name: ${json['name']}');
-      print('   Type: ${json['type']}');
-      print('   Created At: ${json['created_at']}');
-      print('   Updated At: ${json['updated_at']}');
-      
+
       return CategoryModel(
         id: (json['id'] is int) ? json['id'] as int : int.parse(json['id'].toString()),
         name: json['name'] as String,
@@ -61,9 +55,6 @@ class CategoryModel extends Equatable {
         updatedAt: DateTime.parse(json['updated_at'] as String),
       );
     } catch (e, stackTrace) {
-      print('❌ CategoryModel.fromJson - Error: $e');
-      print('❌ Stack trace: $stackTrace');
-      print('❌ JSON data: $json');
       rethrow;
     }
   }

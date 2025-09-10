@@ -50,7 +50,9 @@ class TransactionState extends Equatable {
       selectedStartDate: selectedStartDate ?? this.selectedStartDate,
       selectedEndDate: selectedEndDate ?? this.selectedEndDate,
       searchQuery: clearSearchQuery ? null : (searchQuery ?? this.searchQuery),
-      selectedCategoryId: clearSelectedCategoryId ? null : (selectedCategoryId ?? this.selectedCategoryId),
+      selectedCategoryId: clearSelectedCategoryId
+          ? null
+          : (selectedCategoryId ?? this.selectedCategoryId),
       totalIncome: totalIncome ?? this.totalIncome,
       totalExpense: totalExpense ?? this.totalExpense,
       balance: balance ?? this.balance,
@@ -59,27 +61,29 @@ class TransactionState extends Equatable {
 
   @override
   List<Object?> get props => [
-        transactions,
-        isLoading,
-        error,
-        selectedStartDate,
-        selectedEndDate,
-        searchQuery,
-        selectedCategoryId,
-        totalIncome,
-        totalExpense,
-        balance,
-      ];
+    transactions,
+    isLoading,
+    error,
+    selectedStartDate,
+    selectedEndDate,
+    searchQuery,
+    selectedCategoryId,
+    totalIncome,
+    totalExpense,
+    balance,
+  ];
 }
 
 class TransactionController extends StateNotifier<TransactionState> {
   final TransactionService _transactionService;
 
   TransactionController(this._transactionService)
-      : super(TransactionState(
+    : super(
+        TransactionState(
           selectedStartDate: _getFirstDayOfCurrentMonth(),
           selectedEndDate: _getLastDayOfCurrentMonth(),
-        ));
+        ),
+      );
 
   static DateTime _getFirstDayOfCurrentMonth() {
     final now = DateTime.now();
@@ -92,7 +96,6 @@ class TransactionController extends StateNotifier<TransactionState> {
   }
 
   Future<void> loadTransactions() async {
-    
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -103,12 +106,6 @@ class TransactionController extends StateNotifier<TransactionState> {
         categoryId: state.selectedCategoryId,
       );
 
-      print('📊 Transaction Controller - Response received:');
-      print('   Success: ${response.success}');
-      print('   Message: ${response.message}');
-      print('   Data count: ${response.data.length}');
-      print('   Pagination: ${response.pagination.total} total items');
-
       final income = response.data
           .where((t) => t.isIncome)
           .fold(0.0, (sum, t) => sum + t.amountAsDouble);
@@ -117,10 +114,6 @@ class TransactionController extends StateNotifier<TransactionState> {
           .where((t) => t.isExpense)
           .fold(0.0, (sum, t) => sum + t.amountAsDouble);
 
-      print('   Calculated Income: $income');
-      print('   Calculated Expense: $expense');
-      print('   Calculated Balance: ${income - expense}');
-
       state = state.copyWith(
         transactions: response.data,
         isLoading: false,
@@ -128,10 +121,7 @@ class TransactionController extends StateNotifier<TransactionState> {
         totalExpense: expense,
         balance: income - expense,
       );
-      
-      print('✅ Transaction Controller - State updated successfully');
     } catch (e) {
-      print('❌ Transaction Controller - Error: $e');
       state = state.copyWith(
         isLoading: false,
         error: e.toString().replaceFirst('Exception: ', ''),
@@ -158,52 +148,36 @@ class TransactionController extends StateNotifier<TransactionState> {
   }
 
   void toggleCategoryFilter(int categoryId) {
-    print('🔄 toggleCategoryFilter called with categoryId: $categoryId');
-    print('   Current selectedCategoryId: ${state.selectedCategoryId}');
-    
     // Eğer aynı kategori seçiliyse, filtreyi kaldır
     if (state.selectedCategoryId == categoryId) {
-      print('   Same category selected, removing filter');
       state = state.copyWith(clearSelectedCategoryId: true);
     } else {
       // Farklı kategori seçiliyse, yeni kategoriyi uygula
-      print('   Different category selected, applying new filter');
       state = state.copyWith(selectedCategoryId: categoryId);
     }
-    print('   New selectedCategoryId: ${state.selectedCategoryId}');
     loadTransactions();
   }
 
   void clearFilters() {
-    print('🧹 clearFilters called');
-    print('   Before - searchQuery: ${state.searchQuery}, selectedCategoryId: ${state.selectedCategoryId}');
-    
     // Reset to current month
     final now = DateTime.now();
     final currentMonthStart = DateTime(now.year, now.month, 1);
     final currentMonthEnd = DateTime(now.year, now.month + 1, 0);
-    
+
     state = state.copyWith(
       clearSearchQuery: true,
       clearSelectedCategoryId: true,
       selectedStartDate: currentMonthStart,
       selectedEndDate: currentMonthEnd,
     );
-    
-    print('   After - searchQuery: ${state.searchQuery}, selectedCategoryId: ${state.selectedCategoryId}');
-    print('   Date range reset to: ${currentMonthStart} - ${currentMonthEnd}');
+
     loadTransactions(); // API'ye yeni istek gönder
   }
 
   void clearCategoryFilter() {
-    print('🎯 clearCategoryFilter called');
-    print('   Before - selectedCategoryId: ${state.selectedCategoryId}');
-    
-    state = state.copyWith(
-      clearSelectedCategoryId: true,
-    );
-    
-    print('   After - selectedCategoryId: ${state.selectedCategoryId}');
+
+    state = state.copyWith(clearSelectedCategoryId: true);
+
     loadTransactions(); // API'ye yeni istek gönder
   }
 
@@ -216,17 +190,16 @@ class TransactionController extends StateNotifier<TransactionState> {
   }
 
   Future<void> deleteTransaction(int transactionId) async {
-    print('🗑️ deleteTransaction called with ID: $transactionId');
-    
+
     try {
       // API'den sil
       await _transactionService.deleteTransaction(transactionId);
-      
+
       // UI'dan kaldır
       final updatedTransactions = state.transactions
           .where((transaction) => transaction.id != transactionId)
           .toList();
-      
+
       // Totalleri yeniden hesapla
       final income = updatedTransactions
           .where((t) => t.isIncome)
@@ -242,10 +215,8 @@ class TransactionController extends StateNotifier<TransactionState> {
         totalExpense: expense,
         balance: income - expense,
       );
-      
-      print('✅ Transaction deleted successfully');
+
     } catch (e) {
-      print('❌ Error deleting transaction: $e');
       state = state.copyWith(
         error: e.toString().replaceFirst('Exception: ', ''),
       );
@@ -255,6 +226,6 @@ class TransactionController extends StateNotifier<TransactionState> {
 
 final transactionControllerProvider =
     StateNotifierProvider<TransactionController, TransactionState>((ref) {
-  final transactionService = ref.watch(transactionServiceProvider);
-  return TransactionController(transactionService);
-});
+      final transactionService = ref.watch(transactionServiceProvider);
+      return TransactionController(transactionService);
+    });

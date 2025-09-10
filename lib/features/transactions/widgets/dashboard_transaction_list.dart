@@ -164,8 +164,9 @@ class _TransactionCard extends StatelessWidget {
               children: [
                 Text(
                   transaction.category.nameTr,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
+                    fontSize: 14,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
@@ -174,6 +175,7 @@ class _TransactionCard extends StatelessWidget {
                   Text(
                     transaction.description!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontSize: 12,
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                     maxLines: 1,
@@ -184,6 +186,8 @@ class _TransactionCard extends StatelessWidget {
                 Text(
                   _formatDate(transaction.transactionDate),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),

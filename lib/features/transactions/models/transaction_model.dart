@@ -40,14 +40,6 @@ class TransactionModel extends Equatable {
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
     try {
-      print('🔄 TransactionModel.fromJson - Parsing transaction:');
-      print('   ID: ${json['id']}');
-      print('   Type: ${json['type']}');
-      print('   Amount: ${json['amount']}');
-      print('   Transaction Date: ${json['transaction_date']}');
-      print('   Created At: ${json['created_at']}');
-      print('   Updated At: ${json['updated_at']}');
-      print('   Category: ${json['category']}');
       
       return TransactionModel(
         id: (json['id'] is int) ? json['id'] as int : int.parse(json['id'].toString()),
@@ -70,9 +62,6 @@ class TransactionModel extends Equatable {
         category: CategoryModel.fromJson(json['category'] as Map<String, dynamic>),
       );
     } catch (e, stackTrace) {
-      print('❌ TransactionModel.fromJson - Error: $e');
-      print('❌ Stack trace: $stackTrace');
-      print('❌ JSON data: $json');
       rethrow;
     }
   }

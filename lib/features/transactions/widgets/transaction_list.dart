@@ -10,36 +10,22 @@ class TransactionList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionState = ref.watch(transactionControllerProvider);
 
-    print('🎨 TransactionList - Building widget:');
-    print('   isLoading: ${transactionState.isLoading}');
-    print('   error: ${transactionState.error}');
-    print('   transactions count: ${transactionState.transactions.length}');
-    print('   totalIncome: ${transactionState.totalIncome}');
-    print('   totalExpense: ${transactionState.totalExpense}');
-    print('   balance: ${transactionState.balance}');
-    
-    if (transactionState.transactions.isNotEmpty) {
-      print('   First transaction: ${transactionState.transactions.first.id} - ${transactionState.transactions.first.amount} ${transactionState.transactions.first.currency}');
-    }
+ 
 
     if (transactionState.isLoading) {
-      print('   Showing loading indicator');
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
     if (transactionState.error != null) {
-      print('   Showing error widget: ${transactionState.error}');
       return _buildErrorWidget(context, ref, transactionState.error!);
     }
 
     if (transactionState.transactions.isEmpty) {
-      print('   Showing empty widget');
       return _buildEmptyWidget(context);
     }
 
-    print('   Showing transaction list with ${transactionState.transactions.length} items');
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),

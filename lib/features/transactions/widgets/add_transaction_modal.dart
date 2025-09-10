@@ -361,41 +361,46 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
   }
 
   Widget _buildForm() {
-    return Form(
-      key: _formKey,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Transaction Type
-            _buildTypeSelector(),
-            const SizedBox(height: 20),
-            
-            // Category Selector
-            _buildCategorySelector(),
-            const SizedBox(height: 20),
-            
-            // Amount
-            _buildAmountField(),
-            const SizedBox(height: 20),
-            
-            // Description
-            _buildDescriptionField(),
-            const SizedBox(height: 20),
-            
-            // Date
-            _buildDateSelector(),
-            const SizedBox(height: 20),
-            
-            // Recurring Options
-            _buildRecurringOptions(),
-            const SizedBox(height: 20),
-            
-            // Submit Button
-            _buildSubmitButton(),
-            const SizedBox(height: 20),
-          ],
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Transaction Type
+              _buildTypeSelector(),
+              const SizedBox(height: 20),
+              
+              // Category Selector
+              _buildCategorySelector(),
+              const SizedBox(height: 20),
+              
+              // Amount
+              _buildAmountField(),
+              const SizedBox(height: 20),
+              
+              // Description
+              _buildDescriptionField(),
+              const SizedBox(height: 20),
+              
+              // Date
+              _buildDateSelector(),
+              const SizedBox(height: 20),
+              
+              // Recurring Options
+              _buildRecurringOptions(),
+              const SizedBox(height: 20),
+              
+              // Submit Button
+              _buildSubmitButton(),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -692,8 +697,12 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
         TextFormField(
           controller: _amountController,
           keyboardType: TextInputType.number,
+          textInputAction: TextInputAction.done,
           onChanged: (value) {
             _formatAmountInput(value);
+          },
+          onFieldSubmitted: (value) {
+            FocusScope.of(context).unfocus();
           },
           decoration: InputDecoration(
             hintText: '0,00',
@@ -746,8 +755,16 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
         TextFormField(
           controller: _descriptionController,
           maxLines: 3,
+          textInputAction: TextInputAction.done,
+          onFieldSubmitted: (value) {
+            FocusScope.of(context).unfocus();
+          },
           decoration: InputDecoration(
             hintText: 'İşlem açıklaması...',
+            hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+              fontSize: 14,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -833,7 +850,8 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
             ),
             Text(
               'Tekrarlayan İşlem',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -912,7 +930,8 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
                           '${_recurringEndDate!.month.toString().padLeft(2, '0')}/'
                           '${_recurringEndDate!.year}'
                         : 'Bitiş tarihi seçin',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontSize: 12,
                       color: _recurringEndDate != null 
                           ? Theme.of(context).colorScheme.onSurface
                           : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),

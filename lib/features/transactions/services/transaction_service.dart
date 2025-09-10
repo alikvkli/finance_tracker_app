@@ -22,7 +22,6 @@ class TransactionService {
   }) async {
     try {
       final token = _storageService.getAuthToken();
-      print('🔑 TransactionService - Auth Token: ${token != null ? "Present" : "NULL"}');
       if (token == null) {
         throw Exception('Kullanıcı oturumu bulunamadı');
       }
@@ -45,14 +44,6 @@ class TransactionService {
         queryParams['category_id'] = categoryId;
       }
       
-      // Debug logları
-      print('🔍 API Request - getTransactions:');
-      print('   URL: ${ApiConfig.transactionsEndpoint}');
-      print('   Query Params: $queryParams');
-      print('   Category ID: $categoryId');
-      print('   Search: $search');
-      print('   Start Date: $startDate');
-      print('   End Date: $endDate');
       
       final response = await _dio.get(
         ApiConfig.transactionsEndpoint,
@@ -63,37 +54,22 @@ class TransactionService {
           },
         ),
       );
-
-      // Response logları
-      print('✅ API Response - getTransactions:');
-      print('   Status Code: ${response.statusCode}');
-      print('   Data Type: ${response.data.runtimeType}');
-      print('   Full Response: ${response.data}');
       
       if (response.data is Map<String, dynamic>) {
         final data = response.data as Map<String, dynamic>;
-        print('   Response Keys: ${data.keys.toList()}');
         
         if (data.containsKey('success')) {
-          print('   Success: ${data['success']}');
         }
         
         if (data.containsKey('message')) {
-          print('   Message: ${data['message']}');
         }
         
         if (data.containsKey('data')) {
-          final transactions = data['data'] as List<dynamic>;
-          print('   Transaction Count: ${transactions.length}');
-          
-          if (transactions.isNotEmpty) {
-            print('   First Transaction: ${transactions.first}');
-          }
+          final transactions = data['data'] as List<dynamic>;          
         }
         
         if (data.containsKey('pagination')) {
           final pagination = data['pagination'] as Map<String, dynamic>;
-          print('   Pagination: $pagination');
         }
       }
 
@@ -182,11 +158,6 @@ class TransactionService {
         throw Exception('Kullanıcı oturumu bulunamadı');
       }
 
-      // Debug logları
-      print('🗑️ API Request - deleteTransaction:');
-      print('   URL: ${ApiConfig.transactionsEndpoint}/$transactionId');
-      print('   Transaction ID: $transactionId');
-
       final response = await _dio.delete(
         '${ApiConfig.transactionsEndpoint}/$transactionId',
         options: Options(
@@ -195,11 +166,6 @@ class TransactionService {
           },
         ),
       );
-
-      // Response logları
-      print('✅ API Response - deleteTransaction:');
-      print('   Status Code: ${response.statusCode}');
-      print('   Data: ${response.data}');
 
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {

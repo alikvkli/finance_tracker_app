@@ -123,6 +123,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     decoration: InputDecoration(
                       hintText: 'İşlem ara...',
                       hintStyle: TextStyle(
+                        fontSize: 12,
                         color: Theme.of(
                           context,
                         ).colorScheme.onSurface.withValues(alpha: 0.5),
