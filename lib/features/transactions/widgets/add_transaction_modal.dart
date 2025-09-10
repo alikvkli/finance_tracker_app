@@ -487,94 +487,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
         ),
         const SizedBox(height: 12),
         
-        // Seçilen kategori gösterimi
-        if (_selectedCategory != null) ...[
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  _parseColor(_selectedCategory!.color).withValues(alpha: 0.1),
-                  _parseColor(_selectedCategory!.color).withValues(alpha: 0.05),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              border: Border.all(
-                color: _parseColor(_selectedCategory!.color).withValues(alpha: 0.3),
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: _parseColor(_selectedCategory!.color),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: _parseColor(_selectedCategory!.color).withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    _getCategoryIcon(_selectedCategory!.icon),
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _selectedCategory!.nameTr,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: _parseColor(_selectedCategory!.color),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Seçili kategori',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: _parseColor(_selectedCategory!.color).withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedCategory = null;
-                    });
-                  },
-                  icon: Icon(
-                    Icons.close,
-                    color: _parseColor(_selectedCategory!.color),
-                    size: 20,
-                  ),
-                  style: IconButton.styleFrom(
-                    backgroundColor: _parseColor(_selectedCategory!.color).withValues(alpha: 0.1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-        
         // Kategori horizontal scroll
         SizedBox(
           height: 100,
@@ -974,7 +886,14 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
           ),
         ),
         child: _isSubmitting
-            ? const CircularProgressIndicator(color: Colors.white)
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
