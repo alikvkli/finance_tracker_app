@@ -50,32 +50,35 @@ class _MainPageState extends ConsumerState<MainPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          DashboardPage(onNavigateToTransactions: () => _switchToTransactionsTab()),
-          TransactionsPage(),
-        ],
+    return PopScope(
+      canPop: false, // Ana sayfalarda geri tuşunu devre dışı bırak
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            DashboardPage(onNavigateToTransactions: () => _switchToTransactionsTab()),
+            TransactionsPage(),
+          ],
+        ),
+        bottomNavigationBar: CustomBottomNavigation(
+          currentIndex: _currentIndex,
+          onTap: _onItemTapped,
+        ),
+        floatingActionButton: _currentIndex == 1
+            ? FloatingActionButton(
+                onPressed: () => _showFilterBottomSheet(context),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                elevation: 4,
+                shape: const CircleBorder(),
+                child: const Icon(
+                  Icons.tune_rounded,
+                  size: 24,
+                ),
+              )
+            : null,
       ),
-      bottomNavigationBar: CustomBottomNavigation(
-        currentIndex: _currentIndex,
-        onTap: _onItemTapped,
-      ),
-      floatingActionButton: _currentIndex == 1
-          ? FloatingActionButton(
-              onPressed: () => _showFilterBottomSheet(context),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Colors.white,
-              elevation: 4,
-              shape: const CircleBorder(),
-              child: const Icon(
-                Icons.tune_rounded,
-                size: 24,
-              ),
-            )
-          : null,
     );
   }
 

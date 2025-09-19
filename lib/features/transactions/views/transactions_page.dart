@@ -32,9 +32,11 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
     print('🏠 TransactionsPage build - Transaction count: ${transactionState.transactions.length}');
     print('🏠 Loading: ${transactionState.isLoading}, Error: ${transactionState.error}');
     
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SafeArea(
+    return PopScope(
+      canPop: false, // Geri tuşunu devre dışı bırak
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: SafeArea(
         child: transactionState.isLoading
             ? _buildTransactionsPageSkeleton(context)
             : Column(
@@ -80,6 +82,7 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                   ),
                 ],
               ),
+        ),
       ),
     );
   }

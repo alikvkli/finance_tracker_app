@@ -85,8 +85,9 @@ class UnifiedTransactionList extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               'Bir hata oluştu',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
+                fontSize: 18,
               ),
             ),
             const SizedBox(height: 8),
@@ -139,8 +140,9 @@ class UnifiedTransactionList extends ConsumerWidget {
             
             Text(
               emptyTitle ?? 'Henüz işlem yok',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
+                fontSize: 18,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
@@ -203,8 +205,8 @@ class _SwipeableTransactionCard extends ConsumerWidget {
               'Sil',
               style: TextStyle(
                 color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                fontSize: 11,
               ),
             ),
           ],
@@ -214,48 +216,208 @@ class _SwipeableTransactionCard extends ConsumerWidget {
         return await _showDeleteConfirmation(context);
       },
       onDismissed: (direction) async {
-        try {
-          await onDelete(transaction);
-          if (context.mounted) {
-            CustomSnackBar.showSuccess(
-              context,
-              message: 'İşlem başarıyla silindi',
-            );
-          }
-        } catch (e) {
-          if (context.mounted) {
-            CustomSnackBar.showError(
-              context,
-              message: 'İşlem silinirken bir hata oluştu',
-            );
-          }
-        }
+        await _handleDelete(context);
       },
-      child: _TransactionCard(transaction: transaction),
+      child: GestureDetector(
+        onLongPress: () => _showContextMenu(context),
+        child: _TransactionCard(transaction: transaction),
+      ),
+    );
+  }
+
+  Future<void> _handleDelete(BuildContext context) async {
+    try {
+      await onDelete(transaction);
+      if (context.mounted) {
+        CustomSnackBar.showSuccess(
+          context,
+          message: 'İşlem başarıyla silindi',
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        CustomSnackBar.showError(
+          context,
+          message: 'İşlem silinirken bir hata oluştu',
+        );
+      }
+    }
+  }
+
+  void _showContextMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => _TransactionActionsBottomSheet(
+        transaction: transaction,
+        onDelete: () async {
+          Navigator.pop(context);
+          final shouldDelete = await _showDeleteConfirmation(context);
+          if (shouldDelete == true && context.mounted) {
+            await _handleDelete(context);
+          }
+        },
+        onEdit: () {
+          Navigator.pop(context);
+          // TODO: Implement edit functionality
+          CustomSnackBar.showInfo(
+            context,
+            message: 'Düzenleme özelliği yakında eklenecek',
+          );
+        },
+      ),
     );
   }
 
   Future<bool?> _showDeleteConfirmation(BuildContext context) {
     return showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('İşlemi Sil'),
-        content: const Text('Bu işlemi silmek istediğinizden emin misiniz?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('İptal'),
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        elevation: 20,
+        child: Container(
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 30,
+                offset: const Offset(0, 15),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red[600],
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Sil'),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon Container
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.red.withValues(alpha: 0.2),
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  Icons.delete_outline_rounded,
+                  color: Colors.red[600],
+                  size: 36,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Title
+              Text(
+                'İşlemi Sil',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Description
+              Container(
+                constraints: const BoxConstraints(maxWidth: 260),
+                child: Text(
+                  'Bu işlemi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    height: 1.5,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // Action Buttons
+              Row(
+                children: [
+                  // Cancel Button
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'İptal',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  // Delete Button
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.red[600]!,
+                            Colors.red[700]!,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton.icon(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: Colors.white,
+                          shadowColor: Colors.transparent,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        label: const Text(
+                          'Sil',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -316,18 +478,18 @@ class _TransactionCard extends StatelessWidget {
                 Text(
                   transaction.description ?? transaction.category.nameTr,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  transaction.category.nameTr,
+                  transaction.category.nameTr!,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                    fontSize: 14,
+                    fontSize: 13,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -335,7 +497,7 @@ class _TransactionCard extends StatelessWidget {
                   _formatDate(transaction.transactionDate),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                    fontSize: 12,
+                    fontSize: 11,
                   ),
                 ),
               ],
@@ -351,9 +513,9 @@ class _TransactionCard extends StatelessWidget {
               Text(
                 '${isExpense ? '-' : '+'}${_formatAmount(transaction.amount)}',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: amountColor,
-                  fontSize: 16,
+                  fontSize: 15,
                 ),
               ),
               const SizedBox(height: 2),
@@ -361,7 +523,7 @@ class _TransactionCard extends StatelessWidget {
                 transaction.currency,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                  fontSize: 10,
+                  fontSize: 9,
                 ),
               ),
             ],
@@ -497,5 +659,340 @@ class _TransactionCard extends StatelessWidget {
       ];
       return '${date.day} ${monthNames[date.month - 1]}';
     }
+  }
+}
+
+class _TransactionActionsBottomSheet extends StatelessWidget {
+  final TransactionModel transaction;
+  final VoidCallback onDelete;
+  final VoidCallback onEdit;
+
+  const _TransactionActionsBottomSheet({
+    required this.transaction,
+    required this.onDelete,
+    required this.onEdit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle bar
+          Container(
+            margin: const EdgeInsets.only(top: 16),
+            width: 48,
+            height: 5,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+
+          const SizedBox(height: 28),
+
+          // Transaction Info Header
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              children: [
+                // Category Icon
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    _getCategoryIcon(transaction.category.icon),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    size: 24,
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+
+                // Transaction Details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        transaction.description ?? transaction.category.nameTr,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        transaction.category.nameTr,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        _formatDateHelper(transaction.transactionDate),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+
+                // Amount
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${transaction.type == 'expense' ? '-' : '+'}${_formatAmount(transaction.amount)}',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      transaction.currency,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 32),
+
+          // Divider
+          Container(
+            height: 1,
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Action Buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                // Edit Button
+                InkWell(
+                  onTap: onEdit,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.edit_outlined,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Düzenle',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Delete Button
+                InkWell(
+                  onTap: onDelete,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.delete_outline_rounded,
+                          color: Colors.red[600],
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Sil',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.red[600],
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
+  String _formatDateHelper(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final transactionDate = DateTime(date.year, date.month, date.day);
+
+    if (transactionDate == today) {
+      return 'Bugün';
+    } else if (transactionDate == yesterday) {
+      return 'Dün';
+    } else {
+      final monthNames = [
+        'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
+        'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+      ];
+      return '${date.day} ${monthNames[date.month - 1]}';
+    }
+  }
+
+  IconData _getCategoryIcon(String iconName) {
+    switch (iconName.toLowerCase()) {
+      case 'home':
+        return Icons.home;
+      case 'salary':
+        return Icons.work;
+      case 'food':
+        return Icons.restaurant;
+      case 'transport':
+        return Icons.directions_car;
+      case 'shopping':
+        return Icons.shopping_bag;
+      case 'entertainment':
+        return Icons.movie;
+      case 'health':
+        return Icons.health_and_safety;
+      case 'education':
+        return Icons.school;
+      case 'travel':
+        return Icons.flight;
+      case 'gift':
+        return Icons.card_giftcard;
+      case 'flash_on':
+        return Icons.flash_on;
+      case 'water_drop':
+        return Icons.water_drop;
+      case 'local_fire_department':
+        return Icons.local_fire_department;
+      case 'wifi':
+        return Icons.wifi;
+      case 'phone':
+        return Icons.phone;
+      case 'shopping_cart':
+        return Icons.shopping_cart;
+      case 'restaurant':
+        return Icons.restaurant;
+      case 'local_cafe':
+        return Icons.local_cafe;
+      case 'fastfood':
+        return Icons.fastfood;
+      case 'trending_up':
+        return Icons.trending_up;
+      case 'currency_bitcoin':
+        return Icons.currency_bitcoin;
+      case 'account_balance':
+        return Icons.account_balance;
+      case 'receipt_long':
+        return Icons.receipt_long;
+      case 'business':
+        return Icons.business;
+      case 'more':
+        return Icons.more_horiz;
+      case 'directions_car':
+        return Icons.directions_car;
+      case 'local_hospital':
+        return Icons.local_hospital;
+      case 'school':
+        return Icons.school;
+      case 'movie':
+        return Icons.movie;
+      case 'credit_card':
+        return Icons.credit_card;
+      case 'checkroom':
+        return Icons.checkroom;
+      case 'receipt':
+        return Icons.receipt;
+      default:
+        return Icons.category;
+    }
+  }
+
+  String _formatAmount(dynamic amount) {
+    // Amount'u double'a çevir
+    double amountValue;
+    if (amount is String) {
+      amountValue = double.tryParse(amount) ?? 0.0;
+    } else if (amount is num) {
+      amountValue = amount.toDouble();
+    } else {
+      amountValue = 0.0;
+    }
+
+    // Tam sayı kısmını al
+    final integerPart = amountValue.floor();
+    
+    // Binlik ayırıcılarla formatla
+    final formattedAmount = _addThousandSeparators(integerPart.toString());
+    
+    return '₺$formattedAmount';
+  }
+
+  String _addThousandSeparators(String number) {
+    if (number.isEmpty) return number;
+    
+    // Regex ile binlik ayırıcı ekle (nokta kullanarak)
+    return number.replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match match) => '${match[1]}.',
+    );
   }
 }

@@ -33,9 +33,11 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   Widget build(BuildContext context) {
     final dashboardState = ref.watch(dashboardControllerProvider);
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SafeArea(
+    return PopScope(
+      canPop: false, // Geri tuşunu devre dışı bırak
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: SafeArea(
         child: dashboardState.isLoading
             ? _buildDashboardSkeleton(context)
             : Column(
@@ -58,6 +60,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   ),
                 ],
               ),
+        ),
       ),
     );
   }
