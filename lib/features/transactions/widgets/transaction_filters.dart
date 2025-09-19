@@ -125,13 +125,13 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     children: [
                       Text(
                         'Filtreler',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
                         'İşlemlerinizi filtreleyerek arayın',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
@@ -268,7 +268,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             const SizedBox(width: 8),
             Text(
               'Arama',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -399,7 +399,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             const SizedBox(width: 8),
             Text(
               'Dönem Seçimi',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -454,7 +454,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 12,
           ),
@@ -493,7 +493,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     '${selectedDate.day.toString().padLeft(2, '0')}/'
                     '${selectedDate.month.toString().padLeft(2, '0')}/'
                     '${selectedDate.year}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12),
                   ),
                 ),
                 Icon(
@@ -562,7 +562,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             const SizedBox(width: 8),
             Text(
               'Kategoriler',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -590,7 +590,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     const SizedBox(width: 4),
                     Text(
                       'Seçili',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
                     fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -669,7 +669,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     ),
                     Text(
                       selectedCategory.type == 'income' ? 'Gelir' : 'Gider',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         fontSize: 12,
           ),
@@ -769,7 +769,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     Expanded(
                       child: Text(
                         'Kategori Seçiniz',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -879,7 +879,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             const SizedBox(height: 4),
                     Text(
               label,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                         fontSize: 12,
@@ -988,7 +988,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
         ),
         subtitle: Text(
           subtitle,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),

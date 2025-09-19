@@ -145,7 +145,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             _userName != null && _userSurname != null 
                 ? '$_userName $_userSurname'
                 : 'Merhaba',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: Colors.white,
               fontSize: 24,
@@ -158,7 +158,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           // User Email
           Text(
             _userEmail ?? 'E-posta bilgisi yok',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Colors.white.withValues(alpha: 0.9),
               fontSize: 16,
             ),
@@ -227,7 +227,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 const SizedBox(width: 8),
                 Text(
                   'Uyarı',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.red[700],
                     fontSize: 16,
@@ -344,7 +344,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 // Title
                 Text(
                   'Hesabı Sil',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
@@ -564,7 +564,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             // Title
             Text(
               'Çıkış Yap',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),

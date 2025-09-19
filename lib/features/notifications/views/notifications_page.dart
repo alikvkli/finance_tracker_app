@@ -92,7 +92,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
               children: [
                 Text(
                   'Bildirimler',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 24,
@@ -251,7 +251,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           const SizedBox(width: 12),
           Text(
             'Daha fazla bildirim yükleniyor...',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               fontSize: 14,
             ),
@@ -276,7 +276,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             const SizedBox(height: 16),
             Text(
               'Bir hata oluştu',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 fontSize: 18,
               ),
@@ -333,7 +333,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             
             Text(
               'Henüz bildirim yok',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.onSurface,
@@ -730,7 +730,7 @@ class _NotificationCard extends StatelessWidget {
                             children: [
                               Text(
                                 notification.title,
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16,
                                   color: Theme.of(context).colorScheme.onSurface,
@@ -741,7 +741,7 @@ class _NotificationCard extends StatelessWidget {
                               const SizedBox(height: 2),
                               Text(
                                 _formatNotificationTime(notification.sentAt ?? notification.createdAt),
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                                   fontSize: 12,
                                 ),
@@ -871,7 +871,7 @@ class _NotificationCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         'İşlem tamamlanıyor...',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w500,
                           fontSize: 12,
@@ -922,7 +922,7 @@ class _NotificationCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         'Siliniyor...',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w500,
                           fontSize: 12,

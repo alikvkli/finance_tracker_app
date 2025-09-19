@@ -117,7 +117,7 @@ class _SuccessSnackBarContent extends StatelessWidget {
               children: [
                 Text(
                   'Başarılı!',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -208,7 +208,7 @@ class _ErrorSnackBarContent extends StatelessWidget {
               children: [
                 Text(
                   'Hata!',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
@@ -299,7 +299,7 @@ class _InfoSnackBarContent extends StatelessWidget {
               children: [
                 Text(
                   'Bilgi',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,

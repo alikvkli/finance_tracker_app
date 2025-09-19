@@ -117,7 +117,7 @@ class UnifiedTransactionList extends ConsumerWidget {
             const SizedBox(width: 12),
             Text(
               'Yükleniyor...',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontSize: 14,
               ),
@@ -143,7 +143,7 @@ class UnifiedTransactionList extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               'Bir hata oluştu',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 fontSize: 18,
               ),
@@ -198,7 +198,7 @@ class UnifiedTransactionList extends ConsumerWidget {
             
             Text(
               emptyTitle ?? 'Henüz işlem yok',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.onSurface,
@@ -357,7 +357,7 @@ class _SwipeableTransactionCard extends ConsumerWidget {
               // Title
               Text(
                 'İşlemi Sil',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   fontSize: 18,
                   color: Theme.of(context).colorScheme.onSurface,
@@ -489,7 +489,7 @@ class _TransactionCard extends StatelessWidget {
               children: [
                 Text(
                   transaction.description ?? transaction.category.nameTr,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                     fontSize: 15,
                   ),
@@ -507,7 +507,7 @@ class _TransactionCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   _formatDate(transaction.transactionDate),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                     fontSize: 11,
                   ),
@@ -524,7 +524,7 @@ class _TransactionCard extends StatelessWidget {
             children: [
               Text(
                 '${isExpense ? '-' : '+'}${_formatAmount(transaction.amount)}',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: amountColor,
                   fontSize: 15,
@@ -533,7 +533,7 @@ class _TransactionCard extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 transaction.currency,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   fontSize: 9,
                 ),
@@ -751,7 +751,7 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                     children: [
                       Text(
                         transaction.description ?? transaction.category.nameTr,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                           color: Theme.of(context).colorScheme.onSurface,
@@ -762,7 +762,7 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         transaction.category.nameTr,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           fontSize: 13,
                         ),
@@ -770,7 +770,7 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         _formatDateHelper(transaction.transactionDate),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                           fontSize: 12,
                         ),
@@ -787,7 +787,7 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                   children: [
                     Text(
                       '${transaction.type == 'expense' ? '-' : '+'}${_formatAmount(transaction.amount)}',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
@@ -796,7 +796,7 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       transaction.currency,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                         fontSize: 11,
                       ),
@@ -840,7 +840,7 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                         const SizedBox(width: 12),
                         Text(
                           'Düzenle',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w500,
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 15,
@@ -868,7 +868,7 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                         const SizedBox(width: 12),
                         Text(
                           'Sil',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w500,
                             color: Colors.red[600],
                             fontSize: 15,

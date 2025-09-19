@@ -201,7 +201,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                           padding: const EdgeInsets.only(bottom: 4),
                           child: Text(
                             '• $error',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.error,
                             ),
                           ),

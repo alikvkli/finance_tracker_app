@@ -3,8 +3,8 @@ import 'categories_api_model.dart';
 
 class RecurringTransactionModel extends Equatable {
   final int id;
-  final int userId;
-  final int categoryId;
+  final String userId;
+  final String categoryId;
   final String type;
   final String amount;
   final String currency;
@@ -43,8 +43,8 @@ class RecurringTransactionModel extends Equatable {
   factory RecurringTransactionModel.fromJson(Map<String, dynamic> json) {
     return RecurringTransactionModel(
       id: json['id'] as int,
-      userId: json['user_id'] as int,
-      categoryId: json['category_id'] as int,
+      userId: json['user_id'] as String,
+      categoryId: json['category_id'] as String,
       type: json['type'] as String,
       amount: json['amount'] as String,
       currency: json['currency'] as String,

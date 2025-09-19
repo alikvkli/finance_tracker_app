@@ -75,7 +75,7 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
           Expanded(
             child: Text(
               'Hatırlatıcılar',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 24,
@@ -201,7 +201,7 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                       const SizedBox(height: 2),
                       Text(
                         '${state.transactions.length} işlem listeleniyor',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -310,7 +310,7 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
           const SizedBox(width: 12),
           Text(
             'Daha fazla hatırlatıcı yükleniyor...',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               fontSize: 14,
             ),
@@ -599,7 +599,7 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
               // Title
               Text(
                 'Çıkış Yap',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
@@ -771,7 +771,7 @@ class _RecurringTransactionCard extends StatelessWidget {
                   children: [
                     Text(
                       transaction.description ?? transaction.category.nameTr,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
                         color: Theme.of(context).colorScheme.onSurface,
@@ -799,7 +799,7 @@ class _RecurringTransactionCard extends StatelessWidget {
                           ),
                           child: Text(
                             transaction.recurringTypeDisplayName,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.primary,
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -849,7 +849,7 @@ class _RecurringTransactionCard extends StatelessWidget {
                 children: [
                   Text(
                     '${isExpense ? '-' : '+'}${_formatAmount(transaction.amountAsDouble)}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: amountColor,
                       fontSize: 16,
@@ -858,7 +858,7 @@ class _RecurringTransactionCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     transaction.currency,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                       fontSize: 10,
                     ),
@@ -947,7 +947,7 @@ class _RecurringTransactionCard extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   '${_formatDate(transaction.startDate)} - ${_formatDate(transaction.endDate)}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 12,
                   ),
@@ -962,7 +962,7 @@ class _RecurringTransactionCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     '${transaction.reminderCount} hatırlatma',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
@@ -1385,7 +1385,7 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
                         children: [
                           Text(
                             'Bitiş Tarihi',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontSize: 12,
                             ),
