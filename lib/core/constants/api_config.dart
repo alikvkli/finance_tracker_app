@@ -1,6 +1,7 @@
 class ApiConfig {
   // Base API URL
-  static const String baseUrl = 'https://finans.kiracilarim.com';
+  static const String baseUrl = 'http://127.0.0.1:8000';
+  //'https://finans.kiracilarim.com';
   
   // API Endpoints
   static const String registerEndpoint = '/api/register';

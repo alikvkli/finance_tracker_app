@@ -1,6 +1,46 @@
 import 'package:equatable/equatable.dart';
 import 'transaction_model.dart';
 
+class TransactionSummary extends Equatable {
+  final double totalIncome;
+  final double totalExpense;
+  final double netAmount;
+  final int totalTransactionCount;
+
+  const TransactionSummary({
+    required this.totalIncome,
+    required this.totalExpense,
+    required this.netAmount,
+    required this.totalTransactionCount,
+  });
+
+  factory TransactionSummary.fromJson(Map<String, dynamic> json) {
+    return TransactionSummary(
+      totalIncome: (json['total_income'] as num).toDouble(),
+      totalExpense: (json['total_expense'] as num).toDouble(),
+      netAmount: (json['net_amount'] as num).toDouble(),
+      totalTransactionCount: json['total_transaction_count'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total_income': totalIncome,
+      'total_expense': totalExpense,
+      'net_amount': netAmount,
+      'total_transaction_count': totalTransactionCount,
+    };
+  }
+
+  @override
+  List<Object?> get props => [
+    totalIncome,
+    totalExpense,
+    netAmount,
+    totalTransactionCount,
+  ];
+}
+
 class PaginationModel extends Equatable {
   final int currentPage;
   final int lastPage;
@@ -61,12 +101,14 @@ class TransactionsResponse extends Equatable {
   final String message;
   final List<TransactionModel> data;
   final PaginationModel pagination;
+  final TransactionSummary summary;
 
   const TransactionsResponse({
     required this.success,
     required this.message,
     required this.data,
     required this.pagination,
+    required this.summary,
   });
 
   factory TransactionsResponse.fromJson(Map<String, dynamic> json) {
@@ -77,6 +119,7 @@ class TransactionsResponse extends Equatable {
           .map((item) => TransactionModel.fromJson(item as Map<String, dynamic>))
           .toList(),
       pagination: PaginationModel.fromJson(json['pagination'] as Map<String, dynamic>),
+      summary: TransactionSummary.fromJson(json['summary'] as Map<String, dynamic>),
     );
   }
 
@@ -86,9 +129,10 @@ class TransactionsResponse extends Equatable {
       'message': message,
       'data': data.map((item) => item.toJson()).toList(),
       'pagination': pagination.toJson(),
+      'summary': summary.toJson(),
     };
   }
 
   @override
-  List<Object?> get props => [success, message, data, pagination];
+  List<Object?> get props => [success, message, data, pagination, summary];
 }

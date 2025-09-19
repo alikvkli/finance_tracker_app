@@ -75,20 +75,12 @@ class DashboardController extends StateNotifier<DashboardState> {
         endDate: endDate,
       );
 
-      final income = response.data
-          .where((t) => t.isIncome)
-          .fold(0.0, (sum, t) => sum + t.amountAsDouble);
-
-      final expense = response.data
-          .where((t) => t.isExpense)
-          .fold(0.0, (sum, t) => sum + t.amountAsDouble);
-
       state = state.copyWith(
         transactions: response.data,
         isLoading: false,
-        totalIncome: income,
-        totalExpense: expense,
-        balance: income - expense,
+        totalIncome: response.summary.totalIncome,
+        totalExpense: response.summary.totalExpense,
+        balance: response.summary.netAmount,
       );
     } catch (e) {
       state = state.copyWith(
