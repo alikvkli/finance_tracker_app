@@ -8,12 +8,15 @@ import '../../shared/widgets/custom_snackbar.dart';
 class UnifiedTransactionList extends ConsumerWidget {
   final List<TransactionModel> transactions;
   final bool isLoading;
+  final bool isLoadingMore;
   final String? error;
   final bool enableSwipeToDelete;
   final int? maxItems;
   final EdgeInsets? padding;
   final Future<void> Function()? onRefresh;
   final Future<void> Function(TransactionModel)? onDelete;
+  final Future<void> Function()? onLoadMore;
+  final bool hasMorePages;
   final Widget Function()? skeletonBuilder;
   final String? emptyTitle;
   final String? emptySubtitle;
@@ -23,12 +26,15 @@ class UnifiedTransactionList extends ConsumerWidget {
     super.key,
     required this.transactions,
     required this.isLoading,
+    this.isLoadingMore = false,
     this.error,
     this.enableSwipeToDelete = false,
     this.maxItems,
     this.padding,
     this.onRefresh,
     this.onDelete,
+    this.onLoadMore,
+    this.hasMorePages = false,
     this.skeletonBuilder,
     this.emptyTitle,
     this.emptySubtitle,
@@ -53,12 +59,32 @@ class UnifiedTransactionList extends ConsumerWidget {
         ? transactions.take(maxItems!).toList()
         : transactions;
 
+    // Calculate total item count (transactions + loading indicator)
+    final totalItemCount = displayTransactions.length + 
+        (hasMorePages && isLoadingMore ? 1 : 0);
+
     return RefreshIndicator(
       onRefresh: onRefresh ?? () async {},
       child: ListView.builder(
         padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: displayTransactions.length,
+        itemCount: totalItemCount,
         itemBuilder: (context, index) {
+          // Show loading indicator at the end if loading more
+          if (index == displayTransactions.length && hasMorePages && isLoadingMore) {
+            return _buildLoadingMoreIndicator();
+          }
+
+          // Trigger load more when near the end
+          if (index == displayTransactions.length - 3 && 
+              hasMorePages && 
+              !isLoadingMore && 
+              onLoadMore != null &&
+              maxItems == null) { // Only for full lists, not dashboard preview
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              onLoadMore!();
+            });
+          }
+
           final transaction = displayTransactions[index];
           return enableSwipeToDelete && onDelete != null
               ? _SwipeableTransactionCard(
@@ -67,6 +93,37 @@ class UnifiedTransactionList extends ConsumerWidget {
                 )
               : _TransactionCard(transaction: transaction);
         },
+      ),
+    );
+  }
+
+  Widget _buildLoadingMoreIndicator() {
+    return Builder(
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Yükleniyor...',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

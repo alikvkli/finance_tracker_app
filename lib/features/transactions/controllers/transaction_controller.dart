@@ -8,6 +8,7 @@ import '../../../core/di/injection.dart';
 class TransactionState extends Equatable {
   final List<TransactionModel> transactions;
   final bool isLoading;
+  final bool isLoadingMore;
   final String? error;
   final DateTime selectedStartDate;
   final DateTime selectedEndDate;
@@ -16,10 +17,13 @@ class TransactionState extends Equatable {
   final double totalIncome;
   final double totalExpense;
   final double balance;
+  final int currentPage;
+  final bool hasMorePages;
 
   const TransactionState({
     this.transactions = const [],
     this.isLoading = false,
+    this.isLoadingMore = false,
     this.error,
     required this.selectedStartDate,
     required this.selectedEndDate,
@@ -28,11 +32,14 @@ class TransactionState extends Equatable {
     this.totalIncome = 0.0,
     this.totalExpense = 0.0,
     this.balance = 0.0,
+    this.currentPage = 1,
+    this.hasMorePages = false,
   });
 
   TransactionState copyWith({
     List<TransactionModel>? transactions,
     bool? isLoading,
+    bool? isLoadingMore,
     String? error,
     DateTime? selectedStartDate,
     DateTime? selectedEndDate,
@@ -41,12 +48,15 @@ class TransactionState extends Equatable {
     double? totalIncome,
     double? totalExpense,
     double? balance,
+    int? currentPage,
+    bool? hasMorePages,
     bool clearSearchQuery = false,
     bool clearSelectedCategoryId = false,
   }) {
     return TransactionState(
       transactions: transactions ?? this.transactions,
       isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       error: error,
       selectedStartDate: selectedStartDate ?? this.selectedStartDate,
       selectedEndDate: selectedEndDate ?? this.selectedEndDate,
@@ -57,6 +67,8 @@ class TransactionState extends Equatable {
       totalIncome: totalIncome ?? this.totalIncome,
       totalExpense: totalExpense ?? this.totalExpense,
       balance: balance ?? this.balance,
+      currentPage: currentPage ?? this.currentPage,
+      hasMorePages: hasMorePages ?? this.hasMorePages,
     );
   }
 
@@ -64,6 +76,7 @@ class TransactionState extends Equatable {
   List<Object?> get props => [
     transactions,
     isLoading,
+    isLoadingMore,
     error,
     selectedStartDate,
     selectedEndDate,
@@ -72,6 +85,8 @@ class TransactionState extends Equatable {
     totalIncome,
     totalExpense,
     balance,
+    currentPage,
+    hasMorePages,
   ];
 }
 
@@ -96,13 +111,18 @@ class TransactionController extends StateNotifier<TransactionState> {
     return DateTime(now.year, now.month + 1, 0);
   }
 
-  Future<void> loadTransactions() async {
+  Future<void> loadTransactions({bool isRefresh = false}) async {
     print('🚀 Loading transactions with filters:');
     print('📅 Date range: ${state.selectedStartDate} to ${state.selectedEndDate}');
     print('🔍 Search: ${state.searchQuery}');
     print('🏷️ Category ID: ${state.selectedCategoryId}');
     
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(
+      isLoading: true, 
+      error: null,
+      currentPage: 1,
+      hasMorePages: false,
+    );
 
     try {
       final response = await _transactionService.getTransactions(
@@ -110,9 +130,11 @@ class TransactionController extends StateNotifier<TransactionState> {
         endDate: state.selectedEndDate,
         search: state.searchQuery,
         categoryId: state.selectedCategoryId,
+        page: 1,
       );
 
       print('✅ Loaded ${response.data.length} transactions');
+      print('📄 Pagination: Page ${response.pagination.currentPage}/${response.pagination.lastPage}');
       print('💰 Summary - Income: ${response.summary.totalIncome}, Expense: ${response.summary.totalExpense}, Balance: ${response.summary.netAmount}');
       
       state = state.copyWith(
@@ -121,10 +143,49 @@ class TransactionController extends StateNotifier<TransactionState> {
         totalIncome: response.summary.totalIncome,
         totalExpense: response.summary.totalExpense,
         balance: response.summary.netAmount,
+        currentPage: response.pagination.currentPage,
+        hasMorePages: response.pagination.hasMorePages,
       );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
+        error: e.toString().replaceFirst('Exception: ', ''),
+      );
+    }
+  }
+
+  Future<void> loadMoreTransactions() async {
+    if (state.isLoadingMore || !state.hasMorePages) return;
+    
+    print('📄 Loading more transactions - Page ${state.currentPage + 1}');
+    
+    state = state.copyWith(isLoadingMore: true);
+
+    try {
+      final response = await _transactionService.getTransactions(
+        startDate: state.selectedStartDate,
+        endDate: state.selectedEndDate,
+        search: state.searchQuery,
+        categoryId: state.selectedCategoryId,
+        page: state.currentPage + 1,
+      );
+
+      print('✅ Loaded ${response.data.length} more transactions');
+      print('📄 New pagination: Page ${response.pagination.currentPage}/${response.pagination.lastPage}');
+      
+      // Mevcut transactions'lara yenilerini ekle
+      final allTransactions = [...state.transactions, ...response.data];
+      
+      state = state.copyWith(
+        transactions: allTransactions,
+        isLoadingMore: false,
+        currentPage: response.pagination.currentPage,
+        hasMorePages: response.pagination.hasMorePages,
+        // Summary'yi güncelleme - ilk sayfadan gelen summary geçerli
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoadingMore: false,
         error: e.toString().replaceFirst('Exception: ', ''),
       );
     }

@@ -437,9 +437,11 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             child: UnifiedTransactionList(
               transactions: dashboardState.transactions,
               isLoading: false, // Already handled at page level
+              isLoadingMore: dashboardState.isLoadingMore,
               error: dashboardState.error,
               enableSwipeToDelete: true, // Enable swipe to delete on dashboard
-              maxItems: 5, // Show max 5 items on dashboard
+              maxItems: null, // Remove limit to enable infinite scroll
+              hasMorePages: dashboardState.hasMorePages,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               onRefresh: () async {
                 ref.read(dashboardControllerProvider.notifier).refreshDashboard();
@@ -447,6 +449,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               onDelete: (transaction) async {
                 // Delete transaction and refresh dashboard
                 await ref.read(dashboardControllerProvider.notifier).deleteTransaction(transaction.id);
+              },
+              onLoadMore: () async {
+                // Load more transactions for infinite scroll
+                await ref.read(dashboardControllerProvider.notifier).loadMoreDashboardData();
               },
               skeletonBuilder: () => const DashboardTransactionSkeleton(),
               emptyTitle: 'Henüz işlem yok',

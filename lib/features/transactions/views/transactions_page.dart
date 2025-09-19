@@ -63,8 +63,10 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                       child: UnifiedTransactionList(
                         transactions: transactionState.transactions,
                         isLoading: false, // Already handled at page level
+                        isLoadingMore: transactionState.isLoadingMore,
                         error: transactionState.error,
                         enableSwipeToDelete: true, // Enable swipe to delete
+                        hasMorePages: transactionState.hasMorePages,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         onRefresh: () async {
                           ref.read(transactionControllerProvider.notifier).refreshTransactions();
@@ -72,6 +74,10 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                         onDelete: (transaction) async {
                           // Delete transaction and refresh list
                           await ref.read(transactionControllerProvider.notifier).deleteTransaction(transaction.id);
+                        },
+                        onLoadMore: () async {
+                          // Load more transactions for infinite scroll
+                          await ref.read(transactionControllerProvider.notifier).loadMoreTransactions();
                         },
                         skeletonBuilder: () => const TransactionsPageSkeleton(),
                         emptyTitle: 'Henüz işlem yok',

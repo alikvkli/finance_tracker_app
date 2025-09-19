@@ -19,6 +19,7 @@ class TransactionService {
     DateTime? endDate,
     String? search,
     int? categoryId,
+    int page = 1,
   }) async {
     try {
       final token = _storageService.getAuthToken();
@@ -44,6 +45,8 @@ class TransactionService {
         queryParams['category_id'] = categoryId;
       }
       
+      // Pagination parameter
+      queryParams['page'] = page;
       
       final response = await _dio.get(
         ApiConfig.transactionsEndpoint,
