@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class CustomBottomNavigation extends StatelessWidget {
@@ -14,51 +15,55 @@ class CustomBottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.95),
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+            width: 0.5,
           ),
-        ],
+        ),
       ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(
-                context,
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home,
-                label: 'Ana Sayfa',
-                index: 0,
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildNavItem(
+                    context,
+                    icon: Icons.house_outlined,
+                    activeIcon: Icons.house,
+                    label: 'Ana Sayfa',
+                    index: 0,
+                  ),
+                  _buildNavItem(
+                    context,
+                    icon: Icons.list_alt_outlined,
+                    activeIcon: Icons.list_alt,
+                    label: 'İşlemler',
+                    index: 1,
+                  ),
+                  _buildAddButton(context),
+                  _buildNavItem(
+                    context,
+                    icon: Icons.autorenew_outlined,
+                    activeIcon: Icons.autorenew,
+                    label: 'Hatırlatıcılar',
+                    index: 2,
+                  ),
+                  _buildNavItem(
+                    context,
+                    icon: Icons.person_outline,
+                    activeIcon: Icons.person,
+                    label: 'Profil',
+                    index: 3,
+                  ),
+                ],
               ),
-              _buildNavItem(
-                context,
-                icon: Icons.receipt_long_outlined,
-                activeIcon: Icons.receipt_long,
-                label: 'İşlemler',
-                index: 1,
-              ),
-              _buildAddButton(context),
-              _buildNavItem(
-                context,
-                icon: Icons.repeat_outlined,
-                activeIcon: Icons.repeat,
-                label: 'Hatırlatıcılar',
-                index: 2,
-              ),
-              _buildNavItem(
-                context,
-                icon: Icons.person_outline,
-                activeIcon: Icons.person,
-                label: 'Profil',
-                index: 3,
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -74,58 +79,80 @@ class CustomBottomNavigation extends StatelessWidget {
   }) {
     final isActive = currentIndex == index;
     
-    return GestureDetector(
-      onTap: () => onTap(index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isActive ? activeIcon : icon,
-              color: isActive 
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onTap(index),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isActive ? activeIcon : icon,
                 color: isActive 
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                fontSize: 12
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                size: 26,
               ),
-            ),
-          ],
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: isActive 
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 10,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildAddButton(BuildContext context) {
-    return GestureDetector(
-      onTap: () => onTap(4), // Add transaction
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 28,
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onTap(4), // Add transaction
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Ekle',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 10,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );

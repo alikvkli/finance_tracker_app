@@ -3,7 +3,7 @@ import '../../transactions/models/categories_api_model.dart';
 
 class NotificationModel extends Equatable {
   final int id;
-  final int userId;
+  final String userId;
   final String title;
   final String message;
   final String type;
@@ -33,7 +33,7 @@ class NotificationModel extends Equatable {
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
       id: json['id'] as int? ?? 0,
-      userId: json['user_id'] as int? ?? 0,
+      userId: json['user_id'] as String? ?? '',
       title: json['title'] as String? ?? '',
       message: json['message'] as String? ?? '',
       type: json['type'] as String? ?? 'system',
@@ -96,7 +96,7 @@ class NotificationModel extends Equatable {
 
 class NotificationAutoFill extends Equatable {
   final int? recurringTransactionId;
-  final int categoryId;
+  final String categoryId;
   final double amount;
   final String description;
   final String type;
@@ -124,7 +124,7 @@ class NotificationAutoFill extends Equatable {
   factory NotificationAutoFill.fromJson(Map<String, dynamic> json) {
     return NotificationAutoFill(
       recurringTransactionId: json['recurring_transaction_id'] as int?,
-      categoryId: json['category_id'] as int? ?? 0,
+      categoryId: json['category_id'] as String? ?? '',
       amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
       description: json['description'] as String? ?? '',
       type: json['type'] as String? ?? 'expense',
