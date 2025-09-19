@@ -276,6 +276,7 @@ class _SwipeableTransactionCard extends ConsumerWidget {
       barrierDismissible: true,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
         child: Container(
           padding: const EdgeInsets.all(24),
           child: Column(
