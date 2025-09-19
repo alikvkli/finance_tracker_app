@@ -15,7 +15,7 @@ class ProfilePage extends ConsumerStatefulWidget {
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   final _passwordController = TextEditingController();
   bool _isDeleting = false;
-  
+
   String? _userEmail;
   String? _userName;
   String? _userSurname;
@@ -33,7 +33,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     _userName = storageService.getUserName();
     _userSurname = storageService.getUserSurname();
     _userPhone = storageService.getUserPhone();
-    
+
     // Trigger rebuild to show loaded data
     if (mounted) {
       setState(() {});
@@ -57,11 +57,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             children: [
               // Header
               _buildProfileHeader(context),
-              
+
               // Content
-              Expanded(
-                child: _buildProfileContent(context),
-              ),
+              Expanded(child: _buildProfileContent(context)),
             ],
           ),
         ),
@@ -71,98 +69,114 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Widget _buildProfileHeader(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary,
-            Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
         ),
-        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         children: [
-          // Top Row - Logout Button
+          // Top Row - Title and Logout
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              Text(
+                'Profil',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 28,
+                ),
+              ),
+
+              const Spacer(),
+
               IconButton(
                 onPressed: () => _showLogoutDialog(context),
                 style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(8),
-                  minimumSize: const Size(36, 36),
-                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                  padding: const EdgeInsets.all(12),
+                  minimumSize: const Size(44, 44),
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.errorContainer.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 tooltip: 'Çıkış Yap',
-                icon: const Icon(
+                icon: Icon(
                   Icons.logout_rounded,
-                  color: Colors.white,
-                  size: 18,
+                  color: Theme.of(context).colorScheme.error,
+                  size: 20,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 32),
 
-          // Profile Avatar
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.3),
-                width: 3,
+          // Profile Info
+          Row(
+            children: [
+              // Simple Avatar
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.person_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 32,
+                ),
               ),
-            ),
-            child: const Icon(
-              Icons.person_rounded,
-              color: Colors.white,
-              size: 40,
-            ),
-          ),
 
-          const SizedBox(height: 16),
+              const SizedBox(width: 20),
 
-          // User Name
-          Text(
-            _userName != null && _userSurname != null 
-                ? '$_userName $_userSurname'
-                : 'Merhaba',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontSize: 24,
-            ),
-            textAlign: TextAlign.center,
-          ),
+              // User Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _userName != null && _userSurname != null
+                          ? '$_userName $_userSurname'
+                          : 'Merhaba',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 20,
+                      ),
+                    ),
 
-          const SizedBox(height: 8),
+                    const SizedBox(height: 4),
 
-          // User Email
-          Text(
-            _userEmail ?? 'E-posta bilgisi yok',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.center,
+                    Text(
+                      _userEmail ?? 'E-posta bilgisi yok',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -171,9 +185,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Widget _buildProfileContent(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      padding: const EdgeInsets.all(20),
       child: Column(
-        children: [          
+        children: [
           // Danger Zone
           _buildDangerZone(context),
         ],
@@ -182,131 +196,66 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   }
 
   Widget _buildDangerZone(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.red[50]!,
-            Colors.red[50]!.withValues(alpha: 0.7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.red.withValues(alpha: 0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.red.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Modern Section Title
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.red[100],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.warning_rounded,
-                  color: Colors.red[700],
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Uyarı',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red[700],
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          Text(
-            'Bu işlemler geri alınamaz ve tüm verileriniz kalıcı olarak silinir. Lütfen dikkatli olun.',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Simple Section Title
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 16),
+          child: Text(
+            'Hesap Yönetimi',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.red[700],
-              fontSize: 14,
-              height: 1.5,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 18,
             ),
           ),
-          
-          const SizedBox(height: 20),
-          
-          // Premium Delete Account Button
-          Container(
-            width: double.infinity,
-            height: 56,
-            decoration: BoxDecoration(
-              gradient: _isDeleting ? null : LinearGradient(
-                colors: [
-                  Colors.red[600]!,
-                  Colors.red[700]!,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+        ),
+
+        // Simple Delete Button
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _isDeleting
+                ? null
+                : () => _showDeleteAccountDialog(context),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(
+                color: Theme.of(context).colorScheme.error,
+                width: 1.5,
               ),
-              color: _isDeleting ? Colors.grey[300] : null,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: _isDeleting ? null : [
-                BoxShadow(
-                  color: Colors.red.withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: ElevatedButton.icon(
-              onPressed: _isDeleting ? null : () => _showDeleteAccountDialog(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                foregroundColor: Colors.white,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              icon: _isDeleting
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[600]!),
+            icon: _isDeleting
+                ? SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).colorScheme.error,
                       ),
-                    )
-                  : const Icon(
-                      Icons.delete_forever_rounded,
-                      size: 22,
                     ),
-              label: Text(
-                _isDeleting ? 'Hesap Siliniyor...' : 'Hesabı Kalıcı Olarak Sil',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                  )
+                : Icon(
+                    Icons.delete_outline_rounded,
+                    color: Theme.of(context).colorScheme.error,
+                    size: 20,
+                  ),
+            label: Text(
+              _isDeleting ? 'Hesap Siliniyor...' : 'Hesabı Sil',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.error,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -314,29 +263,19 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         contentPadding: const EdgeInsets.all(24),
         content: StatefulBuilder(
           builder: (context, setDialogState) {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Icon
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: Colors.red[50],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.warning_outlined,
-                    color: Colors.red[600],
-                    size: 32,
-                  ),
+                // Simple Icon
+                Icon(
+                  Icons.delete_outline_rounded,
+                  color: Theme.of(context).colorScheme.error,
+                  size: 48,
                 ),
 
                 const SizedBox(height: 20),
@@ -357,7 +296,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   'Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve tüm verileriniz silinecektir.',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                     height: 1.5,
                   ),
                 ),
@@ -402,7 +343,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         },
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
-                            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.3),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -412,7 +355,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         child: Text(
                           'İptal',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -424,7 +369,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     // Delete Button
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: _isDeleting ? null : () => _deleteAccount(context),
+                        onPressed: _isDeleting
+                            ? null
+                            : () => _deleteAccount(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red[600],
                           foregroundColor: Colors.white,
@@ -443,7 +390,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                     height: 16,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
@@ -457,9 +406,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               )
                             : const Text(
                                 'Hesabı Sil',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.w600),
                               ),
                       ),
                     ),
@@ -475,10 +422,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Future<void> _deleteAccount(BuildContext context) async {
     if (_passwordController.text.trim().isEmpty) {
-      CustomSnackBar.showError(
-        context,
-        message: 'Lütfen şifrenizi giriniz',
-      );
+      CustomSnackBar.showError(context, message: 'Lütfen şifrenizi giriniz');
       return;
     }
 
@@ -490,26 +434,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       final authService = ref.read(authServiceProvider);
       final storageService = ref.read(storageServiceProvider);
       final token = storageService.getAuthToken();
-      
+
       if (token == null) {
         throw Exception('Oturum bulunamadı');
       }
-      
+
       await authService.deleteAccount(_passwordController.text.trim(), token);
-      
+
       if (mounted) {
         Navigator.of(context).pop(); // Close dialog
-        
+
         // Clear local storage
         final storageService = ref.read(storageServiceProvider);
         await storageService.clearAuthToken();
-        
+
         // Navigate to onboarding and clear all data
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRouter.onboarding,
-          (route) => false,
-        );
-        
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil(AppRouter.onboarding, (route) => false);
+
         CustomSnackBar.showSuccess(
           context,
           message: 'Hesabınız başarıyla silindi',
@@ -517,10 +460,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       }
     } catch (e) {
       if (mounted) {
-        CustomSnackBar.showError(
-          context,
-          message: e.toString(),
-        );
+        CustomSnackBar.showError(context, message: e.toString());
       }
     } finally {
       if (mounted) {
@@ -536,27 +476,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         contentPadding: const EdgeInsets.all(24),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Icon
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: Colors.orange[50],
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.logout_rounded,
-                color: Colors.orange[600],
-                size: 32,
-              ),
+            // Simple Icon
+            Icon(
+              Icons.logout_rounded,
+              color: Theme.of(context).colorScheme.primary,
+              size: 48,
             ),
 
             const SizedBox(height: 20),
@@ -577,7 +507,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
                 height: 1.5,
               ),
             ),
@@ -593,7 +525,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     onPressed: () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.3),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -603,7 +537,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     child: Text(
                       'İptal',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -626,19 +562,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange[600],
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
                     ),
                     child: const Text(
                       'Çıkış Yap',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
