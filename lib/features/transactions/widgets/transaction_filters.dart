@@ -294,7 +294,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             const Spacer(),
             TextButton(
               onPressed: () => _selectPreviousMonth(),
-              child: const Text('Önceki Ay'),
+              child: const Text('Geçen Ay'),
             ),
 
             const SizedBox(width: 8),

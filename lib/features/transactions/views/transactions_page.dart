@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/transaction_controller.dart';
-import '../widgets/transaction_list.dart';
-import '../../../core/routing/app_router.dart';
-import '../../auth/controllers/auth_controller.dart';
+import '../../../shared/widgets/financial_header.dart';
+import '../../../shared/widgets/month_badge.dart';
+import '../../../shared/widgets/unified_transaction_list.dart';
+import '../../../shared/widgets/transaction_skeleton.dart';
 
 class TransactionsPage extends ConsumerStatefulWidget {
   const TransactionsPage({super.key});
@@ -25,30 +26,120 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final transactionState = ref.watch(transactionControllerProvider);
+    
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Custom App Bar
-            _buildAppBar(context),
-            
-            // Content
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: TransactionList(),
+        child: transactionState.isLoading
+            ? _buildTransactionsPageSkeleton(context)
+            : Column(
+                children: [
+                  // Financial Header
+                  FinancialHeader(
+                    title: 'İşlemler',
+                    balance: transactionState.balance,
+                    totalIncome: transactionState.totalIncome,
+                    totalExpense: transactionState.totalExpense,
+                    monthBadge: MonthBadge.dateRange(
+                      start: transactionState.selectedStartDate,
+                      end: transactionState.selectedEndDate,
+                    ),
+                    onNotificationTap: () {
+                      // Notification action
+                    },
+                  ),
+                  
+                  // Content
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: UnifiedTransactionList(
+                        transactions: transactionState.transactions,
+                        isLoading: false, // Already handled at page level
+                        error: transactionState.error,
+                        enableSwipeToDelete: true, // Enable swipe to delete
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        onRefresh: () async {
+                          ref.read(transactionControllerProvider.notifier).refreshTransactions();
+                        },
+                        onDelete: (transaction) async {
+                          // Delete transaction and refresh list
+                          await ref.read(transactionControllerProvider.notifier).deleteTransaction(transaction.id);
+                        },
+                        skeletonBuilder: () => const TransactionsPageSkeleton(),
+                        emptyTitle: 'Henüz işlem yok',
+                        emptySubtitle: 'Seçilen tarih aralığında herhangi bir işlem bulunamadı',
+                        emptyActionButton: _buildClearFiltersButton(context, transactionState),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
-    final transactionState = ref.watch(transactionControllerProvider);
+  Widget? _buildClearFiltersButton(BuildContext context, TransactionState transactionState) {
+    // Eğer herhangi bir filtre aktifse buton göster
+    final now = DateTime.now();
+    final defaultStartDate = DateTime(now.year, now.month, 1);
+    final defaultEndDate = DateTime(now.year, now.month + 1, 0);
     
+    final isDateFiltered = transactionState.selectedStartDate != defaultStartDate ||
+                          transactionState.selectedEndDate != defaultEndDate;
+    final isCategoryFiltered = transactionState.selectedCategoryId != null;
+    final isSearchFiltered = transactionState.searchQuery != null && 
+                            transactionState.searchQuery!.isNotEmpty;
+    
+    final isFiltered = isDateFiltered || isCategoryFiltered || isSearchFiltered;
+    
+    if (!isFiltered) return null;
+    
+    return Container(
+      margin: const EdgeInsets.only(top: 24),
+      child: Column(
+        children: [          
+            // Clear filters button
+            ElevatedButton.icon(
+              onPressed: () {
+                // Tüm filtreleri temizle
+                ref.read(transactionControllerProvider.notifier).clearFilters();
+              },
+              icon: const Icon(Icons.clear_all, size: 18),
+              label: const Text('Filtreleri Temizle'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+
+
+  Widget _buildTransactionsPageSkeleton(BuildContext context) {
+    return Column(
+      children: [
+        // Header Skeleton
+        _buildHeaderSkeleton(context),
+        
+        // Transactions List Skeleton
+        Expanded(
+          child: _buildTransactionsListSkeleton(context),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeaderSkeleton(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       decoration: BoxDecoration(
@@ -67,406 +158,182 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
       ),
       child: Column(
         children: [
-          // Top Row with Title and Action Buttons
+          // Top Row Skeleton
           Row(
             children: [
-              // App Title
-              Expanded(
-                child: Text(
-                  'İşlemler',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 24,
-                  ),
-                ),
-              ),
+              // App Title Skeleton
+              _buildSkeletonContainer(width: 100, height: 24),
+              const Spacer(),
               
-              // Action Buttons
+              // Action Buttons Skeleton
               Row(
                 children: [
-                  // Notification Button
-                  IconButton(
-                    onPressed: () {
-                      // Notification action
-                    },
-                    icon: Icon(
-                      Icons.notifications_outlined,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                      size: 22,
-                    ),
-                    tooltip: 'Bildirimler',
-                    style: IconButton.styleFrom(
-                      padding: const EdgeInsets.all(8),
-                      minimumSize: const Size(40, 40),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                  _buildSkeletonContainer(width: 40, height: 40, isCircle: true),
+                  const SizedBox(width: 4),
+                  _buildSkeletonContainer(width: 40, height: 40, isCircle: true),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Financial Overview Skeleton
+          Column(
+            children: [
+              // Month Badge Skeleton
+              _buildSkeletonContainer(width: 120, height: 28, borderRadius: 16),
+              
+              const SizedBox(height: 16),
+              
+              // Net Balance Label Skeleton
+              _buildSkeletonContainer(width: 80, height: 14),
+              
+              const SizedBox(height: 8),
+              
+              // Net Balance Amount Skeleton
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildSkeletonContainer(width: 180, height: 32),
+                  const SizedBox(width: 8),
+                  _buildSkeletonContainer(width: 20, height: 20, isCircle: true),
+                ],
+              ),
+              
+              const SizedBox(height: 32),
+              
+              // Income & Expense Row Skeleton
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildSkeletonContainer(width: 16, height: 16, isCircle: true),
+                            const SizedBox(width: 6),
+                            _buildSkeletonContainer(width: 40, height: 12),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        _buildSkeletonContainer(width: 80, height: 16),
+                      ],
                     ),
                   ),
-                  
-                  const SizedBox(width: 4),
-                  
-                  // Logout Button
-                  IconButton(
-                    onPressed: () => _showLogoutDialog(context),
-                    icon: Icon(
-                      Icons.logout_rounded,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                      size: 22,
-                    ),
-                    tooltip: 'Çıkış Yap',
-                    style: IconButton.styleFrom(
-                      padding: const EdgeInsets.all(8),
-                      minimumSize: const Size(40, 40),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                  Container(
+                    width: 1,
+                    height: 40,
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                  ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildSkeletonContainer(width: 16, height: 16, isCircle: true),
+                            const SizedBox(width: 6),
+                            _buildSkeletonContainer(width: 40, height: 12),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        _buildSkeletonContainer(width: 80, height: 16),
+                      ],
                     ),
                   ),
                 ],
               ),
             ],
           ),
-          
-          const SizedBox(height: 24),
-          
-          // Financial Overview
-          _buildFinancialOverview(context, transactionState),
         ],
       ),
     );
   }
 
-  Widget _buildFinancialOverview(BuildContext context, TransactionState transactionState) {
-    return Column(
-      children: [
-        // Net Balance - Primary Focus
-        _buildNetBalanceSection(context, transactionState.balance),
-        
-        const SizedBox(height: 32),
-        
-        // Income & Expense - Secondary
-        Row(
-          children: [
-            Expanded(
-              child: _buildStatItem(
-                context,
-                'Gelir',
-                _formatAmount(transactionState.totalIncome),
-                Icons.arrow_upward_rounded,
-                const Color(0xFF059669),
-              ),
-            ),
-            Container(
-              width: 1,
-              height: 40,
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-            ),
-            Expanded(
-              child: _buildStatItem(
-                context,
-                'Gider',
-                _formatAmount(transactionState.totalExpense),
-                Icons.arrow_downward_rounded,
-                const Color(0xFFDC2626),
-              ),
-            ),
-          ],
-        ),
-      ],
+  Widget _buildTransactionsListSkeleton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: 15, // Show more items for transactions page
+        itemBuilder: (context, index) => _buildTransactionItemSkeleton(context, index),
+      ),
     );
   }
 
-  Widget _buildNetBalanceSection(BuildContext context, double balance) {
-    final isPositive = balance >= 0;
-    final color = isPositive ? const Color(0xFF059669) : const Color(0xFFDC2626);
-    final transactionState = ref.watch(transactionControllerProvider);
-    
-    return Column(
-      children: [
-        // Month Badge
-        _buildMonthBadge(context, transactionState),
-        
-        const SizedBox(height: 16),
-        
-        // Net Balance Label
-        Text(
-          'Net Bakiye',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.3,
-          ),
-        ),
-        
-        const SizedBox(height: 8),
-        
-        // Net Balance Amount with Icon
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(
-              _formatAmount(balance),
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: color,
-                fontSize: 32,
-                letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Icon(
-              isPositive ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-              color: color,
-              size: 20,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatItem(BuildContext context, String label, String amount, IconData icon, Color color) {
-    return Column(
-      children: [
-        // Icon and Label Row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: color,
-              size: 16,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-        
-        const SizedBox(height: 8),
-        
-        // Amount
-        Text(
-          amount,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface,
-            fontSize: 16,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMonthBadge(BuildContext context, TransactionState transactionState) {
-    final monthNames = [
-      'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
-    ];
-    
-    final startDate = transactionState.selectedStartDate;
-    final endDate = transactionState.selectedEndDate;
-    
-    String monthText;
-    if (startDate.year == endDate.year && startDate.month == endDate.month) {
-      // Same month
-      monthText = '${monthNames[startDate.month - 1]} ${startDate.year}';
-    } else if (startDate.year == endDate.year) {
-      // Same year, different months
-      monthText = '${monthNames[startDate.month - 1]} - ${monthNames[endDate.month - 1]} ${startDate.year}';
-    } else {
-      // Different years
-      monthText = '${monthNames[startDate.month - 1]} ${startDate.year} - ${monthNames[endDate.month - 1]} ${endDate.year}';
-    }
-    
+  Widget _buildTransactionItemSkeleton(BuildContext context, int index) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      margin: EdgeInsets.only(bottom: index == 14 ? 0 : 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
         ),
-      ),
-      child: Text(
-        monthText,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  String _formatAmount(double amount) {
-    if (amount == 0) return '₺0,00';
-    
-    // Negatif değerleri pozitif yap
-    final absAmount = amount.abs();
-    
-    if (absAmount >= 1000000) {
-      return '₺${(absAmount / 1000000).toStringAsFixed(1)}M';
-    } else if (absAmount >= 1000) {
-      return '₺${(absAmount / 1000).toStringAsFixed(1)}K';
-    } else {
-      return '₺${absAmount.toStringAsFixed(0)}';
-    }
-  }
-
-
-
-
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        elevation: 20,
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+        ],
+      ),
+      child: Row(
+        children: [
+          // Category Icon Skeleton
+          _buildSkeletonContainer(width: 48, height: 48, borderRadius: 12),
+          
+          const SizedBox(width: 16),
+          
+          // Transaction Info Skeleton
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSkeletonContainer(width: double.infinity, height: 16),
+                const SizedBox(height: 6),
+                _buildSkeletonContainer(width: 120, height: 14),
+                const SizedBox(height: 4),
+                _buildSkeletonContainer(width: 80, height: 12),
+              ],
+            ),
+          ),
+          
+          const SizedBox(width: 12),
+          
+          // Amount Skeleton
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              // Icon Container
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.red.withValues(alpha: 0.2),
-                    width: 2,
-                  ),
-                ),
-                child: Icon(
-                  Icons.logout_rounded,
-                  color: Colors.red[600],
-                  size: 36,
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Title
-              Text(
-                'Çıkış Yap',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              
-              const SizedBox(height: 12),
-              
-              // Description
-              Text(
-                'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                  height: 1.5,
-                ),
-              ),
-              
-              const SizedBox(height: 32),
-              
-              // Action Buttons
-              Row(
-                children: [
-                  // Cancel Button
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        'İptal',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(width: 12),
-                  
-                  // Logout Button
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                        await ref.read(authControllerProvider.notifier).logout();
-                        if (mounted) {
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            AppRouter.login,
-                            (route) => false,
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[600],
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Çıkış Yap',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              _buildSkeletonContainer(width: 100, height: 16),
+              const SizedBox(height: 4),
+              _buildSkeletonContainer(width: 30, height: 10),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
 
+  Widget _buildSkeletonContainer({
+    double? width,
+    double? height,
+    double? borderRadius,
+    bool isCircle = false,
+  }) {
+    return Container(
+      width: width,
+      height: height ?? 16,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+        borderRadius: isCircle 
+            ? BorderRadius.circular((height ?? 16) / 2)
+            : BorderRadius.circular(borderRadius ?? 8),
+      ),
+    );
+  }
 }

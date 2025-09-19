@@ -104,6 +104,18 @@ class DashboardController extends StateNotifier<DashboardState> {
   Future<void> refreshDashboard() async {
     await loadDashboardData();
   }
+
+  Future<void> deleteTransaction(int transactionId) async {
+    try {
+      await _transactionService.deleteTransaction(transactionId);
+      // Refresh dashboard data after deletion
+      await refreshDashboard();
+    } catch (e) {
+      state = state.copyWith(
+        error: e.toString().replaceFirst('Exception: ', ''),
+      );
+    }
+  }
 }
 
 final dashboardControllerProvider =

@@ -13,6 +13,11 @@ Generate code, corrections, and refactorings that comply with the basic principl
   - Create necessary types.
 - Don't leave blank lines within a function.
 - One export per file.
+- For complex widgets, do not place them under `shared`. Only create shared widgets that are truly reusable across the app.  
+- Always follow SOLID principles when designing components.  
+- Instead of writing a single long file for a complex widget, split it into smaller, focused files for better maintainability and readability.
+
+
 
 ### Nomenclature
 
