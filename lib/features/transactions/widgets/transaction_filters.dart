@@ -18,6 +18,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
   String? _localSearchQuery;
   int? _localSelectedCategoryId;
   bool _isInitialized = false;
+  String _selectedCategoryType = 'income'; // 'income', 'expense'
 
   @override
   void initState() {
@@ -48,7 +49,6 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     _searchController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -280,10 +280,6 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
           controller: _searchController,
           decoration: InputDecoration(
             hintText: 'İşlem açıklaması...',
-            prefixIcon: Icon(
-              Icons.search,
-              color: Theme.of(context).colorScheme.primary,
-            ),
             suffixIcon: (_localSearchQuery?.isNotEmpty ?? false)
                 ? IconButton(
                     icon: Icon(
@@ -413,7 +409,6 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
               onPressed: () => _selectPreviousMonth(),
               child: const Text('Geçen Ay'),
             ),
-
             const SizedBox(width: 8),
             TextButton(
               onPressed: () => _selectCurrentMonth(),
@@ -460,9 +455,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
         Text(
           title,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.6),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 12,
           ),
         ),
@@ -483,9 +476,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               border: Border.all(
-                color: Theme.of(
-                  context,
-                ).colorScheme.outline.withValues(alpha: 0.3),
+                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
               ),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -502,16 +493,12 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     '${selectedDate.day.toString().padLeft(2, '0')}/'
                     '${selectedDate.month.toString().padLeft(2, '0')}/'
                     '${selectedDate.year}',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodySmall?.copyWith(fontSize: 12),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12),
                   ),
                 ),
                 Icon(
                   Icons.arrow_drop_down,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   size: 16,
                 ),
               ],
@@ -548,8 +535,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
 
     return _localSearchQuery != null ||
         _localSelectedCategoryId != null ||
-        (_selectedStartDate != null &&
-            _selectedStartDate != currentMonthStart) ||
+        (_selectedStartDate != null && _selectedStartDate != currentMonthStart) ||
         (_selectedEndDate != null && _selectedEndDate != currentMonthEnd);
   }
 
@@ -618,131 +604,408 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
 
         const SizedBox(height: 16),
 
-        // Gelir Kategorileri
-        if (incomeCategories.isNotEmpty) ...[
-          _buildCategorySectionHeader(context, 'Gelir', Icons.trending_up, const Color(0xFF059669)),
-          const SizedBox(height: 12),
-          _buildCategoryGrid(context, incomeCategories),
-          const SizedBox(height: 20),
-        ],
-        
-        // Gider Kategorileri
-        if (expenseCategories.isNotEmpty) ...[
-          _buildCategorySectionHeader(context, 'Gider', Icons.trending_down, const Color(0xFFDC2626)),
-          const SizedBox(height: 12),
-          _buildCategoryGrid(context, expenseCategories),
-        ],
+        // Category Selection
+        _buildCategoryDropdown(context, incomeCategories, expenseCategories),
       ],
     );
   }
 
-  Widget _buildCategorySectionHeader(BuildContext context, String title, IconData icon, Color color) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 16,
-          color: color,
-        ),
-        const SizedBox(width: 6),
-        Text(
-          title,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: color,
-            fontSize: 13,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCategoryGrid(BuildContext context, List<CategoriesApiModel> categories) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 0.9,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-      ),
-      itemCount: categories.length,
-      itemBuilder: (context, index) {
-        final category = categories[index];
-        final isSelected = _localSelectedCategoryId == category.id;
-        final categoryColor = _parseColor(category.color);
-
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              if (_localSelectedCategoryId == category.id) {
-                _localSelectedCategoryId = null; // Deselect if already selected
-              } else {
-                _localSelectedCategoryId = category.id; // Select new category
-              }
-            });
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: isSelected 
-                  ? categoryColor.withValues(alpha: 0.15)
-                  : Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isSelected 
-                    ? categoryColor
-                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-                width: isSelected ? 2 : 1,
-              ),
-              boxShadow: isSelected ? [
-                BoxShadow(
-                  color: categoryColor.withValues(alpha: 0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ] : null,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: isSelected 
-                        ? categoryColor
-                        : categoryColor.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    _getIconData(category.icon),
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Text(
-                    category.nameTr,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: isSelected 
-                          ? categoryColor
-                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                      fontSize: 11,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
+  Widget _buildCategoryDropdown(
+    BuildContext context, 
+    List<CategoriesApiModel> incomeCategories, 
+    List<CategoriesApiModel> expenseCategories
+  ) {
+    final allCategories = [...incomeCategories, ...expenseCategories];
+    CategoriesApiModel? selectedCategory;
+    if (_localSelectedCategoryId != null) {
+      try {
+        selectedCategory = allCategories.firstWhere(
+          (cat) => cat.id == _localSelectedCategoryId,
         );
+      } catch (e) {
+        selectedCategory = null;
+      }
+    }
+
+    return GestureDetector(
+      onTap: () => _showCategoryPicker(context, incomeCategories, expenseCategories),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: _localSelectedCategoryId == null 
+                ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)
+                : Theme.of(context).colorScheme.primary,
+            width: _localSelectedCategoryId == null ? 1 : 2,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            if (_localSelectedCategoryId != null && selectedCategory != null) ...[
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: _parseColor(selectedCategory.color),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  _getIconData(selectedCategory.icon),
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      selectedCategory.nameTr,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      selectedCategory.type == 'income' ? 'Gelir' : 'Gider',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ] else ...[
+              Expanded(
+                child: Text(
+                  'Kategori seçiniz (tümü)',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+            ],
+            Icon(
+              Icons.arrow_drop_down,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCategoryPicker(
+    BuildContext context,
+    List<CategoriesApiModel> incomeCategories,
+    List<CategoriesApiModel> expenseCategories,
+  ) {
+    // Seçili kategorinin türünü belirle
+    if (_localSelectedCategoryId != null) {
+      final allCategories = [...incomeCategories, ...expenseCategories];
+      try {
+        final selectedCategory = allCategories.firstWhere(
+          (cat) => cat.id == _localSelectedCategoryId,
+        );
+        _selectedCategoryType = selectedCategory.type;
+      } catch (e) {
+        _selectedCategoryType = 'income';
+      }
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.6,
+          ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.apps_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Kategori Seçiniz',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Category Type Selector
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildModalTypeButton(
+                        context, 
+                        setModalState, 
+                        'income', 
+                        'Gelir', 
+                        Icons.trending_up, 
+                        const Color(0xFF059669),
+                        incomeCategories,
+                        expenseCategories,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildModalTypeButton(
+                        context, 
+                        setModalState, 
+                        'expense', 
+                        'Gider', 
+                        Icons.trending_down, 
+                        const Color(0xFFDC2626),
+                        incomeCategories,
+                        expenseCategories,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Categories List based on selected type
+              Expanded(
+                child: _buildModalFilteredCategoriesList(context, setModalState, incomeCategories, expenseCategories),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModalTypeButton(
+    BuildContext context,
+    StateSetter setModalState,
+    String type,
+    String label,
+    IconData icon,
+    Color color,
+    List<CategoriesApiModel> incomeCategories,
+    List<CategoriesApiModel> expenseCategories,
+  ) {
+    final isSelected = _selectedCategoryType == type;
+    
+    return GestureDetector(
+      onTap: () {
+        setModalState(() {
+          _selectedCategoryType = type;
+          // Seçili kategori varsa ve yeni türe uygun değilse temizle
+          if (_localSelectedCategoryId != null) {
+            final allCategories = [...incomeCategories, ...expenseCategories];
+            try {
+              final selectedCategory = allCategories.firstWhere(
+                (cat) => cat.id == _localSelectedCategoryId,
+              );
+              
+              // Eğer seçili kategori yeni türe uygun değilse temizle
+              if (selectedCategory.type != type) {
+                _localSelectedCategoryId = null;
+              }
+            } catch (e) {
+              _localSelectedCategoryId = null;
+            }
+          }
+        });
       },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
+          border: Border.all(
+            color: isSelected ? color : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              size: 20,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModalFilteredCategoriesList(
+    BuildContext context,
+    StateSetter setModalState,
+    List<CategoriesApiModel> incomeCategories,
+    List<CategoriesApiModel> expenseCategories,
+  ) {
+    List<CategoriesApiModel> categoriesToShow = [];
+    
+    switch (_selectedCategoryType) {
+      case 'income':
+        categoriesToShow = incomeCategories;
+        break;
+      case 'expense':
+        categoriesToShow = expenseCategories;
+        break;
+      default:
+        categoriesToShow = incomeCategories;
+        break;
+    }
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      children: [
+        // Clear selection option
+        _buildModalCategoryOption(
+          context,
+          setModalState,
+          null,
+          'Kategori Seçimi Kaldır',
+          '${_selectedCategoryType == 'income' ? 'Gelir' : 'Gider'} kategorisi filtresini kaldır',
+          Icons.clear_all,
+          Theme.of(context).colorScheme.primary,
+        ),
+        
+        const SizedBox(height: 8),
+        
+        // Categories
+        ...categoriesToShow.map((cat) => _buildModalCategoryOption(
+          context,
+          setModalState,
+          cat.id,
+          cat.nameTr,
+          '${cat.type == 'income' ? 'Gelir' : 'Gider'} kategorisi',
+          _getIconData(cat.icon),
+          _parseColor(cat.color),
+        )),
+        
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildModalCategoryOption(
+    BuildContext context,
+    StateSetter setModalState,
+    int? categoryId,
+    String title,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
+    final isSelected = _localSelectedCategoryId == categoryId;
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        onTap: () {
+          setModalState(() {
+            _localSelectedCategoryId = categoryId;
+          });
+          setState(() {
+            _localSelectedCategoryId = categoryId;
+          });
+          Navigator.pop(context);
+        },
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: 20,
+          ),
+        ),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            color: isSelected ? color : null,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        ),
+        trailing: isSelected 
+            ? Icon(
+                Icons.check_circle,
+                color: color,
+                size: 24,
+              )
+            : null,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        tileColor: isSelected 
+            ? color.withValues(alpha: 0.1)
+            : null,
+      ),
     );
   }
 
@@ -753,7 +1016,6 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
       return Colors.grey;
     }
   }
-
 
   IconData _getIconData(String iconName) {
     switch (iconName) {
