@@ -66,12 +66,20 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
       // Kategoriler yüklenene kadar bekle
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final categories = ref.read(categoriesProvider);
+        
         if (categories.isNotEmpty) {
-          final autoFillCategory = categories.firstWhere(
-            (cat) => cat.id == widget.autoFillData!.categoryId,
-            orElse: () => categories.first,
-          );
+          final targetCategoryId = widget.autoFillData!.category?.id ?? widget.autoFillData!.categoryId;
           
+          // Filter categories by transaction type first
+          final filteredCategories = categories.where((cat) => cat.type == _selectedType).toList();
+          
+          final autoFillCategory = filteredCategories.firstWhere(
+            (cat) => cat.id == targetCategoryId,
+            orElse: () {
+              return filteredCategories.isNotEmpty ? filteredCategories.first : categories.first;
+            },
+          );
+                     
           setState(() {
             _selectedCategory = autoFillCategory;
           });
@@ -131,7 +139,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
         }
       }
       
-      // Category will be set after categories are loaded
       _hasUserInteracted = true; // Auto-fill counts as user interaction
     }
   }
@@ -185,7 +192,10 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
       });
     }
     
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    
     if (_selectedCategory == null) {
       CustomSnackBar.showError(
         context,

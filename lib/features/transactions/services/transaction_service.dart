@@ -155,10 +155,10 @@ class TransactionService {
         final errors = e.response?.data['errors'] as List<dynamic>?;
         throw Exception(errors?.first ?? 'Geçersiz veri');
       } else {
-        throw Exception('İşlem eklenirken bir hata oluştu');
+        throw Exception('İşlem eklenirken bir hata oluştu: ${e.response?.statusCode}');
       }
     } catch (e) {
-      throw Exception('Beklenmeyen bir hata oluştu');
+      throw Exception('Beklenmeyen bir hata oluştu: $e');
     }
   }
 
