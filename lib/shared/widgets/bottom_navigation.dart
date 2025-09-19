@@ -36,13 +36,20 @@ class CustomBottomNavigation extends StatelessWidget {
                 label: 'Ana Sayfa',
                 index: 0,
               ),
-              _buildAddButton(context),
               _buildNavItem(
                 context,
                 icon: Icons.receipt_long_outlined,
                 activeIcon: Icons.receipt_long,
                 label: 'İşlemler',
                 index: 1,
+              ),
+              _buildAddButton(context),
+              _buildNavItem(
+                context,
+                icon: Icons.repeat_outlined,
+                activeIcon: Icons.repeat,
+                label: 'Hatırlatıcılar',
+                index: 2,
               ),
             ],
           ),
@@ -93,7 +100,7 @@ class CustomBottomNavigation extends StatelessWidget {
 
   Widget _buildAddButton(BuildContext context) {
     return GestureDetector(
-      onTap: () => onTap(2), // Add transaction
+      onTap: () => onTap(3), // Add transaction
       child: Container(
         width: 56,
         height: 56,

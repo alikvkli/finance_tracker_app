@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../home/views/dashboard_page.dart';
 import '../../transactions/views/transactions_page.dart';
+import '../../transactions/views/recurring_transactions_page.dart';
 import '../../transactions/widgets/add_transaction_modal.dart';
 import '../../transactions/widgets/transaction_filters.dart';
 import '../../../shared/widgets/bottom_navigation.dart';
@@ -28,7 +29,7 @@ class _MainPageState extends ConsumerState<MainPage>
     super.initState();
     _currentIndex = widget.initialTab;
     _tabController = TabController(
-      length: 2, // Sadece Dashboard ve Transactions
+      length: 3, // Dashboard, Transactions ve Recurring
       vsync: this,
       initialIndex: widget.initialTab,
     );
@@ -54,13 +55,14 @@ class _MainPageState extends ConsumerState<MainPage>
       canPop: false, // Ana sayfalarda geri tuşunu devre dışı bırak
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            DashboardPage(onNavigateToTransactions: () => _switchToTransactionsTab()),
-            TransactionsPage(),
-          ],
-        ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          DashboardPage(onNavigateToTransactions: () => _switchToTransactionsTab()),
+          TransactionsPage(),
+          RecurringTransactionsPage(),
+        ],
+      ),
         bottomNavigationBar: CustomBottomNavigation(
           currentIndex: _currentIndex,
           onTap: _onItemTapped,
@@ -83,7 +85,7 @@ class _MainPageState extends ConsumerState<MainPage>
   }
 
   void _onItemTapped(int index) {
-    if (index == 2) {
+    if (index == 3) {
       // Add transaction button
       _showAddTransactionModal(context);
     } else {

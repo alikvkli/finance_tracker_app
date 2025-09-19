@@ -13,8 +13,6 @@ class CategoriesApiModel extends Equatable {
   final bool isActive;
   final bool isDefault;
   final String? description;
-  final bool hasChildren;
-  final List<dynamic> children;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -31,8 +29,6 @@ class CategoriesApiModel extends Equatable {
     required this.isActive,
     required this.isDefault,
     this.description,
-    required this.hasChildren,
-    required this.children,
     this.createdAt,
     this.updatedAt,
   });
@@ -48,11 +44,9 @@ class CategoriesApiModel extends Equatable {
       color: json['color'] as String,
       parentId: json['parent_id'] as int?,
       sortOrder: json['sort_order'] as int,
-      isActive: json['is_active'] as bool,
-      isDefault: json['is_default'] as bool,
+      isActive: json['is_active'] as bool? ?? true,
+      isDefault: json['is_default'] as bool? ?? false,
       description: json['description'] as String?,
-      hasChildren: json['has_children'] as bool,
-      children: json['children'] as List<dynamic>? ?? [],
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
       updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : null,
     );
@@ -72,8 +66,6 @@ class CategoriesApiModel extends Equatable {
       'is_active': isActive,
       'is_default': isDefault,
       'description': description,
-      'has_children': hasChildren,
-      'children': children,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
@@ -93,8 +85,6 @@ class CategoriesApiModel extends Equatable {
     isActive,
     isDefault,
     description,
-    hasChildren,
-    children,
     createdAt,
     updatedAt,
   ];

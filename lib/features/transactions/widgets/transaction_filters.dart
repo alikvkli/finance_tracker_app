@@ -30,16 +30,16 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
 
     // Initialize search controller and date range with current values
     _initializeWithCurrentState();
-  }
+      }
 
   void _initializeWithCurrentState() {
     final transactionState = ref.read(transactionControllerProvider);
     _searchController.text = transactionState.searchQuery ?? '';
-    setState(() {
-      _selectedStartDate = transactionState.selectedStartDate;
-      _selectedEndDate = transactionState.selectedEndDate;
-      _localSearchQuery = transactionState.searchQuery;
-      _localSelectedCategoryId = transactionState.selectedCategoryId;
+      setState(() {
+        _selectedStartDate = transactionState.selectedStartDate;
+        _selectedEndDate = transactionState.selectedEndDate;
+        _localSearchQuery = transactionState.searchQuery;
+        _localSelectedCategoryId = transactionState.selectedCategoryId;
       _isInitialized = true;
     });
   }
@@ -92,17 +92,17 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
-          Container(
+                Container(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
-            decoration: BoxDecoration(
+                  decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
                   color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-                  width: 1,
-                ),
-              ),
+                      width: 1,
+                    ),
+                  ),
             ),
             child: Row(
               children: [
@@ -261,7 +261,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
         Row(
           children: [
             Icon(
-              Icons.search,
+                        Icons.search,
               size: 20,
               color: Theme.of(context).colorScheme.primary,
             ),
@@ -281,19 +281,19 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
           decoration: InputDecoration(
             hintText: 'İşlem açıklaması...',
             suffixIcon: (_localSearchQuery?.isNotEmpty ?? false)
-                ? IconButton(
-                    icon: Icon(
-                      Icons.clear,
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.clear,
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                    onPressed: () {
-                      _searchController.clear();
-                      setState(() {
-                        _localSearchQuery = null;
-                      });
-                    },
-                  )
-                : null,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  _localSearchQuery = null;
+                                });
+                              },
+                            )
+                          : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -303,55 +303,55 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                 color: Theme.of(context).colorScheme.primary,
                 width: 2,
               ),
-            ),
-          ),
-          onChanged: (value) {
-            setState(() {
-              _localSearchQuery = value.isEmpty ? null : value;
-            });
-          },
-        ),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _localSearchQuery = value.isEmpty ? null : value;
+                      });
+                    },
+                  ),
       ],
     );
   }
 
   Widget _buildActionButtons(BuildContext context) {
     return Row(
-      children: [
-        // Clear Button (only show if there are active filters)
-        if (_hasActiveFilters())
-          Expanded(
+                  children: [
+                    // Clear Button (only show if there are active filters)
+                    if (_hasActiveFilters())
+                      Expanded(
             child: OutlinedButton.icon(
-              onPressed: () {
-                _searchController.clear();
+                          onPressed: () {
+                            _searchController.clear();
                 _selectCurrentMonth();
-                setState(() {
-                  _localSearchQuery = null;
-                  _localSelectedCategoryId = null;
-                });
+                            setState(() {
+                              _localSearchQuery = null;
+                              _localSelectedCategoryId = null;
+                            });
                 ref.read(transactionControllerProvider.notifier).clearFilters();
-                Navigator.pop(context);
-              },
+                            Navigator.pop(context);
+                          },
               icon: const Icon(Icons.clear_all, size: 18),
               label: const Text('Temizle'),
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
 
-        if (_hasActiveFilters()) const SizedBox(width: 12),
+                    if (_hasActiveFilters()) const SizedBox(width: 12),
 
-        // Apply Button
-        Expanded(
+                    // Apply Button
+                    Expanded(
           child: ElevatedButton.icon(
-            onPressed: () {
+                        onPressed: () {
               print('🔍 Applying filters:');
               print('📅 Date: $_selectedStartDate to $_selectedEndDate');
               print('🔍 Search: $_localSearchQuery');
@@ -366,21 +366,21 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                 clearCategory: _localSelectedCategoryId == null,
               );
 
-              Navigator.pop(context);
-            },
+                          Navigator.pop(context);
+                        },
             icon: const Icon(Icons.check, size: 18),
             label: const Text('Uygula'),
-            style: ElevatedButton.styleFrom(
+                        style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
-      ],
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
     );
   }
 
@@ -590,11 +590,11 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     const SizedBox(width: 4),
                     Text(
                       'Seçili',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 11,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 11,
                         fontWeight: FontWeight.w600,
-                      ),
+                  ),
                     ),
                   ],
                 ),
@@ -602,7 +602,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
           ],
         ),
 
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
         // Category Selection
         _buildCategoryDropdown(context, incomeCategories, expenseCategories),
@@ -641,7 +641,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          children: [
+      children: [
             if (_localSelectedCategoryId != null && selectedCategory != null) ...[
               Container(
                 width: 32,
@@ -653,7 +653,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                 child: Icon(
                   _getIconData(selectedCategory.icon),
                   color: Colors.white,
-                  size: 16,
+          size: 16,
                 ),
               ),
               const SizedBox(width: 12),
@@ -661,10 +661,10 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+        Text(
                       selectedCategory.nameTr,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
@@ -672,9 +672,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         fontSize: 12,
-                      ),
-                    ),
-                  ],
+          ),
+        ),
+      ],
                 ),
               ),
             ] else ...[
@@ -838,7 +838,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     final isSelected = _selectedCategoryType == type;
     
     return GestureDetector(
-      onTap: () {
+              onTap: () {
         setModalState(() {
           _selectedCategoryType = type;
           // Seçili kategori varsa ve yeni türe uygun değilse temizle
@@ -856,38 +856,38 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             } catch (e) {
               _localSelectedCategoryId = null;
             }
-          }
-        });
-      },
-      child: Container(
+                  }
+                });
+              },
+              child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
+                decoration: BoxDecoration(
           color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
-          border: Border.all(
+                  border: Border.all(
             color: isSelected ? color : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
-          children: [
-            Icon(
+                  children: [
+                    Icon(
               icon,
               color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               size: 20,
             ),
             const SizedBox(height: 4),
-            Text(
+                    Text(
               label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                fontSize: 12,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
