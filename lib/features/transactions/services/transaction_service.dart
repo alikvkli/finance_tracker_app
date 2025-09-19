@@ -159,6 +159,40 @@ class TransactionService {
     }
   }
 
+  Future<AddTransactionResponse> updateTransaction(int transactionId, AddTransactionRequest request) async {
+    try {
+      final token = _storageService.getAuthToken();
+      if (token == null) {
+        throw Exception('Kullanıcı oturumu bulunamadı');
+      }
+
+      final response = await _dio.put(
+        '${ApiConfig.transactionsEndpoint}/$transactionId',
+        data: request.toJson(),
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      return AddTransactionResponse.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw Exception('Oturum süresi dolmuş. Lütfen tekrar giriş yapın.');
+      } else if (e.response?.statusCode == 404) {
+        throw Exception('İşlem bulunamadı');
+      } else if (e.response?.statusCode == 422) {
+        final errors = e.response?.data['errors'] as List<dynamic>?;
+        throw Exception(errors?.first ?? 'Geçersiz veri');
+      } else {
+        throw Exception('İşlem güncellenirken bir hata oluştu');
+      }
+    } catch (e) {
+      throw Exception('Beklenmeyen bir hata oluştu');
+    }
+  }
+
   Future<void> deleteTransaction(int transactionId) async {
     try {
       final token = _storageService.getAuthToken();
@@ -166,7 +200,7 @@ class TransactionService {
         throw Exception('Kullanıcı oturumu bulunamadı');
       }
 
-      final response = await _dio.delete(
+      await _dio.delete(
         '${ApiConfig.transactionsEndpoint}/$transactionId',
         options: Options(
           headers: {

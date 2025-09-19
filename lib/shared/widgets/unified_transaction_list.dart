@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/transactions/models/transaction_model.dart';
+import '../../features/transactions/widgets/edit_transaction_modal.dart';
 import '../../shared/widgets/transaction_skeleton.dart';
 import '../../shared/widgets/custom_snackbar.dart';
 
@@ -260,13 +261,18 @@ class _SwipeableTransactionCard extends ConsumerWidget {
         },
         onEdit: () {
           Navigator.pop(context);
-          // TODO: Implement edit functionality
-          CustomSnackBar.showInfo(
-            context,
-            message: 'Düzenleme özelliği yakında eklenecek',
-          );
+          _showEditTransactionModal(context, transaction);
         },
       ),
+    );
+  }
+
+  void _showEditTransactionModal(BuildContext context, TransactionModel transaction) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => EditTransactionModal(transaction: transaction),
     );
   }
 

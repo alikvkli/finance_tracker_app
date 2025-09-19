@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:equatable/equatable.dart';
 import '../models/transaction_model.dart';
+import '../models/add_transaction_request.dart';
 import '../services/transaction_service.dart';
 import '../../../core/di/injection.dart';
 
@@ -212,6 +213,22 @@ class TransactionController extends StateNotifier<TransactionState> {
 
   Future<void> refreshTransactions() async {
     await loadTransactions();
+  }
+
+  Future<void> updateTransaction(int transactionId, AddTransactionRequest request) async {
+    try {
+      // API'ye güncelleme isteği gönder
+      await _transactionService.updateTransaction(transactionId, request);
+
+      // Başarılı olursa işlemleri yeniden yükle
+      await loadTransactions();
+
+    } catch (e) {
+      state = state.copyWith(
+        error: e.toString().replaceFirst('Exception: ', ''),
+      );
+      throw e; // Hata durumunda exception'ı tekrar fırlat
+    }
   }
 
   Future<void> deleteTransaction(int transactionId) async {

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:equatable/equatable.dart';
 import '../../transactions/models/transaction_model.dart';
+import '../../transactions/models/add_transaction_request.dart';
 import '../../transactions/services/transaction_service.dart';
 import '../../../core/di/injection.dart';
 
@@ -103,6 +104,19 @@ class DashboardController extends StateNotifier<DashboardState> {
 
   Future<void> refreshDashboard() async {
     await loadDashboardData();
+  }
+
+  Future<void> updateTransaction(int transactionId, AddTransactionRequest request) async {
+    try {
+      await _transactionService.updateTransaction(transactionId, request);
+      // Refresh dashboard data after update
+      await refreshDashboard();
+    } catch (e) {
+      state = state.copyWith(
+        error: e.toString().replaceFirst('Exception: ', ''),
+      );
+      throw e; // Hata durumunda exception'ı tekrar fırlat
+    }
   }
 
   Future<void> deleteTransaction(int transactionId) async {
