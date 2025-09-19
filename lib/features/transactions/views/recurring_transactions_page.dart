@@ -86,25 +86,25 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
           // Action Buttons
           Row(
             children: [
-              // Notification Button
-              IconButton(
-                onPressed: () {
-                  // Notification action
-                },
-                icon: Icon(
-                  Icons.notifications_outlined,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                  size: 22,
-                ),
-                tooltip: 'Bildirimler',
-                style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(8),
-                  minimumSize: const Size(40, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  // Notification Button
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, AppRouter.notifications);
+                    },
+                    icon: Icon(
+                      Icons.notifications_outlined,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      size: 22,
+                    ),
+                    tooltip: 'Bildirimler',
+                    style: IconButton.styleFrom(
+                      padding: const EdgeInsets.all(8),
+                      minimumSize: const Size(40, 40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                   ),
-                ),
-              ),
 
               const SizedBox(width: 4),
 

@@ -7,9 +7,23 @@ import '../providers/category_provider.dart';
 import '../../home/controllers/dashboard_controller.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../core/di/injection.dart';
+import '../../notifications/models/notification_model.dart';
 
 class AddTransactionModal extends ConsumerStatefulWidget {
-  const AddTransactionModal({super.key});
+  final NotificationAutoFill? autoFillData;
+  final String? dueDateOverride;
+  final bool hideRecurringOptions;
+  final bool lockTypeAndCategory;
+  final VoidCallback? onTransactionCreated;
+  
+  const AddTransactionModal({
+    super.key,
+    this.autoFillData,
+    this.dueDateOverride,
+    this.hideRecurringOptions = false,
+    this.lockTypeAndCategory = false,
+    this.onTransactionCreated,
+  });
 
   @override
   ConsumerState<AddTransactionModal> createState() => _AddTransactionModalState();
@@ -34,11 +48,108 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
   @override
   void initState() {
     super.initState();
+    // Auto-fill data varsa initialize et
+    _initializeWithAutoFillData();
+    
     // Kategorileri yükle (cache'den veya API'den)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(categoryProvider.notifier).loadCategories();
       _validateForm(forButtonState: true); // İlk button state'ini set et
+      
+      // Auto-fill category'yi set et (kategoriler yüklendikten sonra)
+      _setAutoFillCategory();
     });
+  }
+
+  void _setAutoFillCategory() {
+    if (widget.autoFillData != null) {
+      // Kategoriler yüklenene kadar bekle
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final categories = ref.read(categoriesProvider);
+        if (categories.isNotEmpty) {
+          final autoFillCategory = categories.firstWhere(
+            (cat) => cat.id == widget.autoFillData!.categoryId,
+            orElse: () => categories.first,
+          );
+          
+          setState(() {
+            _selectedCategory = autoFillCategory;
+          });
+          _validateForm(forButtonState: true);
+        } else {
+          // Kategoriler henüz yüklenmediyse tekrar dene
+          Future.delayed(const Duration(milliseconds: 100), _setAutoFillCategory);
+        }
+      });
+    }
+  }
+
+  void _initializeWithAutoFillData() {
+    if (widget.autoFillData != null) {
+      final autoFill = widget.autoFillData!;
+      
+      // Transaction type
+      _selectedType = autoFill.type;
+      
+      // Amount - format for display
+      _amountController.text = _formatAmountForDisplay(autoFill.amount);
+      
+      // Description
+      _descriptionController.text = autoFill.description;
+      
+      // Date - use due date override or transaction date
+      if (widget.dueDateOverride != null) {
+        try {
+          _selectedDate = DateTime.parse(widget.dueDateOverride!);
+        } catch (e) {
+          _selectedDate = DateTime.now();
+        }
+      } else {
+        try {
+          _selectedDate = DateTime.parse(autoFill.transactionDate);
+        } catch (e) {
+          _selectedDate = DateTime.now();
+        }
+      }
+      
+      // Recurring options - notification'dan geliyorsa tekrarlayan işlem olarak ekleme
+      if (widget.hideRecurringOptions) {
+        _isRecurring = false;
+        _recurringType = 'daily';
+        _recurringEndDate = null;
+      } else {
+        _isRecurring = autoFill.isRecurring;
+        if (autoFill.recurringType != null) {
+          _recurringType = autoFill.recurringType!;
+        }
+        if (autoFill.recurringEndDate != null) {
+          try {
+            _recurringEndDate = DateTime.parse(autoFill.recurringEndDate!);
+          } catch (e) {
+            _recurringEndDate = null;
+          }
+        }
+      }
+      
+      // Category will be set after categories are loaded
+      _hasUserInteracted = true; // Auto-fill counts as user interaction
+    }
+  }
+
+  String _formatAmountForDisplay(double amount) {
+    // Convert double to display format (e.g., 5000.0 -> "5.000")
+    final integerPart = amount.truncate();
+    final decimalPart = amount - integerPart;
+    
+    String formattedInteger = _addThousandSeparators(integerPart.toString());
+    
+    if (decimalPart > 0) {
+      // Add decimal part with comma
+      final decimalString = (decimalPart * 100).round().toString().padLeft(2, '0');
+      return '$formattedInteger,$decimalString';
+    }
+    
+    return formattedInteger;
   }
 
   @override
@@ -136,6 +247,9 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
           context,
           message: 'İşlem başarıyla kaydedildi',
         );
+        
+        // Callback'i çağır (notification'dan geliyorsa mark as read için)
+        widget.onTransactionCreated?.call();
       }
     } catch (e) {
       if (mounted) {
@@ -510,9 +624,11 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
               _buildDateSelector(),
               const SizedBox(height: 20),
               
-              // Recurring Options
-              _buildRecurringOptions(),
-              const SizedBox(height: 20),
+              // Recurring Options (hide if from notification)
+              if (!widget.hideRecurringOptions) ...[
+                _buildRecurringOptions(),
+                const SizedBox(height: 20),
+              ],
               
               // Submit Button
               _buildSubmitButton(),
@@ -552,39 +668,42 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
   Widget _buildTypeButton(String type, String label, Color color, IconData icon) {
     final isSelected = _selectedType == type;
     return GestureDetector(
-      onTap: () {
+      onTap: widget.lockTypeAndCategory ? null : () {
         setState(() {
           _selectedType = type;
           _selectedCategory = null; // Reset category when type changes
         });
         _validateForm(forButtonState: true); // Button state'i için validation yap ama error mesajları gösterme
       },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
-          border: Border.all(
-            color: isSelected ? color : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-            width: 2,
+      child: Opacity(
+        opacity: widget.lockTypeAndCategory ? 0.5 : 1.0,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
+            border: Border.all(
+              color: isSelected ? color : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(12),
           ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-              size: 24,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          child: Column(
+            children: [
+              Icon(
+                icon,
                 color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                size: 24,
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -616,55 +735,61 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
         const SizedBox(height: 8),
         
         // Custom kategori selector
-        GestureDetector(
-          onTap: () => _showCategoryPicker(filteredCategories),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: _selectedCategory == null 
-                    ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)
-                    : Theme.of(context).colorScheme.primary,
-                width: _selectedCategory == null ? 1 : 2,
-              ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                if (_selectedCategory != null) ...[
-                  Icon(
-                    _getCategoryIcon(_selectedCategory!.icon),
-                    color: _parseColor(_selectedCategory!.color),
-                    size: 20,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      _selectedCategory!.nameTr,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ] else ...[
-                  Expanded(
-                    child: Text(
-                      'Kategori seçiniz',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ),
-                ],
-                Icon(
-                  Icons.arrow_drop_down,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+        Opacity(
+          opacity: widget.lockTypeAndCategory ? 0.5 : 1.0,
+          child: GestureDetector(
+            onTap: widget.lockTypeAndCategory ? null : () => _showCategoryPicker(filteredCategories),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: widget.lockTypeAndCategory
+                      ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.2)
+                      : _selectedCategory == null 
+                          ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)
+                          : Theme.of(context).colorScheme.primary,
+                  width: _selectedCategory == null ? 1 : 2,
                 ),
-              ],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  if (_selectedCategory != null) ...[
+                    Icon(
+                      _getCategoryIcon(_selectedCategory!.icon),
+                      color: _parseColor(_selectedCategory!.color),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _selectedCategory!.nameTr,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ] else ...[
+                    Expanded(
+                      child: Text(
+                        'Kategori seçiniz',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (!widget.lockTypeAndCategory)
+                    Icon(
+                      Icons.arrow_drop_down,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
-        if (_hasUserInteracted && _selectedCategory == null)
+        if (_hasUserInteracted && _selectedCategory == null && !widget.lockTypeAndCategory)
           Padding(
             padding: const EdgeInsets.only(left: 12, top: 8),
             child: Text(

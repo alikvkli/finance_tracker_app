@@ -11,6 +11,7 @@ class ApiConfig {
   static const String transactionsEndpoint = '/api/transactions';
   static const String categoriesEndpoint = '/api/categories';
   static const String recurringTransactionsEndpoint = '/api/recurring-transactions';
+  static const String notificationsEndpoint = '/api/notifications';
   
   // Request Timeouts
   static const Duration connectTimeout = Duration(seconds: 30);

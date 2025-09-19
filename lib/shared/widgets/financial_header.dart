@@ -61,7 +61,9 @@ class FinancialHeader extends StatelessWidget {
                 children: [
                   // Notification Button
                   IconButton(
-                    onPressed: onNotificationTap,
+                    onPressed: () {
+                      Navigator.pushNamed(context, AppRouter.notifications);
+                    },
                     icon: Icon(
                       Icons.notifications_outlined,
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
