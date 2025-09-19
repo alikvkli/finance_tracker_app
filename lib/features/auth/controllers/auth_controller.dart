@@ -94,6 +94,15 @@ class AuthController extends StateNotifier<AuthState> {
       await _storageService.saveUserEmail(email);
       await _storageService.saveUserPassword(password);
       
+      // Save user data
+      await _storageService.saveUserData(
+        name: response.user.name,
+        surname: response.user.surname,
+        email: response.user.email,
+        phone: response.user.phone,
+        userId: response.user.userId,
+      );
+      
       state = state.copyWith(
         isLoading: false,
         user: response.user,
@@ -180,8 +189,4 @@ class AuthState {
 
 final authControllerProvider = StateNotifierProvider<AuthController, AuthState>((ref) {
   return getIt<AuthController>();
-});
-
-final authServiceProvider = Provider<AuthService>((ref) {
-  return getIt<AuthService>();
 });

@@ -57,6 +57,36 @@ class AuthService {
       throw AuthException(['Bir hata oluştu. Lütfen tekrar deneyin.']);
     }
   }
+
+  Future<Map<String, dynamic>> deleteAccount(String password, String token) async {
+    try {
+      final response = await _dio.delete(
+        ApiConfig.deleteAccountEndpoint,
+        data: {
+          'password': password,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+      
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 422) {
+        // Validation errors (wrong password)
+        final errors = e.response?.data['errors'] as List<dynamic>?;
+        throw AuthException(errors?.cast<String>() ?? ['Şifre doğrulama hatası']);
+      } else if (e.response?.statusCode == 401) {
+        throw AuthException(['Oturum süresi dolmuş. Lütfen tekrar giriş yapın.']);
+      } else {
+        throw AuthException(['Hesap silinirken bir hata oluştu']);
+      }
+    } catch (e) {
+      throw AuthException(['Beklenmeyen bir hata oluştu']);
+    }
+  }
 }
 
 class AuthException implements Exception {

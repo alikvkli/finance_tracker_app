@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../home/views/dashboard_page.dart';
 import '../../transactions/views/transactions_page.dart';
 import '../../transactions/views/recurring_transactions_page.dart';
+import '../../profile/views/profile_page.dart';
 import '../../transactions/widgets/add_transaction_modal.dart';
 import '../../transactions/widgets/transaction_filters.dart';
 import '../../../shared/widgets/bottom_navigation.dart';
@@ -29,7 +30,7 @@ class _MainPageState extends ConsumerState<MainPage>
     super.initState();
     _currentIndex = widget.initialTab;
     _tabController = TabController(
-      length: 3, // Dashboard, Transactions ve Recurring
+      length: 4, // Dashboard, Transactions, Recurring ve Profile
       vsync: this,
       initialIndex: widget.initialTab,
     );
@@ -61,6 +62,7 @@ class _MainPageState extends ConsumerState<MainPage>
           DashboardPage(onNavigateToTransactions: () => _switchToTransactionsTab()),
           TransactionsPage(),
           RecurringTransactionsPage(),
+          ProfilePage(),
         ],
       ),
         bottomNavigationBar: CustomBottomNavigation(
@@ -85,7 +87,7 @@ class _MainPageState extends ConsumerState<MainPage>
   }
 
   void _onItemTapped(int index) {
-    if (index == 3) {
+    if (index == 4) {
       // Add transaction button
       _showAddTransactionModal(context);
     } else {

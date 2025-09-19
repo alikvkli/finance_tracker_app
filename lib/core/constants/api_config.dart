@@ -8,6 +8,7 @@ class ApiConfig {
   static const String loginEndpoint = '/api/login';
   static const String logoutEndpoint = '/api/logout';
   static const String profileEndpoint = '/api/profile';
+  static const String deleteAccountEndpoint = '/api/delete-account';
   static const String transactionsEndpoint = '/api/transactions';
   static const String categoriesEndpoint = '/api/categories';
   static const String recurringTransactionsEndpoint = '/api/recurring-transactions';

@@ -66,10 +66,34 @@ class StorageService {
     return getString('user_password');
   }
   
+  Future<bool> saveUserData({
+    required String name,
+    required String surname,
+    required String email,
+    required String phone,
+    required int userId,
+  }) async {
+    await setString('user_name', name);
+    await setString('user_surname', surname);
+    await setString('user_email', email);
+    await setString('user_phone', phone);
+    await setInt('user_id', userId);
+    return true;
+  }
+  
+  String? getUserName() => getString('user_name');
+  String? getUserSurname() => getString('user_surname');
+  String? getUserPhone() => getString('user_phone');
+  int? getUserId() => getInt('user_id');
+
   Future<bool> clearAuthData() async {
     await remove('auth_token');
     await remove('user_email');
     await remove('user_password');
+    await remove('user_name');
+    await remove('user_surname');
+    await remove('user_phone');
+    await remove('user_id');
     return true;
   }
   
@@ -79,5 +103,9 @@ class StorageService {
   
   bool isUserLoggedIn() {
     return getAuthToken() != null;
+  }
+  
+  Future<bool> clearAuthToken() async {
+    return await remove('auth_token');
   }
 }

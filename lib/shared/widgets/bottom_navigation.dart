@@ -51,6 +51,13 @@ class CustomBottomNavigation extends StatelessWidget {
                 label: 'Hatırlatıcılar',
                 index: 2,
               ),
+              _buildNavItem(
+                context,
+                icon: Icons.person_outline,
+                activeIcon: Icons.person,
+                label: 'Profil',
+                index: 3,
+              ),
             ],
           ),
         ),
@@ -100,7 +107,7 @@ class CustomBottomNavigation extends StatelessWidget {
 
   Widget _buildAddButton(BuildContext context) {
     return GestureDetector(
-      onTap: () => onTap(3), // Add transaction
+      onTap: () => onTap(4), // Add transaction
       child: Container(
         width: 56,
         height: 56,
