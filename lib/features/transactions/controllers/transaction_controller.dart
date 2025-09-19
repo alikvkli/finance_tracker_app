@@ -96,6 +96,11 @@ class TransactionController extends StateNotifier<TransactionState> {
   }
 
   Future<void> loadTransactions() async {
+    print('🚀 Loading transactions with filters:');
+    print('📅 Date range: ${state.selectedStartDate} to ${state.selectedEndDate}');
+    print('🔍 Search: ${state.searchQuery}');
+    print('🏷️ Category ID: ${state.selectedCategoryId}');
+    
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -114,6 +119,9 @@ class TransactionController extends StateNotifier<TransactionState> {
           .where((t) => t.isExpense)
           .fold(0.0, (sum, t) => sum + t.amountAsDouble);
 
+      print('✅ Loaded ${response.data.length} transactions');
+      print('💰 Income: $income, Expense: $expense, Balance: ${income - expense}');
+      
       state = state.copyWith(
         transactions: response.data,
         isLoading: false,
@@ -134,17 +142,34 @@ class TransactionController extends StateNotifier<TransactionState> {
       selectedStartDate: startDate,
       selectedEndDate: endDate,
     );
-    loadTransactions();
+    // Don't call loadTransactions here - will be called after all filters are applied
   }
 
   void updateSearchQuery(String? query) {
     state = state.copyWith(searchQuery: query);
-    loadTransactions();
+    // Don't call loadTransactions here - will be called after all filters are applied
   }
 
   void updateCategoryFilter(int? categoryId) {
     state = state.copyWith(selectedCategoryId: categoryId);
-    loadTransactions();
+    // Don't call loadTransactions here - will be called after all filters are applied
+  }
+
+  void applyFilters({
+    DateTime? startDate,
+    DateTime? endDate,
+    String? searchQuery,
+    int? categoryId,
+    bool clearCategory = false,
+  }) {
+    state = state.copyWith(
+      selectedStartDate: startDate ?? state.selectedStartDate,
+      selectedEndDate: endDate ?? state.selectedEndDate,
+      searchQuery: searchQuery,
+      selectedCategoryId: clearCategory ? null : categoryId,
+      clearSelectedCategoryId: clearCategory,
+    );
+    loadTransactions(); // Only call once after all filters are set
   }
 
   void toggleCategoryFilter(int categoryId) {

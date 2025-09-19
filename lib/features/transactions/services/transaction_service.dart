@@ -55,21 +55,29 @@ class TransactionService {
         ),
       );
       
+      // Debug: Print query parameters
+      print('🔍 API Request - Query Params: $queryParams');
+      
       if (response.data is Map<String, dynamic>) {
         final data = response.data as Map<String, dynamic>;
+        print('📊 API Response - Data keys: ${data.keys}');
         
         if (data.containsKey('success')) {
+          print('✅ Success: ${data['success']}');
         }
         
         if (data.containsKey('message')) {
+          print('💬 Message: ${data['message']}');
         }
         
         if (data.containsKey('data')) {
-          final transactions = data['data'] as List<dynamic>;          
+          final transactions = data['data'] as List<dynamic>;
+          print('📝 Transactions count: ${transactions.length}');
         }
         
         if (data.containsKey('pagination')) {
           final pagination = data['pagination'] as Map<String, dynamic>;
+          print('📄 Pagination: $pagination');
         }
       }
 

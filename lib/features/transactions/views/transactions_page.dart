@@ -28,6 +28,10 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
   Widget build(BuildContext context) {
     final transactionState = ref.watch(transactionControllerProvider);
     
+    // Debug: Print current state
+    print('🏠 TransactionsPage build - Transaction count: ${transactionState.transactions.length}');
+    print('🏠 Loading: ${transactionState.isLoading}, Error: ${transactionState.error}');
+    
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(

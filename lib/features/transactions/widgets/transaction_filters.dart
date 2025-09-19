@@ -17,6 +17,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
   DateTime? _selectedEndDate;
   String? _localSearchQuery;
   int? _localSelectedCategoryId;
+  bool _isInitialized = false;
 
   @override
   void initState() {
@@ -27,17 +28,18 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     });
 
     // Initialize search controller and date range with current values
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final transactionState = ref.read(transactionControllerProvider);
-      if (transactionState.searchQuery != null) {
-        _searchController.text = transactionState.searchQuery!;
-      }
-      setState(() {
-        _selectedStartDate = transactionState.selectedStartDate;
-        _selectedEndDate = transactionState.selectedEndDate;
-        _localSearchQuery = transactionState.searchQuery;
-        _localSelectedCategoryId = transactionState.selectedCategoryId;
-      });
+    _initializeWithCurrentState();
+  }
+
+  void _initializeWithCurrentState() {
+    final transactionState = ref.read(transactionControllerProvider);
+    _searchController.text = transactionState.searchQuery ?? '';
+    setState(() {
+      _selectedStartDate = transactionState.selectedStartDate;
+      _selectedEndDate = transactionState.selectedEndDate;
+      _localSearchQuery = transactionState.searchQuery;
+      _localSelectedCategoryId = transactionState.selectedCategoryId;
+      _isInitialized = true;
     });
   }
 
@@ -54,220 +56,335 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     final categories = ref.watch(categoriesProvider);
     final isLoadingCategories = ref.watch(categoriesLoadingProvider);
 
+    // Sync local state with current transaction state only once
+    if (!_isInitialized) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _initializeWithCurrentState();
+        }
+      });
+    }
+
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           // Handle bar
           Container(
-            margin: const EdgeInsets.only(top: 8),
+            margin: const EdgeInsets.only(top: 12, bottom: 8),
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurface.withValues(alpha: 0.2),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
+          
+          // Header
+          Container(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
               children: [
-                // Search Bar
                 Container(
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.outline.withValues(alpha: 0.2),
-                      width: 1,
-                    ),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'İşlem ara...',
-                      hintStyle: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.5),
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.clear,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.6),
-                              ),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _localSearchQuery = null;
-                                });
-                              },
-                            )
-                          : null,
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      // Don't apply filter immediately, just update local state
-                      // Filter will be applied when "Filtreleri Uygula" is pressed
-                      setState(() {
-                        _localSearchQuery = value.isEmpty ? null : value;
-                      });
-                    },
+                  child: Icon(
+                    Icons.tune,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 20,
                   ),
                 ),
-
-                const SizedBox(height: 20),
-
-                // Date Range Filter
-                _buildDateRangeSection(context),
-
-                const SizedBox(height: 20),
-
-                // Category Filter
-                if (isLoadingCategories)
-                  const Center(child: CircularProgressIndicator())
-                else
-                  _buildCategorySections(context, transactionState, categories),
-
-                const SizedBox(height: 20),
-
-                // Action Buttons
-                Row(
-                  children: [
-                    // Clear Button (only show if there are active filters)
-                    if (_hasActiveFilters())
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            _searchController.clear();
-                            _selectCurrentMonth(); // Reset local state to current month
-                            setState(() {
-                              _localSearchQuery = null;
-                              _localSelectedCategoryId = null;
-                            });
-                            ref
-                                .read(transactionControllerProvider.notifier)
-                                .clearFilters(); // This now resets date range too
-                            Navigator.pop(context);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            'Temizle',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Filtreler',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-
-                    if (_hasActiveFilters()) const SizedBox(width: 12),
-
-                    // Apply Button
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Apply all filter changes
-                          if (_selectedStartDate != null &&
-                              _selectedEndDate != null) {
-                            ref
-                                .read(transactionControllerProvider.notifier)
-                                .updateDateRange(
-                                  _selectedStartDate!,
-                                  _selectedEndDate!,
-                                );
-                          }
-
-                          // Apply search query
-                          ref
-                              .read(transactionControllerProvider.notifier)
-                              .updateSearchQuery(_localSearchQuery);
-
-                          // Apply category filter
-                          if (_localSelectedCategoryId != null) {
-                            ref
-                                .read(transactionControllerProvider.notifier)
-                                .updateCategoryFilter(
-                                  _localSelectedCategoryId!,
-                                );
-                          } else {
-                            ref
-                                .read(transactionControllerProvider.notifier)
-                                .clearCategoryFilter();
-                          }
-
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Filtreleri Uygula',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
+                      Text(
+                        'İşlemlerinizi filtreleyerek arayın',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
+
+          // Content
+          Expanded(
+            child: isLoadingCategories
+                ? _buildFiltersSkeleton(context)
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Search Section
+                        _buildSearchSection(context),
+                        const SizedBox(height: 24),
+
+                        // Date Range Section
+                        _buildDateRangeSection(context),
+                        const SizedBox(height: 24),
+
+                        // Category Section
+                        _buildCategorySections(context, transactionState, categories),
+                        const SizedBox(height: 32),
+
+                        // Action Buttons
+                        _buildActionButtons(context),
+                      ],
+                    ),
+                  ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildFiltersSkeleton(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Search Skeleton
+          _buildSkeletonSection('Arama', [
+            _buildSkeletonContainer(height: 48),
+          ]),
+          const SizedBox(height: 24),
+          
+          // Date Range Skeleton
+          _buildSkeletonSection('Dönem Seçimi', [
+            Row(
+              children: [
+                Expanded(child: _buildSkeletonContainer(height: 56)),
+                const SizedBox(width: 12),
+                Expanded(child: _buildSkeletonContainer(height: 56)),
+              ],
+            ),
+          ]),
+          const SizedBox(height: 24),
+          
+          // Categories Skeleton
+          _buildSkeletonSection('Kategoriler', [
+            _buildSkeletonContainer(height: 50),
+            const SizedBox(height: 12),
+            _buildSkeletonContainer(height: 50),
+          ]),
+          const SizedBox(height: 32),
+          
+          // Buttons Skeleton
+          Row(
+            children: [
+              Expanded(child: _buildSkeletonContainer(height: 48, borderRadius: 12)),
+              const SizedBox(width: 12),
+              Expanded(child: _buildSkeletonContainer(height: 48, borderRadius: 12)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonSection(String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildSkeletonContainer(width: 20, height: 20, isCircle: true),
+            const SizedBox(width: 8),
+            _buildSkeletonContainer(width: 100, height: 16),
+          ],
+        ),
+        const SizedBox(height: 12),
+        ...children,
+      ],
+    );
+  }
+
+  Widget _buildSkeletonContainer({
+    double? width,
+    double? height,
+    double? borderRadius,
+    bool isCircle = false,
+  }) {
+    return Container(
+      width: width,
+      height: height ?? 16,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+        borderRadius: isCircle 
+            ? BorderRadius.circular((height ?? 16) / 2)
+            : BorderRadius.circular(borderRadius ?? 8),
+      ),
+    );
+  }
+
+  Widget _buildSearchSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.search,
+              size: 20,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Arama',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            hintText: 'İşlem açıklaması...',
+            prefixIcon: Icon(
+              Icons.search,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            suffixIcon: (_localSearchQuery?.isNotEmpty ?? false)
+                ? IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {
+                        _localSearchQuery = null;
+                      });
+                    },
+                  )
+                : null,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
+            ),
+          ),
+          onChanged: (value) {
+            setState(() {
+              _localSearchQuery = value.isEmpty ? null : value;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Row(
+      children: [
+        // Clear Button (only show if there are active filters)
+        if (_hasActiveFilters())
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () {
+                _searchController.clear();
+                _selectCurrentMonth();
+                setState(() {
+                  _localSearchQuery = null;
+                  _localSelectedCategoryId = null;
+                });
+                ref.read(transactionControllerProvider.notifier).clearFilters();
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.clear_all, size: 18),
+              label: const Text('Temizle'),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+
+        if (_hasActiveFilters()) const SizedBox(width: 12),
+
+        // Apply Button
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: () {
+              print('🔍 Applying filters:');
+              print('📅 Date: $_selectedStartDate to $_selectedEndDate');
+              print('🔍 Search: $_localSearchQuery');
+              print('🏷️ Category: $_localSelectedCategoryId');
+              
+              // Apply all filters at once to prevent multiple API calls
+              ref.read(transactionControllerProvider.notifier).applyFilters(
+                startDate: _selectedStartDate,
+                endDate: _selectedEndDate,
+                searchQuery: _localSearchQuery,
+                categoryId: _localSelectedCategoryId,
+                clearCategory: _localSelectedCategoryId == null,
+              );
+
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.check, size: 18),
+            label: const Text('Uygula'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -442,21 +559,17 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     List<CategoriesApiModel> categories,
   ) {
     // Kategorileri type'a göre ayır
-    final incomeCategories = categories
-        .where((c) => c.type == 'income')
-        .toList();
-    final expenseCategories = categories
-        .where((c) => c.type == 'expense')
-        .toList();
+    final incomeCategories = categories.where((c) => c.type == 'income').toList();
+    final expenseCategories = categories.where((c) => c.type == 'expense').toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Kategori Header with Info
+        // Kategori Header
         Row(
           children: [
             Icon(
-              Icons.category_outlined,
+              Icons.apps_rounded,
               color: Theme.of(context).colorScheme.primary,
               size: 20,
             ),
@@ -471,40 +584,53 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             const Spacer(),
             if (_localSelectedCategoryId != null)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Tekrar tıklayarak kaldır',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    width: 1,
                   ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      size: 14,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Seçili',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
           ],
         ),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
 
         // Gelir Kategorileri
         if (incomeCategories.isNotEmpty) ...[
-          _buildCategorySectionHeader(context, 'Gelir Kategorileri', Icons.trending_up, Colors.green[600]!),
-          const SizedBox(height: 8),
-          _buildCategoryList(context, incomeCategories, transactionState),
-          const SizedBox(height: 16),
+          _buildCategorySectionHeader(context, 'Gelir', Icons.trending_up, const Color(0xFF059669)),
+          const SizedBox(height: 12),
+          _buildCategoryGrid(context, incomeCategories),
+          const SizedBox(height: 20),
         ],
         
         // Gider Kategorileri
         if (expenseCategories.isNotEmpty) ...[
-          _buildCategorySectionHeader(context, 'Gider Kategorileri', Icons.trending_down, Colors.red[600]!),
-          const SizedBox(height: 8),
-          _buildCategoryList(context, expenseCategories, transactionState),
+          _buildCategorySectionHeader(context, 'Gider', Icons.trending_down, const Color(0xFFDC2626)),
+          const SizedBox(height: 12),
+          _buildCategoryGrid(context, expenseCategories),
         ],
       ],
     );
@@ -531,90 +657,101 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     );
   }
 
-  Widget _buildCategoryList(BuildContext context, List<CategoriesApiModel> categories, TransactionState transactionState) {
-    return SizedBox(
-      height: 50,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          final isSelected = _localSelectedCategoryId == category.id;
-          final categoryColor = Color(
-            int.parse(category.color.replaceFirst('#', '0xFF')),
-          );
+  Widget _buildCategoryGrid(BuildContext context, List<CategoriesApiModel> categories) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.9,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        final category = categories[index];
+        final isSelected = _localSelectedCategoryId == category.id;
+        final categoryColor = _parseColor(category.color);
 
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (_localSelectedCategoryId == category.id) {
-                    _localSelectedCategoryId =
-                        null; // Deselect if already selected
-                  } else {
-                    _localSelectedCategoryId =
-                        category.id; // Select new category
-                  }
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              if (_localSelectedCategoryId == category.id) {
+                _localSelectedCategoryId = null; // Deselect if already selected
+              } else {
+                _localSelectedCategoryId = category.id; // Select new category
+              }
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: isSelected 
+                  ? categoryColor.withValues(alpha: 0.15)
+                  : Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isSelected 
+                    ? categoryColor
+                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                width: isSelected ? 2 : 1,
+              ),
+              boxShadow: isSelected ? [
+                BoxShadow(
+                  color: categoryColor.withValues(alpha: 0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? categoryColor.withValues(alpha: 0.15)
-                      : Theme.of(
-                          context,
-                        ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isSelected
+              ] : null,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: isSelected 
                         ? categoryColor
-                        : Theme.of(
-                            context,
-                          ).colorScheme.outline.withValues(alpha: 0.2),
-                    width: isSelected ? 1.5 : 1,
+                        : categoryColor.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    _getIconData(category.icon),
+                    color: Colors.white,
+                    size: 18,
                   ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _getIconData(category.icon),
-                      size: 16,
-                      color: isSelected
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
+                    category.nameTr,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: isSelected 
                           ? categoryColor
-                          : Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.6),
+                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      fontSize: 11,
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      category.nameTr,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: isSelected
-                            ? categoryColor
-                            : Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.7),
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.w500,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
+              ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
+  }
+
+  Color _parseColor(String colorString) {
+    try {
+      return Color(int.parse(colorString.replaceFirst('#', '0xff')));
+    } catch (e) {
+      return Colors.grey;
+    }
   }
 
 
