@@ -2,16 +2,57 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/config_response.dart';
+import '../../core/di/injection.dart';
 
 @singleton
 class AdMobService {
   final Map<String, BannerAd> _bannerAds = {};
   InterstitialAd? _interstitialAd;
+  RewardedAd? _rewardedAd;
   bool _isInitialized = false;
   AdMobConfig? _config;
+  
+  static const String _cooldownKey = 'rewarded_ad_cooldown';
+  static const int _cooldownMinutes = 1;
 
   bool get isInitialized => _isInitialized;
+  bool get isRewardedAdReady => _rewardedAd != null;
+
+  Future<bool> isInCooldown() async {
+    final prefs = getIt<SharedPreferences>();
+    final lastShownTime = prefs.getInt(_cooldownKey);
+    
+    if (lastShownTime == null) return false;
+    
+    final lastShown = DateTime.fromMillisecondsSinceEpoch(lastShownTime);
+    final now = DateTime.now();
+    final difference = now.difference(lastShown);
+    
+    return difference.inMinutes < _cooldownMinutes;
+  }
+
+  Future<Duration?> getRemainingCooldown() async {
+    final prefs = getIt<SharedPreferences>();
+    final lastShownTime = prefs.getInt(_cooldownKey);
+    
+    if (lastShownTime == null) return null;
+    
+    final lastShown = DateTime.fromMillisecondsSinceEpoch(lastShownTime);
+    final now = DateTime.now();
+    final difference = now.difference(lastShown);
+    
+    if (difference.inMinutes >= _cooldownMinutes) return null;
+    
+    final cooldownDuration = Duration(minutes: _cooldownMinutes);
+    return cooldownDuration - difference;
+  }
+
+  Future<void> _setCooldownTime() async {
+    final prefs = getIt<SharedPreferences>();
+    await prefs.setInt(_cooldownKey, DateTime.now().millisecondsSinceEpoch);
+  }
 
   Future<void> initialize(AdMobConfig config) async {
     if (_isInitialized) return;
@@ -115,6 +156,69 @@ class AdMobService {
     await _interstitialAd?.show();
   }
 
+  Future<void> loadRewardedAd() async {
+    if (!_isInitialized || _config == null) return;
+
+    await RewardedAd.load(
+      adUnitId: _getRewardedAdUnitId(),
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          _rewardedAd = ad;
+          _rewardedAd?.setImmersiveMode(true);
+        },
+        onAdFailedToLoad: (error) {
+          _rewardedAd = null;
+        },
+      ),
+    );
+  }
+
+  Future<bool> showRewardedAd() async {
+    if (_rewardedAd == null) {
+      return false;
+    }
+
+    bool rewardEarned = false;
+
+    _rewardedAd?.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (ad) {
+        // Rewarded ad showed
+      },
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        _rewardedAd = null;
+        // Yeni reklam yükle
+        loadRewardedAd();
+      },
+      onAdFailedToShowFullScreenContent: (ad, error) {
+        ad.dispose();
+        _rewardedAd = null;
+      },
+    );
+
+    await _rewardedAd?.show(
+      onUserEarnedReward: (ad, reward) {
+        rewardEarned = true;
+        // Ödül kazanıldığında cooldown'u set et
+        _setCooldownTime();
+      },
+    );
+
+    return rewardEarned;
+  }
+
+  String _getRewardedAdUnitId() {
+    if (_config?.testMode == true) {
+      // Test reklam unit ID'leri
+      return Platform.isAndroid
+          ? 'ca-app-pub-3940256099942544/5224354917'
+          : 'ca-app-pub-3940256099942544/1712485313';
+    }
+    
+    return _config?.rewardedAdUnitId ?? '';
+  }
+
   String _getBannerAdUnitId() {
     if (_config?.testMode == true) {
       // Test reklam unit ID'leri
@@ -143,6 +247,8 @@ class AdMobService {
     }
     _bannerAds.clear();
     _interstitialAd?.dispose();
+    _rewardedAd?.dispose();
     _interstitialAd = null;
+    _rewardedAd = null;
   }
 }

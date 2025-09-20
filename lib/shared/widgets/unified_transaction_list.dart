@@ -4,6 +4,7 @@ import '../../features/transactions/models/transaction_model.dart';
 import '../../features/transactions/widgets/edit_transaction_modal.dart';
 import '../../shared/widgets/transaction_skeleton.dart';
 import '../../shared/widgets/custom_snackbar.dart';
+import '../../shared/widgets/rewarded_ad_helper.dart';
 
 class UnifiedTransactionList extends ConsumerWidget {
   final List<TransactionModel> transactions;
@@ -276,32 +277,35 @@ class _SwipeableTransactionCard extends ConsumerWidget {
         return await _showDeleteConfirmation(context);
       },
       onDismissed: (direction) async {
-        await _handleDelete(context);
+        await _handleDelete(context, ref);
       },
       child: GestureDetector(
-        onLongPress: () => _showContextMenu(context),
+        onLongPress: () => _showContextMenu(context, ref),
         child: _TransactionCard(transaction: transaction),
       ),
     );
   }
 
-  Future<void> _handleDelete(BuildContext context) async {
-    try {
-      await onDelete(transaction);
-      if (context.mounted) {
-        CustomSnackBar.showSuccess(context, message: 'İşlem başarıyla silindi');
-      }
-    } catch (e) {
-      if (context.mounted) {
-        CustomSnackBar.showError(
-          context,
-          message: 'İşlem silinirken bir hata oluştu',
-        );
-      }
+  Future<void> _handleDelete(BuildContext context, WidgetRef ref) async {
+    final success = await RewardedAdHelper.showRewardedAdForAction(
+      context,
+      ref,
+      actionTitle: 'İşlemi Sil',
+      actionDescription: 'Bu işlemi silmek için kısa bir reklam izlemeniz gerekiyor.',
+      onRewardEarned: () async {
+        await onDelete(transaction);
+      },
+    );
+
+    if (!success && context.mounted) {
+      CustomSnackBar.showError(
+        context,
+        message: 'İşlem iptal edildi',
+      );
     }
   }
 
-  void _showContextMenu(BuildContext context) {
+  void _showContextMenu(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -312,7 +316,7 @@ class _SwipeableTransactionCard extends ConsumerWidget {
           Navigator.pop(context);
           final shouldDelete = await _showDeleteConfirmation(context);
           if (shouldDelete == true && context.mounted) {
-            await _handleDelete(context);
+            await _handleDelete(context, ref);
           }
         },
         onEdit: () {

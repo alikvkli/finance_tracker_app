@@ -8,6 +8,7 @@ import '../../home/controllers/dashboard_controller.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../core/di/injection.dart';
 import '../../notifications/models/notification_model.dart';
+import '../../../shared/widgets/rewarded_ad_helper.dart';
 
 class AddTransactionModal extends ConsumerStatefulWidget {
   final NotificationAutoFill? autoFillData;
@@ -207,6 +208,27 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
+    // Rewarded ad ile işlemi gerçekleştir
+    final success = await RewardedAdHelper.showRewardedAdForAction(
+      context,
+      ref,
+      actionTitle: 'İşlem Ekle',
+      actionDescription: 'Yeni işlem eklemek için kısa bir reklam izlemeniz gerekiyor.',
+      onRewardEarned: () async {
+        await _performTransactionSubmission();
+      },
+    );
+
+    if (!success && context.mounted) {
+      CustomSnackBar.showError(
+        context,
+        message: 'İşlem iptal edildi',
+      );
+    }
+  }
+
+  Future<void> _performTransactionSubmission() async {
 
     if (_selectedCategory == null) {
       CustomSnackBar.showError(context, message: 'Lütfen bir kategori seçiniz');

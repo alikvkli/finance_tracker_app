@@ -7,6 +7,8 @@ import '../../../shared/widgets/month_badge.dart';
 import '../../../shared/widgets/unified_transaction_list.dart';
 import '../../../shared/widgets/banner_ad_widget.dart';
 import '../../../shared/controllers/config_controller.dart';
+import '../../../shared/services/admob_service.dart';
+import '../../../core/di/injection.dart';
 
 class DashboardPage extends ConsumerStatefulWidget {
   final VoidCallback? onNavigateToTransactions;
@@ -28,7 +30,16 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     // Load dashboard data and config when the page is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(dashboardControllerProvider.notifier).loadDashboardData();
-      ref.read(configControllerProvider.notifier).loadConfig();
+      ref.read(configControllerProvider.notifier).loadConfig().then((_) {
+        // Config yüklendikten sonra rewarded ad'i de yükle
+        final configState = ref.read(configControllerProvider);
+        if (configState.config?.userPreferences.showAds == true) {
+          final adMobService = getIt<AdMobService>();
+          if (adMobService.isInitialized) {
+            adMobService.loadRewardedAd();
+          }
+        }
+      });
     });
   }
 

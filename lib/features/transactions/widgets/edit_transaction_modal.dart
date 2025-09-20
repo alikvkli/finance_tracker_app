@@ -7,6 +7,7 @@ import '../controllers/transaction_controller.dart';
 import '../providers/category_provider.dart';
 import '../../home/controllers/dashboard_controller.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
+import '../../../shared/widgets/rewarded_ad_helper.dart';
 
 class EditTransactionModal extends ConsumerStatefulWidget {
   final TransactionModel transaction;
@@ -100,6 +101,27 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       CustomSnackBar.showError(context, message: 'Lütfen bir kategori seçiniz');
       return;
     }
+
+    // Rewarded ad ile işlemi gerçekleştir
+    final success = await RewardedAdHelper.showRewardedAdForAction(
+      context,
+      ref,
+      actionTitle: 'İşlemi Düzenle',
+      actionDescription: 'İşlemi düzenlemek için kısa bir reklam izlemeniz gerekiyor.',
+      onRewardEarned: () async {
+        await _performTransactionUpdate();
+      },
+    );
+
+    if (!success && context.mounted) {
+      CustomSnackBar.showError(
+        context,
+        message: 'İşlem iptal edildi',
+      );
+    }
+  }
+
+  Future<void> _performTransactionUpdate() async {
 
     // Tekrarlayan işlem validation
     if (_isRecurring) {
