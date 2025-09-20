@@ -55,13 +55,13 @@ class UnifiedTransactionList extends ConsumerWidget {
       return _buildEmptyWidget(context);
     }
 
-    final displayTransactions = maxItems != null 
+    final displayTransactions = maxItems != null
         ? transactions.take(maxItems!).toList()
         : transactions;
 
     // Calculate total item count (transactions + loading indicator)
-    final totalItemCount = displayTransactions.length + 
-        (hasMorePages && isLoadingMore ? 1 : 0);
+    final totalItemCount =
+        displayTransactions.length + (hasMorePages && isLoadingMore ? 1 : 0);
 
     return RefreshIndicator(
       onRefresh: onRefresh ?? () async {},
@@ -70,16 +70,19 @@ class UnifiedTransactionList extends ConsumerWidget {
         itemCount: totalItemCount,
         itemBuilder: (context, index) {
           // Show loading indicator at the end if loading more
-          if (index == displayTransactions.length && hasMorePages && isLoadingMore) {
+          if (index == displayTransactions.length &&
+              hasMorePages &&
+              isLoadingMore) {
             return _buildLoadingMoreIndicator();
           }
 
           // Trigger load more when near the end
-          if (index == displayTransactions.length - 3 && 
-              hasMorePages && 
-              !isLoadingMore && 
+          if (index == displayTransactions.length - 3 &&
+              hasMorePages &&
+              !isLoadingMore &&
               onLoadMore != null &&
-              maxItems == null) { // Only for full lists, not dashboard preview
+              maxItems == null) {
+            // Only for full lists, not dashboard preview
             WidgetsBinding.instance.addPostFrameCallback((_) {
               onLoadMore!();
             });
@@ -118,7 +121,9 @@ class UnifiedTransactionList extends ConsumerWidget {
             Text(
               'Yükleniyor...',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontSize: 14,
               ),
             ),
@@ -143,17 +148,18 @@ class UnifiedTransactionList extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               'Bir hata oluştu',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontSize: 18),
             ),
             const SizedBox(height: 8),
             Text(
               error,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 24),
@@ -180,45 +186,52 @@ class UnifiedTransactionList extends ConsumerWidget {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primaryContainer.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
                   width: 2,
                 ),
               ),
               child: Icon(
                 Icons.receipt_long_outlined,
                 size: 48,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.6),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             Text(
               emptyTitle ?? 'Henüz işlem yok',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             Container(
               constraints: const BoxConstraints(maxWidth: 280),
               child: Text(
                 emptySubtitle ?? 'Henüz herhangi bir işlem bulunamadı',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.5,
                 ),
               ),
             ),
-            
+
             // Action button if provided
             if (emptyActionButton != null) emptyActionButton!,
           ],
@@ -253,11 +266,7 @@ class _SwipeableTransactionCard extends ConsumerWidget {
         child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.delete_outline,
-              color: Colors.white,
-              size: 32,
-            ),
+            Icon(Icons.delete_outline, color: Colors.white, size: 32),
             SizedBox(height: 4),
             Text(
               'Sil',
@@ -287,10 +296,7 @@ class _SwipeableTransactionCard extends ConsumerWidget {
     try {
       await onDelete(transaction);
       if (context.mounted) {
-        CustomSnackBar.showSuccess(
-          context,
-          message: 'İşlem başarıyla silindi',
-        );
+        CustomSnackBar.showSuccess(context, message: 'İşlem başarıyla silindi');
       }
     } catch (e) {
       if (context.mounted) {
@@ -324,7 +330,10 @@ class _SwipeableTransactionCard extends ConsumerWidget {
     );
   }
 
-  void _showEditTransactionModal(BuildContext context, TransactionModel transaction) {
+  void _showEditTransactionModal(
+    BuildContext context,
+    TransactionModel transaction,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -348,7 +357,9 @@ class _SwipeableTransactionCard extends ConsumerWidget {
               // Icon
               Icon(
                 Icons.delete_outline_rounded,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
                 size: 48,
               ),
 
@@ -358,7 +369,6 @@ class _SwipeableTransactionCard extends ConsumerWidget {
               Text(
                 'İşlemi Sil',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
                   fontSize: 18,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
@@ -371,7 +381,9 @@ class _SwipeableTransactionCard extends ConsumerWidget {
                 'Bu işlemi silmek istediğinizden emin misiniz?',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
 
@@ -393,7 +405,9 @@ class _SwipeableTransactionCard extends ConsumerWidget {
                       child: Text(
                         'İptal',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.8),
                           fontWeight: FontWeight.w500,
                           fontSize: 15,
                         ),
@@ -489,18 +503,19 @@ class _TransactionCard extends StatelessWidget {
               children: [
                 Text(
                   transaction.description ?? transaction.category.nameTr,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontSize: 15),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                  Text(
-                    transaction.category.nameTr,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                Text(
+                  transaction.category.nameTr,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 13,
                   ),
                 ),
@@ -508,7 +523,9 @@ class _TransactionCard extends StatelessWidget {
                 Text(
                   _formatDate(transaction.transactionDate),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
                     fontSize: 11,
                   ),
                 ),
@@ -525,7 +542,6 @@ class _TransactionCard extends StatelessWidget {
               Text(
                 '${isExpense ? '-' : '+'}${_formatAmount(transaction.amount)}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
                   color: amountColor,
                   fontSize: 15,
                 ),
@@ -534,7 +550,9 @@ class _TransactionCard extends StatelessWidget {
               Text(
                 transaction.currency,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.5),
                   fontSize: 9,
                 ),
               ),
@@ -637,16 +655,16 @@ class _TransactionCard extends StatelessWidget {
 
     // Tam sayı kısmını al
     final integerPart = amountValue.floor();
-    
+
     // Binlik ayırıcılarla formatla
     final formattedAmount = _addThousandSeparators(integerPart.toString());
-    
+
     return '₺$formattedAmount';
   }
 
   String _addThousandSeparators(String number) {
     if (number.isEmpty) return number;
-    
+
     // Regex ile binlik ayırıcı ekle (nokta kullanarak)
     return number.replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
@@ -666,8 +684,18 @@ class _TransactionCard extends StatelessWidget {
       return 'Dün';
     } else {
       final monthNames = [
-        'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-        'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+        'Oca',
+        'Şub',
+        'Mar',
+        'Nis',
+        'May',
+        'Haz',
+        'Tem',
+        'Ağu',
+        'Eyl',
+        'Eki',
+        'Kas',
+        'Ara',
       ];
       return '${transactionDate.day} ${monthNames[transactionDate.month - 1]}';
     }
@@ -714,7 +742,9 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
             width: 48,
             height: 5,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(3),
             ),
           ),
@@ -752,7 +782,6 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                       Text(
                         transaction.description ?? transaction.category.nameTr,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
                           fontSize: 16,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -763,7 +792,9 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                       Text(
                         transaction.category.nameTr,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                           fontSize: 13,
                         ),
                       ),
@@ -771,7 +802,9 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                       Text(
                         _formatDateHelper(transaction.transactionDate),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.5),
                           fontSize: 12,
                         ),
                       ),
@@ -788,7 +821,6 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                     Text(
                       '${transaction.type == 'expense' ? '-' : '+'}${_formatAmount(transaction.amount)}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
                       ),
@@ -797,7 +829,9 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                     Text(
                       transaction.currency,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
                         fontSize: 11,
                       ),
                     ),
@@ -829,7 +863,10 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
                     child: Row(
                       children: [
                         Icon(
@@ -840,11 +877,11 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                         const SizedBox(width: 12),
                         Text(
                           'Düzenle',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 15,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 15,
+                              ),
                         ),
                       ],
                     ),
@@ -857,7 +894,10 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
                     child: Row(
                       children: [
                         Icon(
@@ -868,11 +908,8 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                         const SizedBox(width: 12),
                         Text(
                           'Sil',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: Colors.red[600],
-                            fontSize: 15,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.red[600], fontSize: 15),
                         ),
                       ],
                     ),
@@ -900,8 +937,18 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
       return 'Dün';
     } else {
       final monthNames = [
-        'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-        'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+        'Oca',
+        'Şub',
+        'Mar',
+        'Nis',
+        'May',
+        'Haz',
+        'Tem',
+        'Ağu',
+        'Eyl',
+        'Eki',
+        'Kas',
+        'Ara',
       ];
       return '${transactionDate.day} ${monthNames[transactionDate.month - 1]}';
     }
@@ -991,16 +1038,16 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
 
     // Tam sayı kısmını al
     final integerPart = amountValue.floor();
-    
+
     // Binlik ayırıcılarla formatla
     final formattedAmount = _addThousandSeparators(integerPart.toString());
-    
+
     return '₺$formattedAmount';
   }
 
   String _addThousandSeparators(String number) {
     if (number.isEmpty) return number;
-    
+
     // Regex ile binlik ayırıcı ekle (nokta kullanarak)
     return number.replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),

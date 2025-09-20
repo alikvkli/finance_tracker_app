@@ -394,7 +394,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                             context,
                           ).colorScheme.onSurface.withValues(alpha: 0.6),
                           fontSize: 12,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],

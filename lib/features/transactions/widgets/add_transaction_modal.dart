@@ -413,7 +413,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
                       Text(
                         'Yeni İşlem',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
@@ -576,7 +575,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
             Text(
               'Kategoriler Yüklenemedi',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
@@ -656,7 +654,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
         Text(
           'İşlem Türü',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
@@ -709,7 +706,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
           ],
@@ -775,7 +771,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
                       child: Text(
                         _selectedCategory!.nameTr,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -879,7 +874,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
                         Text(
                           'Kategori Seçiniz',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
@@ -956,7 +950,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
                           child: Text(
                             category.nameTr,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
                                   color: Theme.of(context).colorScheme.onSurface,
                             ),
                             textAlign: TextAlign.center,
@@ -1062,7 +1055,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
         Text(
             'Açıklama (İsteğe Bağlı)',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
@@ -1095,7 +1087,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
         Text(
           'Tarih',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
@@ -1133,7 +1124,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
                   '${_selectedDate.day.toString().padLeft(2, '0')}/'
                   '${_selectedDate.month.toString().padLeft(2, '0')}/'
                   '${_selectedDate.year}',
-                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const Spacer(),
                 Icon(
@@ -1171,7 +1161,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
               'Tekrarlayan İşlem',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -1181,7 +1170,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
           Text(
             'Tekrarlama Sıklığı',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 8),
@@ -1208,7 +1196,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
           Text(
             'Bitiş Tarihi',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 8),

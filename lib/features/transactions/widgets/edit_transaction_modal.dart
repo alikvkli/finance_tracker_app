@@ -635,8 +635,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
               ),
             ),
           ],
@@ -697,7 +696,6 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                     child: Text(
                       _selectedCategory!.nameTr,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -1091,7 +1089,6 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
               'Tekrarlayan İşlem',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -1101,7 +1098,6 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
           Text(
             'Tekrarlama Sıklığı',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 8),
@@ -1128,7 +1124,6 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
           Text(
             'Bitiş Tarihi',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 8),

@@ -78,7 +78,7 @@ class CustomBottomNavigation extends StatelessWidget {
     required int index,
   }) {
     final isActive = currentIndex == index;
-    
+
     return Expanded(
       child: GestureDetector(
         onTap: () => onTap(index),
@@ -90,19 +90,22 @@ class CustomBottomNavigation extends StatelessWidget {
             children: [
               Icon(
                 isActive ? activeIcon : icon,
-                color: isActive 
+                color: isActive
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                    : Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.5),
                 size: 26,
               ),
               const SizedBox(height: 2),
               Text(
                 label,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isActive 
+                  color: isActive
                       ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                  fontWeight: FontWeight.w500,
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.5),
                   fontSize: 10,
                 ),
                 textAlign: TextAlign.center,
@@ -133,18 +136,13 @@ class CustomBottomNavigation extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                child: const Icon(Icons.add, color: Colors.white, size: 20),
               ),
               const SizedBox(height: 2),
               Text(
                 'Ekle',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w500,
                   fontSize: 10,
                 ),
                 textAlign: TextAlign.center,

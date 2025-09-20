@@ -119,7 +119,6 @@ class _SuccessSnackBarContent extends StatelessWidget {
                   'Başarılı!',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white,
-                    fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
                 ),
@@ -210,7 +209,6 @@ class _ErrorSnackBarContent extends StatelessWidget {
                   'Hata!',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white,
-                    fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
                 ),
@@ -301,7 +299,6 @@ class _InfoSnackBarContent extends StatelessWidget {
                   'Bilgi',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white,
-                    fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
                 ),

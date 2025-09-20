@@ -117,7 +117,6 @@ class FixedSummaryCards extends ConsumerWidget {
             title,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 4),

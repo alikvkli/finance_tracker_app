@@ -4,16 +4,10 @@ class MonthBadge extends StatelessWidget {
   final DateTime? startDate;
   final DateTime? endDate;
 
-  const MonthBadge({
-    super.key,
-    this.startDate,
-    this.endDate,
-  });
+  const MonthBadge({super.key, this.startDate, this.endDate});
 
   // Current month constructor
-  MonthBadge.current({super.key}) 
-    : startDate = null,
-      endDate = null;
+  MonthBadge.current({super.key}) : startDate = null, endDate = null;
 
   // Date range constructor
   MonthBadge.dateRange({
@@ -42,7 +36,6 @@ class MonthBadge extends StatelessWidget {
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           color: Theme.of(context).colorScheme.primary,
           fontSize: 13,
-          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -50,8 +43,18 @@ class MonthBadge extends StatelessWidget {
 
   String _getMonthText() {
     final monthNames = [
-      'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık',
     ];
 
     // If no dates provided, show current month
@@ -61,7 +64,8 @@ class MonthBadge extends StatelessWidget {
     }
 
     // Format date range
-    if (startDate!.year == endDate!.year && startDate!.month == endDate!.month) {
+    if (startDate!.year == endDate!.year &&
+        startDate!.month == endDate!.month) {
       // Same month
       return '${monthNames[startDate!.month - 1]} ${startDate!.year}';
     } else if (startDate!.year == endDate!.year) {

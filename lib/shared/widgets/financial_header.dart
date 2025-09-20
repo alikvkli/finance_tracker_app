@@ -49,7 +49,6 @@ class FinancialHeader extends StatelessWidget {
                 child: Text(
                   title,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 24,
                   ),
@@ -172,7 +171,6 @@ class FinancialHeader extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 13,
-            fontWeight: FontWeight.w500,
             letterSpacing: 0.3,
           ),
         ),
@@ -188,7 +186,6 @@ class FinancialHeader extends StatelessWidget {
             Text(
               _formatAmount(balance),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w700,
                 color: color,
                 fontSize: 32,
                 letterSpacing: -0.5,
@@ -226,7 +223,6 @@ class FinancialHeader extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontSize: 12,
-                fontWeight: FontWeight.w500,
               ),
             ),
           ],

@@ -102,7 +102,6 @@ class DashboardCards extends ConsumerWidget {
             title,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 4),
@@ -163,7 +162,6 @@ class DashboardCards extends ConsumerWidget {
                   'Net Bakiye',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 4),

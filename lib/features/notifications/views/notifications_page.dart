@@ -93,7 +93,6 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                 Text(
                   'Bildirimler',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 24,
                   ),
@@ -277,7 +276,6 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             Text(
               'Bir hata oluştu',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
                 fontSize: 18,
               ),
             ),
@@ -334,7 +332,6 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             Text(
               'Henüz bildirim yok',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -731,7 +728,6 @@ class _NotificationCard extends StatelessWidget {
                               Text(
                                 notification.title,
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
                                   fontSize: 16,
                                   color: Theme.of(context).colorScheme.onSurface,
                                 ),
@@ -811,7 +807,6 @@ class _NotificationCard extends StatelessWidget {
                                   'Otomatik işlem oluştur',
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.primary,
-                                    fontWeight: FontWeight.w500,
                                     fontSize: 14,
                                   ),
                                 ),
@@ -873,7 +868,6 @@ class _NotificationCard extends StatelessWidget {
                         'İşlem tamamlanıyor...',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.w500,
                           fontSize: 12,
                         ),
                       ),
@@ -924,7 +918,6 @@ class _NotificationCard extends StatelessWidget {
                         'Siliniyor...',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.w500,
                           fontSize: 12,
                         ),
                       ),

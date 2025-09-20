@@ -92,7 +92,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               Text(
                 'Profil',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 28,
                 ),
@@ -156,7 +155,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           ? '$_userName $_userSurname'
                           : 'Merhaba',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 20,
                       ),
@@ -205,7 +203,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           child: Text(
             'Hesap Yönetimi',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
             ),
@@ -249,7 +246,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               _isDeleting ? 'Hesap Siliniyor...' : 'Hesabı Sil',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.error,
-                fontWeight: FontWeight.w600,
                 fontSize: 16,
               ),
             ),
@@ -284,7 +280,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 Text(
                   'Hesabı Sil',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
@@ -495,7 +490,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             Text(
               'Çıkış Yap',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),

@@ -30,16 +30,16 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
 
     // Initialize search controller and date range with current values
     _initializeWithCurrentState();
-      }
+  }
 
   void _initializeWithCurrentState() {
     final transactionState = ref.read(transactionControllerProvider);
     _searchController.text = transactionState.searchQuery ?? '';
-      setState(() {
-        _selectedStartDate = transactionState.selectedStartDate;
-        _selectedEndDate = transactionState.selectedEndDate;
-        _localSearchQuery = transactionState.searchQuery;
-        _localSelectedCategoryId = transactionState.selectedCategoryId;
+    setState(() {
+      _selectedStartDate = transactionState.selectedStartDate;
+      _selectedEndDate = transactionState.selectedEndDate;
+      _localSearchQuery = transactionState.searchQuery;
+      _localSelectedCategoryId = transactionState.selectedCategoryId;
       _isInitialized = true;
     });
   }
@@ -88,28 +88,34 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
 
           // Header
-                Container(
+          Container(
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
-                  decoration: BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                  ),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+              ),
             ),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -125,14 +131,16 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     children: [
                       Text(
                         'Filtreler',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(),
                       ),
                       Text(
                         'İşlemlerinizi filtreleyerek arayın',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -160,7 +168,11 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                         const SizedBox(height: 24),
 
                         // Category Section
-                        _buildCategorySections(context, transactionState, categories),
+                        _buildCategorySections(
+                          context,
+                          transactionState,
+                          categories,
+                        ),
                         const SizedBox(height: 32),
 
                         // Action Buttons
@@ -181,11 +193,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Search Skeleton
-          _buildSkeletonSection('Arama', [
-            _buildSkeletonContainer(height: 48),
-          ]),
+          _buildSkeletonSection('Arama', [_buildSkeletonContainer(height: 48)]),
           const SizedBox(height: 24),
-          
+
           // Date Range Skeleton
           _buildSkeletonSection('Dönem Seçimi', [
             Row(
@@ -197,7 +207,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             ),
           ]),
           const SizedBox(height: 24),
-          
+
           // Categories Skeleton
           _buildSkeletonSection('Kategoriler', [
             _buildSkeletonContainer(height: 50),
@@ -205,13 +215,17 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             _buildSkeletonContainer(height: 50),
           ]),
           const SizedBox(height: 32),
-          
+
           // Buttons Skeleton
           Row(
             children: [
-              Expanded(child: _buildSkeletonContainer(height: 48, borderRadius: 12)),
+              Expanded(
+                child: _buildSkeletonContainer(height: 48, borderRadius: 12),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _buildSkeletonContainer(height: 48, borderRadius: 12)),
+              Expanded(
+                child: _buildSkeletonContainer(height: 48, borderRadius: 12),
+              ),
             ],
           ),
         ],
@@ -246,8 +260,10 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
       width: width,
       height: height ?? 16,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
-        borderRadius: isCircle 
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+        borderRadius: isCircle
             ? BorderRadius.circular((height ?? 16) / 2)
             : BorderRadius.circular(borderRadius ?? 8),
       ),
@@ -261,7 +277,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
         Row(
           children: [
             Icon(
-                        Icons.search,
+              Icons.search,
               size: 20,
               color: Theme.of(context).colorScheme.primary,
             ),
@@ -269,7 +285,6 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             Text(
               'Arama',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
@@ -281,106 +296,106 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
           decoration: InputDecoration(
             hintText: 'İşlem açıklaması...',
             suffixIcon: (_localSearchQuery?.isNotEmpty ?? false)
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.clear,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                              ),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _localSearchQuery = null;
-                                });
-                              },
-                            )
-                          : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+                ? IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() {
+                        _localSearchQuery = null;
+                      });
+                    },
+                  )
+                : null,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: Theme.of(context).colorScheme.primary,
                 width: 2,
               ),
-                      ),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _localSearchQuery = value.isEmpty ? null : value;
-                      });
-                    },
-                  ),
+            ),
+          ),
+          onChanged: (value) {
+            setState(() {
+              _localSearchQuery = value.isEmpty ? null : value;
+            });
+          },
+        ),
       ],
     );
   }
 
   Widget _buildActionButtons(BuildContext context) {
     return Row(
-                  children: [
-                    // Clear Button (only show if there are active filters)
-                    if (_hasActiveFilters())
-                      Expanded(
+      children: [
+        // Clear Button (only show if there are active filters)
+        if (_hasActiveFilters())
+          Expanded(
             child: OutlinedButton.icon(
-                          onPressed: () {
-                            _searchController.clear();
+              onPressed: () {
+                _searchController.clear();
                 _selectCurrentMonth();
-                            setState(() {
-                              _localSearchQuery = null;
-                              _localSelectedCategoryId = null;
-                            });
+                setState(() {
+                  _localSearchQuery = null;
+                  _localSelectedCategoryId = null;
+                });
                 ref.read(transactionControllerProvider.notifier).clearFilters();
-                            Navigator.pop(context);
-                          },
+                Navigator.pop(context);
+              },
               icon: const Icon(Icons.clear_all, size: 18),
               label: const Text('Temizle'),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
 
-                    if (_hasActiveFilters()) const SizedBox(width: 12),
+        if (_hasActiveFilters()) const SizedBox(width: 12),
 
-                    // Apply Button
-                    Expanded(
+        // Apply Button
+        Expanded(
           child: ElevatedButton.icon(
-                        onPressed: () {
+            onPressed: () {
               print('🔍 Applying filters:');
               print('📅 Date: $_selectedStartDate to $_selectedEndDate');
               print('🔍 Search: $_localSearchQuery');
               print('🏷️ Category: $_localSelectedCategoryId');
-              
-              // Apply all filters at once to prevent multiple API calls
-              ref.read(transactionControllerProvider.notifier).applyFilters(
-                startDate: _selectedStartDate,
-                endDate: _selectedEndDate,
-                searchQuery: _localSearchQuery,
-                categoryId: _localSelectedCategoryId,
-                clearCategory: _localSelectedCategoryId == null,
-              );
 
-                          Navigator.pop(context);
-                        },
+              // Apply all filters at once to prevent multiple API calls
+              ref
+                  .read(transactionControllerProvider.notifier)
+                  .applyFilters(
+                    startDate: _selectedStartDate,
+                    endDate: _selectedEndDate,
+                    searchQuery: _localSearchQuery,
+                    categoryId: _localSelectedCategoryId,
+                    clearCategory: _localSelectedCategoryId == null,
+                  );
+
+              Navigator.pop(context);
+            },
             icon: const Icon(Icons.check, size: 18),
             label: const Text('Uygula'),
-                        style: ElevatedButton.styleFrom(
+            style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -400,7 +415,6 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             Text(
               'Dönem Seçimi',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
@@ -455,7 +469,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
         Text(
           title,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 12,
           ),
         ),
@@ -476,7 +492,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.3),
               ),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -493,12 +511,16 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     '${selectedDate.day.toString().padLeft(2, '0')}/'
                     '${selectedDate.month.toString().padLeft(2, '0')}/'
                     '${selectedDate.year}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(fontSize: 12),
                   ),
                 ),
                 Icon(
                   Icons.arrow_drop_down,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.5),
                   size: 16,
                 ),
               ],
@@ -535,7 +557,8 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
 
     return _localSearchQuery != null ||
         _localSelectedCategoryId != null ||
-        (_selectedStartDate != null && _selectedStartDate != currentMonthStart) ||
+        (_selectedStartDate != null &&
+            _selectedStartDate != currentMonthStart) ||
         (_selectedEndDate != null && _selectedEndDate != currentMonthEnd);
   }
 
@@ -545,8 +568,12 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     List<CategoriesApiModel> categories,
   ) {
     // Kategorileri type'a göre ayır
-    final incomeCategories = categories.where((c) => c.type == 'income').toList();
-    final expenseCategories = categories.where((c) => c.type == 'expense').toList();
+    final incomeCategories = categories
+        .where((c) => c.type == 'income')
+        .toList();
+    final expenseCategories = categories
+        .where((c) => c.type == 'expense')
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -563,19 +590,25 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             Text(
               'Kategoriler',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const Spacer(),
             if (_localSelectedCategoryId != null)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -590,11 +623,10 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     const SizedBox(width: 4),
                     Text(
                       'Seçili',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                  ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
@@ -602,7 +634,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
           ],
         ),
 
-          const SizedBox(height: 16),
+        const SizedBox(height: 16),
 
         // Category Selection
         _buildCategoryDropdown(context, incomeCategories, expenseCategories),
@@ -611,9 +643,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
   }
 
   Widget _buildCategoryDropdown(
-    BuildContext context, 
-    List<CategoriesApiModel> incomeCategories, 
-    List<CategoriesApiModel> expenseCategories
+    BuildContext context,
+    List<CategoriesApiModel> incomeCategories,
+    List<CategoriesApiModel> expenseCategories,
   ) {
     final allCategories = [...incomeCategories, ...expenseCategories];
     CategoriesApiModel? selectedCategory;
@@ -628,12 +660,13 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     }
 
     return GestureDetector(
-      onTap: () => _showCategoryPicker(context, incomeCategories, expenseCategories),
+      onTap: () =>
+          _showCategoryPicker(context, incomeCategories, expenseCategories),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           border: Border.all(
-            color: _localSelectedCategoryId == null 
+            color: _localSelectedCategoryId == null
                 ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)
                 : Theme.of(context).colorScheme.primary,
             width: _localSelectedCategoryId == null ? 1 : 2,
@@ -641,8 +674,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-      children: [
-            if (_localSelectedCategoryId != null && selectedCategory != null) ...[
+          children: [
+            if (_localSelectedCategoryId != null &&
+                selectedCategory != null) ...[
               Container(
                 width: 32,
                 height: 32,
@@ -653,7 +687,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                 child: Icon(
                   _getIconData(selectedCategory.icon),
                   color: Colors.white,
-          size: 16,
+                  size: 16,
                 ),
               ),
               const SizedBox(width: 12),
@@ -661,20 +695,20 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-        Text(
+                    Text(
                       selectedCategory.nameTr,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
                     ),
                     Text(
                       selectedCategory.type == 'income' ? 'Gelir' : 'Gider',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                         fontSize: 12,
-          ),
-        ),
-      ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ] else ...[
@@ -682,14 +716,18 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                 child: Text(
                   'Kategori seçiniz (tümü)',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ),
             ],
             Icon(
               Icons.arrow_drop_down,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ],
         ),
@@ -743,11 +781,13 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              
+
               // Header
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
@@ -756,7 +796,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -769,15 +811,15 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     Expanded(
                       child: Text(
                         'Kategori Seçiniz',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(),
                       ),
                     ),
                   ],
                 ),
               ),
-              
+
               // Category Type Selector
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -785,11 +827,11 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                   children: [
                     Expanded(
                       child: _buildModalTypeButton(
-                        context, 
-                        setModalState, 
-                        'income', 
-                        'Gelir', 
-                        Icons.trending_up, 
+                        context,
+                        setModalState,
+                        'income',
+                        'Gelir',
+                        Icons.trending_up,
                         const Color(0xFF059669),
                         incomeCategories,
                         expenseCategories,
@@ -798,11 +840,11 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: _buildModalTypeButton(
-                        context, 
-                        setModalState, 
-                        'expense', 
-                        'Gider', 
-                        Icons.trending_down, 
+                        context,
+                        setModalState,
+                        'expense',
+                        'Gider',
+                        Icons.trending_down,
                         const Color(0xFFDC2626),
                         incomeCategories,
                         expenseCategories,
@@ -811,12 +853,17 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Categories List based on selected type
               Expanded(
-                child: _buildModalFilteredCategoriesList(context, setModalState, incomeCategories, expenseCategories),
+                child: _buildModalFilteredCategoriesList(
+                  context,
+                  setModalState,
+                  incomeCategories,
+                  expenseCategories,
+                ),
               ),
             ],
           ),
@@ -836,9 +883,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     List<CategoriesApiModel> expenseCategories,
   ) {
     final isSelected = _selectedCategoryType == type;
-    
+
     return GestureDetector(
-              onTap: () {
+      onTap: () {
         setModalState(() {
           _selectedCategoryType = type;
           // Seçili kategori varsa ve yeni türe uygun değilse temizle
@@ -848,7 +895,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
               final selectedCategory = allCategories.firstWhere(
                 (cat) => cat.id == _localSelectedCategoryId,
               );
-              
+
               // Eğer seçili kategori yeni türe uygun değilse temizle
               if (selectedCategory.type != type) {
                 _localSelectedCategoryId = null;
@@ -856,38 +903,47 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             } catch (e) {
               _localSelectedCategoryId = null;
             }
-                  }
-                });
-              },
-              child: Container(
+          }
+        });
+      },
+      child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
+        decoration: BoxDecoration(
           color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
-                  border: Border.all(
-            color: isSelected ? color : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+          border: Border.all(
+            color: isSelected
+                ? color
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
-                  children: [
-                    Icon(
+          children: [
+            Icon(
               icon,
-              color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: isSelected
+                  ? color
+                  : Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
               size: 20,
             ),
             const SizedBox(height: 4),
-                    Text(
+            Text(
               label,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: isSelected
+                    ? color
+                    : Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                fontSize: 12,
               ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -898,7 +954,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     List<CategoriesApiModel> expenseCategories,
   ) {
     List<CategoriesApiModel> categoriesToShow = [];
-    
+
     switch (_selectedCategoryType) {
       case 'income':
         categoriesToShow = incomeCategories;
@@ -924,20 +980,22 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
           Icons.clear_all,
           Theme.of(context).colorScheme.primary,
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Categories
-        ...categoriesToShow.map((cat) => _buildModalCategoryOption(
-          context,
-          setModalState,
-          cat.id,
-          cat.nameTr,
-          '${cat.type == 'income' ? 'Gelir' : 'Gider'} kategorisi',
-          _getIconData(cat.icon),
-          _parseColor(cat.color),
-        )),
-        
+        ...categoriesToShow.map(
+          (cat) => _buildModalCategoryOption(
+            context,
+            setModalState,
+            cat.id,
+            cat.nameTr,
+            '${cat.type == 'income' ? 'Gelir' : 'Gider'} kategorisi',
+            _getIconData(cat.icon),
+            _parseColor(cat.color),
+          ),
+        ),
+
         const SizedBox(height: 24),
       ],
     );
@@ -953,7 +1011,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
     Color color,
   ) {
     final isSelected = _localSelectedCategoryId == categoryId;
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -973,11 +1031,7 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
             color: color,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 20,
-          ),
+          child: Icon(icon, color: Colors.white, size: 20),
         ),
         title: Text(
           title,
@@ -989,22 +1043,16 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
         subtitle: Text(
           subtitle,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
-        trailing: isSelected 
-            ? Icon(
-                Icons.check_circle,
-                color: color,
-                size: 24,
-              )
+        trailing: isSelected
+            ? Icon(Icons.check_circle, color: color, size: 24)
             : null,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        tileColor: isSelected 
-            ? color.withValues(alpha: 0.1)
-            : null,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        tileColor: isSelected ? color.withValues(alpha: 0.1) : null,
       ),
     );
   }
