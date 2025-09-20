@@ -72,6 +72,9 @@ dependencies:
   # Push Notifications
   onesignal_flutter: ^5.3.4
   flutter_launcher_icons: ^0.14.4
+  
+  # Fonts
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

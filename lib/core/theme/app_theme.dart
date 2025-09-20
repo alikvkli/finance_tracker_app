@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static const Color primaryColor = Color(0xFF2E7D32);
@@ -25,38 +26,46 @@ class AppTheme {
         surface: surfaceColor,
         error: errorColor,
       ),
-      textTheme: const TextTheme(
-        headlineLarge: TextStyle(
+      textTheme: GoogleFonts.ubuntuTextTheme().copyWith(
+        headlineLarge: GoogleFonts.ubuntu(
           fontSize: 32,
           color: textPrimary,
+          fontWeight: FontWeight.w600,
         ),
-        headlineMedium: TextStyle(
+        headlineMedium: GoogleFonts.ubuntu(
           fontSize: 28,
           color: textPrimary,
+          fontWeight: FontWeight.w600,
         ),
-        headlineSmall: TextStyle(
+        headlineSmall: GoogleFonts.ubuntu(
           fontSize: 24,
           color: textPrimary,
+          fontWeight: FontWeight.w600,
         ),
-        titleLarge: TextStyle(
+        titleLarge: GoogleFonts.ubuntu(
           fontSize: 20,
           color: textPrimary,
+          fontWeight: FontWeight.w500,
         ),
-        titleMedium: TextStyle(
+        titleMedium: GoogleFonts.ubuntu(
           fontSize: 16,
           color: textPrimary,
+          fontWeight: FontWeight.w500,
         ),
-        bodyLarge: TextStyle(
+        bodyLarge: GoogleFonts.ubuntu(
           fontSize: 16,
           color: textPrimary,
+          fontWeight: FontWeight.w400,
         ),
-        bodyMedium: TextStyle(
+        bodyMedium: GoogleFonts.ubuntu(
           fontSize: 14,
           color: textSecondary,
+          fontWeight: FontWeight.w400,
         ),
-        bodySmall: TextStyle(
+        bodySmall: GoogleFonts.ubuntu(
           fontSize: 12,
           color: textHint,
+          fontWeight: FontWeight.w400,
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -68,6 +77,10 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 2,
+          textStyle: GoogleFonts.ubuntu(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -78,13 +91,22 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+          textStyle: GoogleFonts.ubuntu(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        titleTextStyle: GoogleFonts.ubuntu(
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
       ),
     );
   }
