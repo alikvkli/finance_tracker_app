@@ -381,7 +381,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                       Text(
                         'Son İşlemler',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
                           fontSize: 14,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -411,7 +410,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                       fontSize: 14,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   style: TextButton.styleFrom(

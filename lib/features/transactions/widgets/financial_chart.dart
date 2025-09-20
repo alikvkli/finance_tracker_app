@@ -38,38 +38,43 @@ class FinancialChart extends ConsumerWidget {
               const SizedBox(width: 12),
               Text(
                 'Finansal Durum',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(),
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  _formatDateRange(transactionState.selectedStartDate, transactionState.selectedEndDate),
+                  _formatDateRange(
+                    transactionState.selectedStartDate,
+                    transactionState.selectedEndDate,
+                  ),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Chart
           SizedBox(
             height: 200,
             child: _buildPieChart(context, transactionState),
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Legend
           _buildLegend(context, transactionState),
         ],
@@ -86,13 +91,17 @@ class FinancialChart extends ConsumerWidget {
             Icon(
               Icons.pie_chart_outline,
               size: 48,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 8),
             Text(
               'Veri yok',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -109,10 +118,9 @@ class FinancialChart extends ConsumerWidget {
               value: state.totalIncome,
               title: 'Gelir',
               radius: 60,
-              titleStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+              titleStyle: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.white),
             ),
           if (state.totalExpense > 0)
             PieChartSectionData(
@@ -120,10 +128,9 @@ class FinancialChart extends ConsumerWidget {
               value: state.totalExpense,
               title: 'Gider',
               radius: 60,
-              titleStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+              titleStyle: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.white),
             ),
         ],
         sectionsSpace: 2,
@@ -165,7 +172,9 @@ class FinancialChart extends ConsumerWidget {
             'Bakiye',
             state.balance,
             state.balance >= 0 ? Colors.green[600]! : Colors.red[600]!,
-            state.balance >= 0 ? Icons.account_balance_wallet : Icons.account_balance_wallet_outlined,
+            state.balance >= 0
+                ? Icons.account_balance_wallet
+                : Icons.account_balance_wallet_outlined,
           ),
         ),
       ],
@@ -184,33 +193,26 @@ class FinancialChart extends ConsumerWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: color,
-            size: 20,
-          ),
+          Icon(icon, color: color, size: 20),
           const SizedBox(height: 8),
           Text(
             title,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-              fontWeight: FontWeight.w500,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             '${_formatAmount(amount)} ₺',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: color),
           ),
         ],
       ),
@@ -219,8 +221,18 @@ class FinancialChart extends ConsumerWidget {
 
   String _formatDateRange(DateTime startDate, DateTime endDate) {
     final months = [
-      'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-      'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+      'Oca',
+      'Şub',
+      'Mar',
+      'Nis',
+      'May',
+      'Haz',
+      'Tem',
+      'Ağu',
+      'Eyl',
+      'Eki',
+      'Kas',
+      'Ara',
     ];
 
     if (startDate.year == endDate.year && startDate.month == endDate.month) {

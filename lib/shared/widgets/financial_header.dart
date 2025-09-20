@@ -65,7 +65,9 @@ class FinancialHeader extends StatelessWidget {
                     },
                     icon: Icon(
                       Icons.notifications_outlined,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                       size: 22,
                     ),
                     tooltip: 'Bildirimler',
@@ -86,7 +88,9 @@ class FinancialHeader extends StatelessWidget {
                       onPressed: () => _showLogoutDialog(context, ref),
                       icon: Icon(
                         Icons.logout_rounded,
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                         size: 22,
                       ),
                       tooltip: 'Çıkış Yap',
@@ -136,7 +140,9 @@ class FinancialHeader extends StatelessWidget {
             Container(
               width: 1,
               height: 40,
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.1),
             ),
             Expanded(
               child: _buildStatItem(
@@ -155,21 +161,22 @@ class FinancialHeader extends StatelessWidget {
 
   Widget _buildNetBalanceSection(BuildContext context) {
     final isPositive = balance >= 0;
-    final color = isPositive ? const Color(0xFF059669) : const Color(0xFFDC2626);
+    final color = isPositive
+        ? const Color(0xFF059669)
+        : const Color(0xFFDC2626);
 
     return Column(
       children: [
         // Month Badge
-        if (monthBadge != null) ...[
-          monthBadge!,
-          const SizedBox(height: 16),
-        ],
+        if (monthBadge != null) ...[monthBadge!, const SizedBox(height: 16)],
 
         // Net Balance Label
         Text(
           'Net Bakiye',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.6),
             fontSize: 13,
             letterSpacing: 0.3,
           ),
@@ -193,7 +200,9 @@ class FinancialHeader extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Icon(
-              isPositive ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+              isPositive
+                  ? Icons.trending_up_rounded
+                  : Icons.trending_down_rounded,
               color: color,
               size: 20,
             ),
@@ -221,7 +230,9 @@ class FinancialHeader extends StatelessWidget {
             Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
                 fontSize: 12,
               ),
             ),
@@ -234,7 +245,6 @@ class FinancialHeader extends StatelessWidget {
         Text(
           amount,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
             color: Theme.of(context).colorScheme.onSurface,
             fontSize: 16,
           ),
@@ -306,7 +316,6 @@ class FinancialHeader extends StatelessWidget {
               Text(
                 'Çıkış Yap',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
@@ -318,7 +327,9 @@ class FinancialHeader extends StatelessWidget {
                 'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.5,
                 ),
               ),
@@ -334,7 +345,9 @@ class FinancialHeader extends StatelessWidget {
                       onPressed: () => Navigator.of(context).pop(),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.3),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -344,8 +357,9 @@ class FinancialHeader extends StatelessWidget {
                       child: Text(
                         'İptal',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                          fontWeight: FontWeight.w600,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 16,
                         ),
                       ),
@@ -359,7 +373,9 @@ class FinancialHeader extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
-                        await ref.read(authControllerProvider.notifier).logout();
+                        await ref
+                            .read(authControllerProvider.notifier)
+                            .logout();
                         if (context.mounted) {
                           Navigator.pushNamedAndRemoveUntil(
                             context,
@@ -379,10 +395,7 @@ class FinancialHeader extends StatelessWidget {
                       ),
                       child: const Text(
                         'Çıkış Yap',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(fontSize: 16),
                       ),
                     ),
                   ),

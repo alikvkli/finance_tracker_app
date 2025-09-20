@@ -1035,10 +1035,9 @@ class _TransactionFiltersState extends ConsumerState<TransactionFilters> {
         ),
         title: Text(
           title,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            color: isSelected ? color : null,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: isSelected ? color : null),
         ),
         subtitle: Text(
           subtitle,

@@ -14,7 +14,6 @@ class NotificationsPage extends ConsumerStatefulWidget {
 }
 
 class _NotificationsPageState extends ConsumerState<NotificationsPage> {
-
   @override
   void initState() {
     super.initState();
@@ -26,7 +25,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   @override
   Widget build(BuildContext context) {
     final notificationState = ref.watch(notificationControllerProvider);
-    
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
@@ -36,18 +35,19 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                 children: [
                   // Simple Header
                   _buildNotificationHeader(context, notificationState),
-                  
+
                   // Content
-                  Expanded(
-                    child: _buildContent(context, notificationState),
-                  ),
+                  Expanded(child: _buildContent(context, notificationState)),
                 ],
               ),
       ),
     );
   }
 
-  Widget _buildNotificationHeader(BuildContext context, NotificationState state) {
+  Widget _buildNotificationHeader(
+    BuildContext context,
+    NotificationState state,
+  ) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       decoration: BoxDecoration(
@@ -71,7 +71,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             onPressed: () => Navigator.of(context).pop(),
             icon: Icon(
               Icons.arrow_back_rounded,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
               size: 22,
             ),
             tooltip: 'Geri',
@@ -100,18 +102,17 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                 if (state.unreadCount > 0) ...[
                   const SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.red[600],
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       '${state.unreadCount}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
                 ],
@@ -122,17 +123,24 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           // Mark All Read Button
           if (state.unreadCount > 0)
             TextButton(
-              onPressed: state.isMarkingAllAsRead ? null : () async {
-                await ref.read(notificationControllerProvider.notifier).markAllAsRead();
-                if (context.mounted) {
-                  CustomSnackBar.showSuccess(
-                    context,
-                    message: 'Tüm bildirimler okundu olarak işaretlendi',
-                  );
-                }
-              },
+              onPressed: state.isMarkingAllAsRead
+                  ? null
+                  : () async {
+                      await ref
+                          .read(notificationControllerProvider.notifier)
+                          .markAllAsRead();
+                      if (context.mounted) {
+                        CustomSnackBar.showSuccess(
+                          context,
+                          message: 'Tüm bildirimler okundu olarak işaretlendi',
+                        );
+                      }
+                    },
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -150,7 +158,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                               Theme.of(context).colorScheme.primary,
                             ),
                           ),
-                        )
+                        ),
                       ],
                     )
                   : Text(
@@ -158,7 +166,6 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.primary,
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
             ),
@@ -181,28 +188,35 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
 
   Widget _buildNotificationList(BuildContext context, NotificationState state) {
     // Calculate total item count (notifications + loading indicator)
-    final totalItemCount = state.notifications.length + 
+    final totalItemCount =
+        state.notifications.length +
         (state.hasMorePages && state.isLoadingMore ? 1 : 0);
 
     return RefreshIndicator(
       onRefresh: () async {
-        ref.read(notificationControllerProvider.notifier).refreshNotifications();
+        ref
+            .read(notificationControllerProvider.notifier)
+            .refreshNotifications();
       },
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         itemCount: totalItemCount,
         itemBuilder: (context, index) {
           // Show loading indicator at the end if loading more
-          if (index == state.notifications.length && state.hasMorePages && state.isLoadingMore) {
+          if (index == state.notifications.length &&
+              state.hasMorePages &&
+              state.isLoadingMore) {
             return _buildLoadingMoreIndicator(context);
           }
 
           // Trigger load more when near the end
-          if (index == state.notifications.length - 3 && 
-              state.hasMorePages && 
+          if (index == state.notifications.length - 3 &&
+              state.hasMorePages &&
               !state.isLoadingMore) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              ref.read(notificationControllerProvider.notifier).loadMoreNotifications();
+              ref
+                  .read(notificationControllerProvider.notifier)
+                  .loadMoreNotifications();
             });
           }
 
@@ -212,15 +226,21 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             isMarkingAsRead: state.markingAsRead.contains(notification.id),
             isDeleting: state.deletingNotifications.contains(notification.id),
             onMarkAsRead: () async {
-              await ref.read(notificationControllerProvider.notifier)
+              await ref
+                  .read(notificationControllerProvider.notifier)
                   .markAsRead(notification.id);
             },
             onAutoFillTap: () {
-              _handleNotificationAction(context, notification, onTransactionCreated: () async {
-                // İşlem oluşturulduktan sonra bildirimi okundu olarak işaretle
-                await ref.read(notificationControllerProvider.notifier)
-                    .markAsRead(notification.id);
-              });
+              _handleNotificationAction(
+                context,
+                notification,
+                onTransactionCreated: () async {
+                  // İşlem oluşturulduktan sonra bildirimi okundu olarak işaretle
+                  await ref
+                      .read(notificationControllerProvider.notifier)
+                      .markAsRead(notification.id);
+                },
+              );
             },
             onLongPress: () {
               _showDeleteConfirmationDialog(context, notification);
@@ -251,7 +271,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           Text(
             'Daha fazla bildirim yükleniyor...',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
               fontSize: 14,
             ),
           ),
@@ -275,22 +297,26 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             const SizedBox(height: 16),
             Text(
               'Bir hata oluştu',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 18,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontSize: 18),
             ),
             const SizedBox(height: 8),
             Text(
               error,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                ref.read(notificationControllerProvider.notifier).refreshNotifications();
+                ref
+                    .read(notificationControllerProvider.notifier)
+                    .refreshNotifications();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Deneyiniz'),
@@ -313,22 +339,28 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primaryContainer.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
                   width: 2,
                 ),
               ),
               child: Icon(
                 Icons.notifications_outlined,
                 size: 48,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.6),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             Text(
               'Henüz bildirim yok',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -336,16 +368,18 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             Container(
               constraints: const BoxConstraints(maxWidth: 280),
               child: Text(
                 'Henüz herhangi bir bildirim bulunamadı. Hatırlatıcılarınız ve sistem bildirimleri burada görünecek.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.5,
                 ),
               ),
@@ -361,14 +395,16 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       children: [
         // Simple Header Skeleton
         _buildSimpleHeaderSkeleton(context),
-        
+
         // Content Skeleton
         Expanded(
           child: Container(
             margin: const EdgeInsets.only(top: 16),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -411,26 +447,26 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             children: [
               // Back Button Skeleton
               _buildAnimatedSkeletonContainer(
-                width: 40, 
-                height: 40, 
+                width: 40,
+                height: 40,
                 isCircle: true,
                 animationValue: repeatingValue,
               ),
               const SizedBox(width: 8),
-              
+
               // Title Skeleton
               _buildAnimatedSkeletonContainer(
-                width: 100, 
+                width: 100,
                 height: 24,
                 animationValue: repeatingValue,
               ),
-              
+
               const Spacer(),
-              
+
               // Action Button Skeleton
               _buildAnimatedSkeletonContainer(
-                width: 80, 
-                height: 32, 
+                width: 80,
+                height: 32,
                 borderRadius: 8,
                 animationValue: repeatingValue,
               ),
@@ -448,19 +484,17 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     bool isCircle = false,
     required double animationValue,
   }) {
-    final shimmerColor = Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3);
+    final shimmerColor = Theme.of(
+      context,
+    ).colorScheme.surfaceVariant.withValues(alpha: 0.3);
     final highlightColor = Theme.of(context).colorScheme.surface;
-    
+
     return Container(
       width: width,
       height: height ?? 16,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            shimmerColor,
-            highlightColor,
-            shimmerColor,
-          ],
+          colors: [shimmerColor, highlightColor, shimmerColor],
           stops: [
             animationValue - 0.3,
             animationValue,
@@ -469,7 +503,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           begin: const Alignment(-1.0, -0.3),
           end: const Alignment(1.0, 0.3),
         ),
-        borderRadius: isCircle 
+        borderRadius: isCircle
             ? BorderRadius.circular((height ?? 16) / 2)
             : BorderRadius.circular(borderRadius ?? 8),
       ),
@@ -486,22 +520,25 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       width: width,
       height: height ?? 16,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
-        borderRadius: isCircle 
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+        borderRadius: isCircle
             ? BorderRadius.circular((height ?? 16) / 2)
             : BorderRadius.circular(borderRadius ?? 8),
       ),
     );
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, NotificationModel notification) {
+  void _showDeleteConfirmationDialog(
+    BuildContext context,
+    NotificationModel notification,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         contentPadding: const EdgeInsets.all(24),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -527,7 +564,6 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             Text(
               'Bildirimi Sil',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
@@ -539,7 +575,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
               'Bu bildirimi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
                 height: 1.5,
               ),
             ),
@@ -555,7 +593,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                     onPressed: () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.3),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -565,8 +605,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                     child: Text(
                       'İptal',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                        fontWeight: FontWeight.w500,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ),
@@ -579,7 +620,8 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                   child: ElevatedButton(
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      await ref.read(notificationControllerProvider.notifier)
+                      await ref
+                          .read(notificationControllerProvider.notifier)
                           .deleteNotification(notification.id);
                       if (context.mounted) {
                         CustomSnackBar.showSuccess(
@@ -597,12 +639,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'Sil',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: const Text('Sil', style: TextStyle()),
                   ),
                 ),
               ],
@@ -614,7 +651,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   }
 
   void _handleNotificationAction(
-    BuildContext context, 
+    BuildContext context,
     NotificationModel notification, {
     VoidCallback? onTransactionCreated,
   }) {
@@ -624,7 +661,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       if (notification.data != null) {
         dueDate = notification.data!['due_date'] as String?;
       }
-      
+
       // Show AddTransactionModal with auto-fill data
       showModalBottomSheet(
         context: context,
@@ -633,8 +670,8 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         builder: (context) => AddTransactionModal(
           autoFillData: notification.autoFill,
           dueDateOverride: dueDate,
-          hideRecurringOptions: true,   // ✅ Recurring options'ı gizle
-          lockTypeAndCategory: true,    // ✅ Type ve category'yi kilitle
+          hideRecurringOptions: true, // ✅ Recurring options'ı gizle
+          lockTypeAndCategory: true, // ✅ Type ve category'yi kilitle
           onTransactionCreated: onTransactionCreated, // ✅ Callback
         ),
       );
@@ -666,14 +703,18 @@ class _NotificationCard extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: notification.isRead 
+            color: notification.isRead
                 ? Theme.of(context).colorScheme.surface
-                : Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.1),
+                : Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: notification.isRead
                   ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.1)
-                  : Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                  : Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.2),
               width: 1,
             ),
             boxShadow: [
@@ -727,20 +768,29 @@ class _NotificationCard extends StatelessWidget {
                             children: [
                               Text(
                                 notification.title,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontSize: 16,
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      fontSize: 16,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                _formatNotificationTime(notification.sentAt ?? notification.createdAt),
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                                  fontSize: 12,
+                                _formatNotificationTime(
+                                  notification.sentAt ?? notification.createdAt,
                                 ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.6),
+                                      fontSize: 12,
+                                    ),
                               ),
                             ],
                           ),
@@ -749,11 +799,15 @@ class _NotificationCard extends StatelessWidget {
                         // Mark as Read Icon Button
                         if (!notification.isRead)
                           IconButton(
-                            onPressed: (isMarkingAsRead || isDeleting) ? null : onMarkAsRead,
+                            onPressed: (isMarkingAsRead || isDeleting)
+                                ? null
+                                : onMarkAsRead,
                             style: IconButton.styleFrom(
                               padding: const EdgeInsets.all(8),
                               minimumSize: const Size(32, 32),
-                              backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.1),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -774,23 +828,32 @@ class _NotificationCard extends StatelessWidget {
                     Text(
                       notification.message,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.8),
                         height: 1.4,
                       ),
                     ),
 
                     // Auto-fill Action (only for unread notifications)
-                    if (notification.autoFill != null && !notification.isRead) ...[
+                    if (notification.autoFill != null &&
+                        !notification.isRead) ...[
                       const SizedBox(height: 16),
                       GestureDetector(
-                        onTap: (isMarkingAsRead || isDeleting) ? null : onAutoFillTap,
+                        onTap: (isMarkingAsRead || isDeleting)
+                            ? null
+                            : onAutoFillTap,
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outline.withValues(alpha: 0.1),
                               width: 1,
                             ),
                           ),
@@ -805,10 +868,13 @@ class _NotificationCard extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   'Otomatik işlem oluştur',
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    fontSize: 14,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                        fontSize: 14,
+                                      ),
                                 ),
                               ),
                               Icon(
@@ -838,7 +904,10 @@ class _NotificationCard extends StatelessWidget {
               ),
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
@@ -888,7 +957,10 @@ class _NotificationCard extends StatelessWidget {
               ),
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
@@ -933,7 +1005,7 @@ class _NotificationCard extends StatelessWidget {
 
   String _formatNotificationTime(DateTime? dateTime) {
     if (dateTime == null) return 'Bilinmiyor';
-    
+
     final now = DateTime.now();
     final difference = now.difference(dateTime);
 
@@ -947,8 +1019,18 @@ class _NotificationCard extends StatelessWidget {
       return '${difference.inDays} gün önce';
     } else {
       final monthNames = [
-        'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-        'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+        'Oca',
+        'Şub',
+        'Mar',
+        'Nis',
+        'May',
+        'Haz',
+        'Tem',
+        'Ağu',
+        'Eyl',
+        'Eki',
+        'Kas',
+        'Ara',
       ];
       return '${dateTime.day} ${monthNames[dateTime.month - 1]}';
     }

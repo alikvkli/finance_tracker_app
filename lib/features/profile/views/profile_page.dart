@@ -353,7 +353,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             color: Theme.of(
                               context,
                             ).colorScheme.onSurface.withValues(alpha: 0.7),
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
@@ -393,16 +392,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                   const SizedBox(width: 8),
                                   const Text(
                                     'Siliniyor...',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                    style: TextStyle(),
                                   ),
                                 ],
                               )
-                            : const Text(
-                                'Hesabı Sil',
-                                style: TextStyle(fontWeight: FontWeight.w600),
-                              ),
+                            : const Text('Hesabı Sil'),
                       ),
                     ),
                   ],
@@ -534,7 +528,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         color: Theme.of(
                           context,
                         ).colorScheme.onSurface.withValues(alpha: 0.7),
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -564,10 +557,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'Çıkış Yap',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    child: const Text('Çıkış Yap'),
                   ),
                 ),
               ],

@@ -127,7 +127,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       Text(
                         'Giriş Yap',
                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
@@ -174,7 +173,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               'Hata',
                               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                 color: Theme.of(context).colorScheme.error,
-                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -251,7 +249,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             text: 'Kayıt Ol',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],

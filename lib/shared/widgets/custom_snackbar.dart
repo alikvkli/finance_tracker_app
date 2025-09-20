@@ -146,7 +146,6 @@ class _SuccessSnackBarContent extends StatelessWidget {
               child: Text(
                 actionLabel!,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),
               ),
@@ -236,7 +235,6 @@ class _ErrorSnackBarContent extends StatelessWidget {
               child: Text(
                 actionLabel!,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),
               ),
@@ -326,7 +324,6 @@ class _InfoSnackBarContent extends StatelessWidget {
               child: Text(
                 actionLabel!,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w600,
                   fontSize: 13,
                 ),
               ),

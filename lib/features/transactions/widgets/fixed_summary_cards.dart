@@ -44,7 +44,9 @@ class FixedSummaryCards extends ConsumerWidget {
               'Bakiye',
               transactionState.balance,
               transactionState.balance >= 0 ? Colors.green : Colors.red,
-              transactionState.balance >= 0 ? Icons.account_balance_wallet : Icons.account_balance_wallet_outlined,
+              transactionState.balance >= 0
+                  ? Icons.account_balance_wallet
+                  : Icons.account_balance_wallet_outlined,
               transactionState.balance >= 0 ? '+' : '',
             ),
           ),
@@ -73,10 +75,7 @@ class FixedSummaryCards extends ConsumerWidget {
             offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(
-          color: color.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,11 +88,7 @@ class FixedSummaryCards extends ConsumerWidget {
                   color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 20,
-                ),
+                child: Icon(icon, color: color, size: 20),
               ),
               const Spacer(),
               Container(
@@ -104,10 +99,9 @@ class FixedSummaryCards extends ConsumerWidget {
                 ),
                 child: Text(
                   prefix,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: color),
                 ),
               ),
             ],
@@ -116,16 +110,17 @@ class FixedSummaryCards extends ConsumerWidget {
           Text(
             title,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             '${_formatAmount(amount)} ₺',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: color),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

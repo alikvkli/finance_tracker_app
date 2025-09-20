@@ -11,24 +11,27 @@ class RecurringTransactionsPage extends ConsumerStatefulWidget {
   const RecurringTransactionsPage({super.key});
 
   @override
-  ConsumerState<RecurringTransactionsPage> createState() => _RecurringTransactionsPageState();
+  ConsumerState<RecurringTransactionsPage> createState() =>
+      _RecurringTransactionsPageState();
 }
 
-class _RecurringTransactionsPageState extends ConsumerState<RecurringTransactionsPage> {
-
+class _RecurringTransactionsPageState
+    extends ConsumerState<RecurringTransactionsPage> {
   @override
   void initState() {
     super.initState();
     // Load recurring transactions when the page is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(recurringTransactionControllerProvider.notifier).loadRecurringTransactions();
+      ref
+          .read(recurringTransactionControllerProvider.notifier)
+          .loadRecurringTransactions();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final recurringState = ref.watch(recurringTransactionControllerProvider);
-    
+
     return PopScope(
       canPop: false, // Geri tuşunu devre dışı bırak
       child: Scaffold(
@@ -40,11 +43,9 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                   children: [
                     // Custom Header for Recurring Transactions
                     _buildRecurringHeader(context, recurringState),
-                    
+
                     // Content
-                    Expanded(
-                      child: _buildContent(context, recurringState),
-                    ),
+                    Expanded(child: _buildContent(context, recurringState)),
                   ],
                 ),
         ),
@@ -52,7 +53,10 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
     );
   }
 
-  Widget _buildRecurringHeader(BuildContext context, RecurringTransactionState state) {
+  Widget _buildRecurringHeader(
+    BuildContext context,
+    RecurringTransactionState state,
+  ) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       decoration: BoxDecoration(
@@ -85,25 +89,27 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
           // Action Buttons
           Row(
             children: [
-                  // Notification Button
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRouter.notifications);
-                    },
-                    icon: Icon(
-                      Icons.notifications_outlined,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                      size: 22,
-                    ),
-                    tooltip: 'Bildirimler',
-                    style: IconButton.styleFrom(
-                      padding: const EdgeInsets.all(8),
-                      minimumSize: const Size(40, 40),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+              // Notification Button
+              IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, AppRouter.notifications);
+                },
+                icon: Icon(
+                  Icons.notifications_outlined,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
+                  size: 22,
+                ),
+                tooltip: 'Bildirimler',
+                style: IconButton.styleFrom(
+                  padding: const EdgeInsets.all(8),
+                  minimumSize: const Size(40, 40),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
+                ),
+              ),
 
               const SizedBox(width: 4),
 
@@ -112,7 +118,9 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                 onPressed: () => _showLogoutDialog(context),
                 icon: Icon(
                   Icons.logout_rounded,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                   size: 22,
                 ),
                 tooltip: 'Çıkış Yap',
@@ -130,8 +138,6 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
       ),
     );
   }
-
-
 
   Widget _buildContent(BuildContext context, RecurringTransactionState state) {
     if (state.error != null) {
@@ -162,10 +168,14 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
               border: Border(
                 bottom: BorderSide(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),
@@ -175,7 +185,9 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -192,7 +204,6 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                       Text(
                         'Tekrarlayan Hatırlatmalar',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
                           fontSize: 18,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
@@ -201,7 +212,9 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                       Text(
                         '${state.transactions.length} işlem listeleniyor',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                           fontSize: 12,
                         ),
                       ),
@@ -213,38 +226,46 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
           ),
 
           // Transaction List
-          Expanded(
-            child: _buildTransactionList(context, state),
-          ),
+          Expanded(child: _buildTransactionList(context, state)),
         ],
       ),
     );
   }
 
-  Widget _buildTransactionList(BuildContext context, RecurringTransactionState state) {
+  Widget _buildTransactionList(
+    BuildContext context,
+    RecurringTransactionState state,
+  ) {
     // Calculate total item count (transactions + loading indicator)
-    final totalItemCount = state.transactions.length + 
+    final totalItemCount =
+        state.transactions.length +
         (state.hasMorePages && state.isLoadingMore ? 1 : 0);
 
     return RefreshIndicator(
       onRefresh: () async {
-        ref.read(recurringTransactionControllerProvider.notifier).refreshRecurringTransactions();
+        ref
+            .read(recurringTransactionControllerProvider.notifier)
+            .refreshRecurringTransactions();
       },
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         itemCount: totalItemCount,
         itemBuilder: (context, index) {
           // Show loading indicator at the end if loading more
-          if (index == state.transactions.length && state.hasMorePages && state.isLoadingMore) {
+          if (index == state.transactions.length &&
+              state.hasMorePages &&
+              state.isLoadingMore) {
             return _buildLoadingMoreIndicator(context);
           }
 
           // Trigger load more when near the end
-          if (index == state.transactions.length - 3 && 
-              state.hasMorePages && 
+          if (index == state.transactions.length - 3 &&
+              state.hasMorePages &&
               !state.isLoadingMore) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              ref.read(recurringTransactionControllerProvider.notifier).loadMoreRecurringTransactions();
+              ref
+                  .read(recurringTransactionControllerProvider.notifier)
+                  .loadMoreRecurringTransactions();
             });
           }
 
@@ -255,17 +276,22 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
             isEditing: state.editingTransactions.contains(transaction.id),
             isDeleting: state.deletingTransactions.contains(transaction.id),
             onToggle: (isActive) async {
-              await ref.read(recurringTransactionControllerProvider.notifier)
+              await ref
+                  .read(recurringTransactionControllerProvider.notifier)
                   .toggleTransaction(transaction.id, isActive);
             },
             onEdit: () async {
               await _showEditTransactionModal(context, transaction);
             },
             onDelete: () async {
-              final shouldDelete = await _showDeleteConfirmation(context, transaction);
+              final shouldDelete = await _showDeleteConfirmation(
+                context,
+                transaction,
+              );
               if (shouldDelete == true) {
                 try {
-                  await ref.read(recurringTransactionControllerProvider.notifier)
+                  await ref
+                      .read(recurringTransactionControllerProvider.notifier)
                       .deleteTransaction(transaction.id);
                   if (context.mounted) {
                     CustomSnackBar.showSuccess(
@@ -309,7 +335,9 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
           Text(
             'Daha fazla hatırlatıcı yükleniyor...',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
               fontSize: 14,
             ),
           ),
@@ -333,23 +361,26 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
             const SizedBox(height: 16),
             Text(
               'Bir hata oluştu',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontSize: 18),
             ),
             const SizedBox(height: 8),
             Text(
               error,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                ref.read(recurringTransactionControllerProvider.notifier).refreshRecurringTransactions();
+                ref
+                    .read(recurringTransactionControllerProvider.notifier)
+                    .refreshRecurringTransactions();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Deneyiniz'),
@@ -372,40 +403,47 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.2),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primaryContainer.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
                   width: 2,
                 ),
               ),
               child: Icon(
                 Icons.repeat_rounded,
                 size: 48,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.6),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             Text(
               'Henüz hatırlatıcı yok',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             Container(
               constraints: const BoxConstraints(maxWidth: 280),
               child: Text(
                 'Henüz herhangi bir tekrarlayan işlem bulunamadı. Yeni işlem eklerken tekrarlama seçeneğini kullanabilirsiniz.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.5,
                 ),
               ),
@@ -421,14 +459,16 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
       children: [
         // Simple Header Skeleton (like FinancialHeader)
         _buildSimpleHeaderSkeleton(context),
-        
+
         // Content Skeleton with TransactionSkeleton
         Expanded(
           child: Container(
             margin: const EdgeInsets.only(top: 16),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -466,7 +506,7 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
           // App Title Skeleton
           _buildSkeletonContainer(width: 140, height: 24),
           const Spacer(),
-          
+
           // Action Buttons Skeleton
           Row(
             children: [
@@ -480,7 +520,6 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
     );
   }
 
-
   Widget _buildSkeletonContainer({
     double? width,
     double? height,
@@ -491,17 +530,20 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
       width: width,
       height: height ?? 16,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
-        borderRadius: isCircle 
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+        borderRadius: isCircle
             ? BorderRadius.circular((height ?? 16) / 2)
             : BorderRadius.circular(borderRadius ?? 8),
       ),
     );
   }
 
-
-
-  Future<bool?> _showDeleteConfirmation(BuildContext context, RecurringTransactionModel transaction) {
+  Future<bool?> _showDeleteConfirmation(
+    BuildContext context,
+    RecurringTransactionModel transaction,
+  ) {
     return showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -517,22 +559,27 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
     );
   }
 
-  Future<void> _showEditTransactionModal(BuildContext context, RecurringTransactionModel transaction) async {
+  Future<void> _showEditTransactionModal(
+    BuildContext context,
+    RecurringTransactionModel transaction,
+  ) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       barrierDismissible: true,
-      builder: (context) => _EditRecurringTransactionDialog(transaction: transaction),
+      builder: (context) =>
+          _EditRecurringTransactionDialog(transaction: transaction),
     );
 
     if (result != null) {
       try {
-        await ref.read(recurringTransactionControllerProvider.notifier)
+        await ref
+            .read(recurringTransactionControllerProvider.notifier)
             .updateTransaction(
               transaction.id,
               amount: result['amount'] as double?,
               endDate: result['end_date'] as DateTime?,
             );
-        
+
         if (context.mounted) {
           CustomSnackBar.showSuccess(
             context,
@@ -609,7 +656,9 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                 'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                   height: 1.5,
                 ),
               ),
@@ -625,7 +674,9 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                       onPressed: () => Navigator.of(context).pop(),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.3),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -635,8 +686,9 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                       child: Text(
                         'İptal',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                          fontWeight: FontWeight.w600,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 16,
                         ),
                       ),
@@ -650,7 +702,9 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                     child: ElevatedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
-                        await ref.read(authControllerProvider.notifier).logout();
+                        await ref
+                            .read(authControllerProvider.notifier)
+                            .logout();
                         if (context.mounted) {
                           Navigator.pushNamedAndRemoveUntil(
                             context,
@@ -670,10 +724,7 @@ class _RecurringTransactionsPageState extends ConsumerState<RecurringTransaction
                       ),
                       child: const Text(
                         'Çıkış Yap',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(fontSize: 16),
                       ),
                     ),
                   ),
@@ -720,9 +771,11 @@ class _RecurringTransactionCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: transaction.isActive 
+              color: transaction.isActive
                   ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
-                  : Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                  : Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.1),
               width: 1,
             ),
             boxShadow: [
@@ -734,239 +787,274 @@ class _RecurringTransactionCard extends StatelessWidget {
             ],
           ),
           child: Column(
-        children: [
-          Row(
             children: [
-              // Category Icon
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: _parseColor(transaction.category.color),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _parseColor(transaction.category.color).withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  _getCategoryIcon(transaction.category.icon),
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-
-              const SizedBox(width: 16),
-
-              // Transaction Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      transaction.description ?? transaction.category.nameTr,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      transaction.category.nameTr,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        // Recurring Type Badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            transaction.recurringTypeDisplayName,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
-                        
-                        const SizedBox(width: 8),
-                        
-                        // Active/Inactive Badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: transaction.isActive 
-                                ? Colors.green[50]
-                                : Colors.orange[50],
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: transaction.isActive 
-                                  ? Colors.green[200]!
-                                  : Colors.orange[200]!,
-                              width: 1,
-                            ),
-                          ),
-                          child: Text(
-                            transaction.isActive ? 'Aktif' : 'Pasif',
-                            style: TextStyle(
-                              color: transaction.isActive 
-                                  ? Colors.green[700]
-                                  : Colors.orange[700],
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+              Row(
+                children: [
+                  // Category Icon
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: _parseColor(transaction.category.color),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _parseColor(
+                            transaction.category.color,
+                          ).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(width: 12),
-
-              // Amount & Controls
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '${isExpense ? '-' : '+'}${_formatAmount(transaction.amountAsDouble)}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: amountColor,
-                      fontSize: 16,
+                    child: Icon(
+                      _getCategoryIcon(transaction.category.icon),
+                      color: Colors.white,
+                      size: 24,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    transaction.currency,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                      fontSize: 10,
+
+                  const SizedBox(width: 16),
+
+                  // Transaction Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          transaction.description ??
+                              transaction.category.nameTr,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                fontSize: 16,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          transaction.category.nameTr,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
+                                fontSize: 14,
+                              ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            // Recurring Type Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                transaction.recurringTypeDisplayName,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      fontSize: 11,
+                                    ),
+                              ),
+                            ),
+
+                            const SizedBox(width: 8),
+
+                            // Active/Inactive Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: transaction.isActive
+                                    ? Colors.green[50]
+                                    : Colors.orange[50],
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: transaction.isActive
+                                      ? Colors.green[200]!
+                                      : Colors.orange[200]!,
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                transaction.isActive ? 'Aktif' : 'Pasif',
+                                style: TextStyle(
+                                  color: transaction.isActive
+                                      ? Colors.green[700]
+                                      : Colors.orange[700],
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
+
+                  const SizedBox(width: 12),
+
+                  // Amount & Controls
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      // Toggle Switch
-                      Transform.scale(
-                        scale: 0.8,
-                        child: Switch(
-                          value: transaction.isActive,
-                          onChanged: (isToggling || isEditing || isDeleting) ? null : onToggle, // Disable during any loading
-                          activeColor: Colors.green[600],
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      Text(
+                        '${isExpense ? '-' : '+'}${_formatAmount(transaction.amountAsDouble)}',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: amountColor,
+                          fontSize: 16,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      // Edit Button
-                      InkWell(
-                        onTap: (isToggling || isEditing || isDeleting) ? null : onEdit,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: (isToggling || isEditing || isDeleting)
-                                ? Colors.grey[100]
-                                : Colors.blue[50],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.edit_outlined,
-                            color: (isToggling || isEditing || isDeleting)
-                                ? Colors.grey[400]
-                                : Colors.blue[600],
-                            size: 18,
-                          ),
+                      const SizedBox(height: 4),
+                      Text(
+                        transaction.currency,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.5),
+                          fontSize: 10,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      // Delete Button
-                      InkWell(
-                        onTap: (isToggling || isEditing || isDeleting) ? null : onDelete,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: (isToggling || isEditing || isDeleting)
-                                ? Colors.grey[100]
-                                : Colors.red[50],
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Toggle Switch
+                          Transform.scale(
+                            scale: 0.8,
+                            child: Switch(
+                              value: transaction.isActive,
+                              onChanged: (isToggling || isEditing || isDeleting)
+                                  ? null
+                                  : onToggle, // Disable during any loading
+                              activeColor: Colors.green[600],
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // Edit Button
+                          InkWell(
+                            onTap: (isToggling || isEditing || isDeleting)
+                                ? null
+                                : onEdit,
                             borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: (isToggling || isEditing || isDeleting)
+                                    ? Colors.grey[100]
+                                    : Colors.blue[50],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.edit_outlined,
+                                color: (isToggling || isEditing || isDeleting)
+                                    ? Colors.grey[400]
+                                    : Colors.blue[600],
+                                size: 18,
+                              ),
+                            ),
                           ),
-                          child: Icon(
-                            Icons.delete_outline,
-                            color: (isToggling || isEditing || isDeleting)
-                                ? Colors.grey[400]
-                                : Colors.red[600],
-                            size: 18,
+                          const SizedBox(width: 8),
+                          // Delete Button
+                          InkWell(
+                            onTap: (isToggling || isEditing || isDeleting)
+                                ? null
+                                : onDelete,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: (isToggling || isEditing || isDeleting)
+                                    ? Colors.grey[100]
+                                    : Colors.red[50],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.delete_outline,
+                                color: (isToggling || isEditing || isDeleting)
+                                    ? Colors.grey[400]
+                                    : Colors.red[600],
+                                size: 18,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
                 ],
               ),
+
+              const SizedBox(height: 16),
+
+              // Bottom Info Row
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                      size: 14,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${_formatDate(transaction.startDate)} - ${_formatDate(transaction.endDate)}',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontSize: 12,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (transaction.lastReminderSent != null) ...[
+                      Icon(
+                        Icons.notifications_outlined,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${transaction.reminderCount} hatırlatma',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
             ],
           ),
-
-          const SizedBox(height: 16),
-
-          // Bottom Info Row
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.calendar_today_outlined,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                  size: 14,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  '${_formatDate(transaction.startDate)} - ${_formatDate(transaction.endDate)}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                    fontSize: 12,
-                  ),
-                ),
-                const Spacer(),
-                if (transaction.lastReminderSent != null) ...[
-                  Icon(
-                    Icons.notifications_outlined,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 14,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${transaction.reminderCount} hatırlatma',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
         ),
 
         // Loading Overlay
@@ -980,7 +1068,10 @@ class _RecurringTransactionCard extends StatelessWidget {
               ),
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
@@ -1007,11 +1098,11 @@ class _RecurringTransactionCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        isDeleting 
-                            ? 'Siliniyor...' 
-                            : isEditing 
-                                ? 'Kaydediliyor...' 
-                                : 'Güncelleniyor...',
+                        isDeleting
+                            ? 'Siliniyor...'
+                            : isEditing
+                            ? 'Kaydediliyor...'
+                            : 'Güncelleniyor...',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 14,
@@ -1109,16 +1200,16 @@ class _RecurringTransactionCard extends StatelessWidget {
   String _formatAmount(double amount) {
     // Tam sayı kısmını al
     final integerPart = amount.floor();
-    
+
     // Binlik ayırıcılarla formatla
     final formattedAmount = _addThousandSeparators(integerPart.toString());
-    
+
     return '₺$formattedAmount';
   }
 
   String _addThousandSeparators(String number) {
     if (number.isEmpty) return number;
-    
+
     // Regex ile binlik ayırıcı ekle (nokta kullanarak)
     return number.replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
@@ -1128,8 +1219,18 @@ class _RecurringTransactionCard extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     final monthNames = [
-      'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-      'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+      'Oca',
+      'Şub',
+      'Mar',
+      'Nis',
+      'May',
+      'Haz',
+      'Tem',
+      'Ağu',
+      'Eyl',
+      'Eki',
+      'Kas',
+      'Ara',
     ];
     return '${date.day} ${monthNames[date.month - 1]} ${date.year}';
   }
@@ -1159,7 +1260,9 @@ class _DeleteConfirmationDialog extends StatelessWidget {
             // Icon
             Icon(
               Icons.delete_outline_rounded,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.6),
               size: 48,
             ),
 
@@ -1169,7 +1272,6 @@ class _DeleteConfirmationDialog extends StatelessWidget {
             Text(
               'Hatırlatıcıyı Sil',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -1182,7 +1284,9 @@ class _DeleteConfirmationDialog extends StatelessWidget {
               'Bu tekrarlayan işlemi silmek istediğinizden emin misiniz?',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
 
@@ -1204,8 +1308,9 @@ class _DeleteConfirmationDialog extends StatelessWidget {
                     child: Text(
                       'İptal',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
-                        fontWeight: FontWeight.w500,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.8),
                         fontSize: 15,
                       ),
                     ),
@@ -1227,13 +1332,7 @@ class _DeleteConfirmationDialog extends StatelessWidget {
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'Sil',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),
-                    ),
+                    child: const Text('Sil', style: TextStyle(fontSize: 15)),
                   ),
                 ),
               ],
@@ -1248,15 +1347,15 @@ class _DeleteConfirmationDialog extends StatelessWidget {
 class _EditRecurringTransactionDialog extends StatefulWidget {
   final RecurringTransactionModel transaction;
 
-  const _EditRecurringTransactionDialog({
-    required this.transaction,
-  });
+  const _EditRecurringTransactionDialog({required this.transaction});
 
   @override
-  State<_EditRecurringTransactionDialog> createState() => _EditRecurringTransactionDialogState();
+  State<_EditRecurringTransactionDialog> createState() =>
+      _EditRecurringTransactionDialogState();
 }
 
-class _EditRecurringTransactionDialogState extends State<_EditRecurringTransactionDialog> {
+class _EditRecurringTransactionDialogState
+    extends State<_EditRecurringTransactionDialog> {
   late TextEditingController _amountController;
   late DateTime _selectedEndDate;
 
@@ -1268,7 +1367,7 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
     final formattedAmount = _formatAmountForDisplay(amountValue);
     _amountController = TextEditingController(text: formattedAmount);
     _selectedEndDate = widget.transaction.endDate;
-    
+
     // Amount input listener ekle
     _amountController.addListener(() {
       _formatAmountInput(_amountController.text);
@@ -1306,10 +1405,9 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
                 Expanded(
                   child: Text(
                     'Hatırlatıcıyı Düzenle',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleLarge?.copyWith(fontSize: 18),
                   ),
                 ),
               ],
@@ -1320,7 +1418,9 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
             // Amount Field
             TextFormField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: InputDecoration(
                 labelText: 'Tutar',
                 prefixIcon: Container(
@@ -1329,8 +1429,9 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
                   child: Text(
                     '₺',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                      fontWeight: FontWeight.w500,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ),
@@ -1345,9 +1446,7 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
                   ),
                 ),
               ),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
             ),
 
             const SizedBox(height: 16),
@@ -1359,7 +1458,9 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.5),
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1367,7 +1468,9 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
                   children: [
                     Icon(
                       Icons.calendar_today_outlined,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                       size: 20,
                     ),
                     const SizedBox(width: 12),
@@ -1377,16 +1480,19 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
                         children: [
                           Text(
                             'Bitiş Tarihi',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                              fontSize: 12,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
+                                  fontSize: 12,
+                                ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             _formatDate(_selectedEndDate),
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            ),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(),
                           ),
                         ],
                       ),
@@ -1458,13 +1564,13 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
   void _formatAmountInput(String value) {
     // Sadece rakam ve virgül karakterlerine izin ver (nokta sadece binlik ayırıcı olarak kullanılacak)
     final cleanValue = value.replaceAll(RegExp(r'[^\d,]'), '');
-    
+
     // Virgül kontrolü - sadece bir tane olabilir
     final commaCount = cleanValue.split(',').length - 1;
     if (commaCount > 1) {
       return; // Geçersiz format, değişiklik yapma
     }
-    
+
     // Virgülden sonra maksimum 2 rakam
     if (cleanValue.contains(',')) {
       final parts = cleanValue.split(',');
@@ -1472,10 +1578,10 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
         return; // Virgülden sonra 2'den fazla rakam
       }
     }
-    
+
     // Formatlanmış değeri hesapla
     String formattedValue = _formatNumberWithSeparators(cleanValue);
-    
+
     // Eğer değer değiştiyse, controller'ı güncelle
     if (formattedValue != value) {
       _amountController.value = TextEditingValue(
@@ -1487,17 +1593,17 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
 
   String _formatNumberWithSeparators(String value) {
     if (value.isEmpty) return value;
-    
+
     // Virgül varsa, ondalık kısmını ayır
     String integerPart = value;
     String decimalPart = '';
-    
+
     if (value.contains(',')) {
       final parts = value.split(',');
       integerPart = parts[0];
       decimalPart = parts.length > 1 ? parts[1] : '';
     }
-    
+
     // Tam sayı kısmını binlik ayırıcılarla formatla
     if (integerPart.isNotEmpty) {
       final number = int.tryParse(integerPart);
@@ -1505,18 +1611,18 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
         integerPart = _addThousandSeparators(number.toString());
       }
     }
-    
+
     // Ondalık kısmını ekle
     if (decimalPart.isNotEmpty) {
       return '$integerPart,$decimalPart';
     }
-    
+
     return integerPart;
   }
 
   String _addThousandSeparators(String number) {
     if (number.isEmpty) return number;
-    
+
     // Regex ile binlik ayırıcı ekle (nokta kullanarak)
     return number.replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
@@ -1535,10 +1641,10 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
       final parts = amount.toString().split('.');
       final integerPart = parts[0];
       final decimalPart = parts.length > 1 ? parts[1] : '';
-      
+
       // Ondalık kısmını 2 haneli yap
       final formattedDecimal = decimalPart.padRight(2, '0').substring(0, 2);
-      
+
       return '${_addThousandSeparators(integerPart)},$formattedDecimal';
     }
   }
@@ -1551,7 +1657,7 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
 
   void _saveChanges(BuildContext context) {
     final amount = _parseAmountFromText(_amountController.text);
-    
+
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Lütfen geçerli bir tutar giriniz')),
@@ -1559,16 +1665,23 @@ class _EditRecurringTransactionDialogState extends State<_EditRecurringTransacti
       return;
     }
 
-    Navigator.of(context).pop({
-      'amount': amount,
-      'end_date': _selectedEndDate,
-    });
+    Navigator.of(context).pop({'amount': amount, 'end_date': _selectedEndDate});
   }
 
   String _formatDate(DateTime date) {
     final monthNames = [
-      'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-      'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+      'Oca',
+      'Şub',
+      'Mar',
+      'Nis',
+      'May',
+      'Haz',
+      'Tem',
+      'Ağu',
+      'Eyl',
+      'Eki',
+      'Kas',
+      'Ara',
     ];
     return '${date.day} ${monthNames[date.month - 1]} ${date.year}';
   }

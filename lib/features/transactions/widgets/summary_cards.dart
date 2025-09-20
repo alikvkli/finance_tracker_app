@@ -16,7 +16,7 @@ class SummaryCards extends ConsumerWidget {
           // Balance Card
           _buildBalanceCard(context, transactionState.balance),
           const SizedBox(height: 12),
-          
+
           // Income and Expense Cards
           Row(
             children: [
@@ -49,23 +49,17 @@ class SummaryCards extends ConsumerWidget {
   Widget _buildBalanceCard(BuildContext context, double balance) {
     final isPositive = balance >= 0;
     final color = isPositive ? Colors.green[600]! : Colors.red[600]!;
-    
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            color.withValues(alpha: 0.1),
-            color.withValues(alpha: 0.05),
-          ],
+          colors: [color.withValues(alpha: 0.1), color.withValues(alpha: 0.05)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: color.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
       ),
       child: Column(
         children: [
@@ -78,7 +72,9 @@ class SummaryCards extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                  isPositive ? Icons.account_balance_wallet : Icons.account_balance_wallet_outlined,
+                  isPositive
+                      ? Icons.account_balance_wallet
+                      : Icons.account_balance_wallet_outlined,
                   color: color,
                   size: 24,
                 ),
@@ -91,32 +87,35 @@ class SummaryCards extends ConsumerWidget {
                     Text(
                       'Toplam Bakiye',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${_formatAmount(balance)} ₺',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineMedium?.copyWith(color: color),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   isPositive ? 'Artı' : 'Eksi',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: color),
                 ),
               ),
             ],
@@ -157,19 +156,14 @@ class SummaryCards extends ConsumerWidget {
                   color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 20,
-                ),
+                child: Icon(icon, color: color, size: 20),
               ),
               const Spacer(),
               Text(
                 '${_formatAmount(amount)} ₺',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(color: color),
               ),
             ],
           ),
@@ -177,7 +171,9 @@ class SummaryCards extends ConsumerWidget {
           Text(
             title,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
         ],

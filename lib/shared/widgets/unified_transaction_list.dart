@@ -268,14 +268,7 @@ class _SwipeableTransactionCard extends ConsumerWidget {
           children: [
             Icon(Icons.delete_outline, color: Colors.white, size: 32),
             SizedBox(height: 4),
-            Text(
-              'Sil',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-                fontSize: 11,
-              ),
-            ),
+            Text('Sil', style: TextStyle(color: Colors.white, fontSize: 11)),
           ],
         ),
       ),
@@ -408,7 +401,6 @@ class _SwipeableTransactionCard extends ConsumerWidget {
                           color: Theme.of(
                             context,
                           ).colorScheme.onSurface.withValues(alpha: 0.8),
-                          fontWeight: FontWeight.w500,
                           fontSize: 15,
                         ),
                       ),
@@ -430,13 +422,7 @@ class _SwipeableTransactionCard extends ConsumerWidget {
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
-                        'Sil',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
+                      child: const Text('Sil', style: TextStyle(fontSize: 15)),
                     ),
                   ),
                 ],

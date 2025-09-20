@@ -78,7 +78,6 @@ class CustomButton extends StatelessWidget {
           Text(
             text,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
               color: isOutlined
                   ? Theme.of(context).colorScheme.primary
                   : Colors.white,
@@ -91,7 +90,6 @@ class CustomButton extends StatelessWidget {
     return Text(
       text,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.w600,
         color: isOutlined
             ? Theme.of(context).colorScheme.primary
             : Colors.white,

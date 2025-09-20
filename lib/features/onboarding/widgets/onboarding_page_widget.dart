@@ -10,7 +10,7 @@ class OnboardingPageWidget extends StatelessWidget {
   final VoidCallback? onNext;
   final VoidCallback? onSkip;
   final VoidCallback? onGetStarted;
-  
+
   const OnboardingPageWidget({
     super.key,
     required this.pageModel,
@@ -23,7 +23,7 @@ class OnboardingPageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -51,9 +51,9 @@ class OnboardingPageWidget extends StatelessWidget {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 40),
-          
+
           // Text Section
           Expanded(
             flex: 2,
@@ -62,18 +62,19 @@ class OnboardingPageWidget extends StatelessWidget {
                 Text(
                   _getLocalizedText(localizations, pageModel.title),
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 Text(
                   _getLocalizedText(localizations, pageModel.description),
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.7),
                     height: 1.5,
                   ),
                   textAlign: TextAlign.center,
@@ -81,9 +82,9 @@ class OnboardingPageWidget extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 40),
-          
+
           // Action Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -95,28 +96,30 @@ class OnboardingPageWidget extends StatelessWidget {
                   child: Text(
                     localizations.skip,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 )
               else
                 const SizedBox.shrink(),
-              
+
               // Next/Get Started Button
               ElevatedButton(
                 onPressed: isLastPage ? onGetStarted : onNext,
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
                 child: Text(
                   isLastPage ? localizations.getStarted : localizations.next,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
             ],
@@ -125,7 +128,7 @@ class OnboardingPageWidget extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildContent(BuildContext context) {
     // Try to load Lottie animation first, fallback to image
     try {
@@ -140,7 +143,7 @@ class OnboardingPageWidget extends StatelessWidget {
       return _buildImageFallback(context);
     }
   }
-  
+
   Widget _buildImageFallback(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -162,7 +165,7 @@ class OnboardingPageWidget extends StatelessWidget {
       ),
     );
   }
-  
+
   IconData _getIconForPage(String title) {
     switch (title) {
       case 'onboarding_welcome':
@@ -175,7 +178,7 @@ class OnboardingPageWidget extends StatelessWidget {
         return Icons.info;
     }
   }
-  
+
   String _getLocalizedText(AppLocalizations localizations, String key) {
     switch (key) {
       case 'onboarding_welcome':

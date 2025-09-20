@@ -39,14 +39,18 @@ class MonthSelector extends ConsumerWidget {
                 Text(
                   'Seçilen Dönem',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  _formatDateRange(transactionState.selectedStartDate, transactionState.selectedEndDate),
+                  _formatDateRange(
+                    transactionState.selectedStartDate,
+                    transactionState.selectedEndDate,
+                  ),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
@@ -54,7 +58,8 @@ class MonthSelector extends ConsumerWidget {
             ),
           ),
           IconButton(
-            onPressed: () => _showDatePicker(context, controller, transactionState),
+            onPressed: () =>
+                _showDatePicker(context, controller, transactionState),
             icon: Icon(
               Icons.arrow_drop_down,
               color: Theme.of(context).colorScheme.primary,
@@ -67,8 +72,18 @@ class MonthSelector extends ConsumerWidget {
 
   String _formatDateRange(DateTime startDate, DateTime endDate) {
     final months = [
-      'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık',
     ];
 
     if (startDate.year == endDate.year && startDate.month == endDate.month) {
@@ -78,7 +93,11 @@ class MonthSelector extends ConsumerWidget {
     }
   }
 
-  void _showDatePicker(BuildContext context, TransactionController controller, TransactionState state) {
+  void _showDatePicker(
+    BuildContext context,
+    TransactionController controller,
+    TransactionState state,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -134,11 +153,13 @@ class _DatePickerModalState extends State<_DatePickerModal> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.all(20),
@@ -146,9 +167,7 @@ class _DatePickerModalState extends State<_DatePickerModal> {
               children: [
                 Text(
                   'Dönem Seç',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
                 ),
                 const Spacer(),
                 TextButton(
@@ -158,7 +177,7 @@ class _DatePickerModalState extends State<_DatePickerModal> {
               ],
             ),
           ),
-          
+
           // Date pickers
           Expanded(
             child: Padding(
@@ -180,7 +199,7 @@ class _DatePickerModalState extends State<_DatePickerModal> {
               ),
             ),
           ),
-          
+
           // Action buttons
           Padding(
             padding: const EdgeInsets.all(20),
@@ -196,7 +215,10 @@ class _DatePickerModalState extends State<_DatePickerModal> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      widget.controller.updateDateRange(selectedStartDate, selectedEndDate);
+                      widget.controller.updateDateRange(
+                        selectedStartDate,
+                        selectedEndDate,
+                      );
                       Navigator.pop(context);
                     },
                     child: const Text('Uygula'),
@@ -210,16 +232,15 @@ class _DatePickerModalState extends State<_DatePickerModal> {
     );
   }
 
-  Widget _buildDateSelector(String title, DateTime selectedDate, Function(DateTime) onChanged) {
+  Widget _buildDateSelector(
+    String title,
+    DateTime selectedDate,
+    Function(DateTime) onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith()),
         const SizedBox(height: 8),
         InkWell(
           onTap: () async {
@@ -237,7 +258,9 @@ class _DatePickerModalState extends State<_DatePickerModal> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.3),
               ),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -258,7 +281,9 @@ class _DatePickerModalState extends State<_DatePickerModal> {
                 const Spacer(),
                 Icon(
                   Icons.arrow_drop_down,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ],
             ),

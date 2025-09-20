@@ -11,27 +11,25 @@ import '../../../shared/widgets/custom_snackbar.dart';
 class EditTransactionModal extends ConsumerStatefulWidget {
   final TransactionModel transaction;
 
-  const EditTransactionModal({
-    super.key,
-    required this.transaction,
-  });
+  const EditTransactionModal({super.key, required this.transaction});
 
   @override
-  ConsumerState<EditTransactionModal> createState() => _EditTransactionModalState();
+  ConsumerState<EditTransactionModal> createState() =>
+      _EditTransactionModalState();
 }
 
 class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   String _selectedType = 'income';
   CategoriesApiModel? _selectedCategory;
   DateTime _selectedDate = DateTime.now();
   bool _isRecurring = false;
   String _recurringType = 'daily';
   DateTime? _recurringEndDate;
-  
+
   bool _isSubmitting = false;
   bool _isFormValid = false;
   bool _hasUserInteracted = false;
@@ -40,7 +38,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
   void initState() {
     super.initState();
     _initializeWithTransactionData();
-    
+
     // Kategorileri yükle (cache'den veya API'den)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(categoryProvider.notifier).loadCategories();
@@ -50,14 +48,14 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
 
   void _initializeWithTransactionData() {
     final transaction = widget.transaction;
-    
+
     _selectedType = transaction.type;
-    
+
     // Amount'u doğru formatta göster
     final amountValue = transaction.amountAsDouble;
     final formattedAmount = _formatAmountForDisplay(amountValue);
     _amountController.text = formattedAmount;
-    
+
     _descriptionController.text = transaction.description ?? '';
     _selectedDate = transaction.transactionDate;
     _isRecurring = transaction.isRecurring;
@@ -75,20 +73,19 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
   void _validateForm({bool forButtonState = false}) {
     // Button state için her zaman validation yap, error mesajları için sadece user interaction sonrası
     if (!_hasUserInteracted && !forButtonState) return;
-    
+
     final hasAmount = _amountController.text.trim().isNotEmpty;
     final hasCategory = _selectedCategory != null;
     final recurringValid = !_isRecurring || _recurringEndDate != null;
-    
+
     final isValid = hasAmount && hasCategory && recurringValid;
-    
+
     if (_isFormValid != isValid) {
       setState(() {
         _isFormValid = isValid;
       });
     }
   }
-
 
   Future<void> _submitTransaction() async {
     // Submit'e basıldığında kullanıcının etkileşimde bulunduğunu işaretle
@@ -97,13 +94,10 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
         _hasUserInteracted = true;
       });
     }
-    
+
     if (!_formKey.currentState!.validate()) return;
     if (_selectedCategory == null) {
-      CustomSnackBar.showError(
-        context,
-        message: 'Lütfen bir kategori seçiniz',
-      );
+      CustomSnackBar.showError(context, message: 'Lütfen bir kategori seçiniz');
       return;
     }
 
@@ -124,37 +118,41 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
 
     try {
       // Miktarı temizle (binlik ayırıcıları kaldır)
-      final cleanAmount = _amountController.text.trim()
+      final cleanAmount = _amountController.text
+          .trim()
           .replaceAll('.', '')
           .replaceAll(',', '.');
-      
+
       final request = AddTransactionRequest(
         categoryId: _selectedCategory!.id,
         type: _selectedType,
         amount: cleanAmount,
-        description: _descriptionController.text.trim().isEmpty 
-            ? null 
+        description: _descriptionController.text.trim().isEmpty
+            ? null
             : _descriptionController.text.trim(),
         transactionDate: _formatDate(_selectedDate),
         currency: 'TRY',
         isRecurring: _isRecurring,
         recurringType: _isRecurring ? _recurringType : null,
-        recurringEndDate: _isRecurring && _recurringEndDate != null 
-            ? _formatDate(_recurringEndDate!) 
+        recurringEndDate: _isRecurring && _recurringEndDate != null
+            ? _formatDate(_recurringEndDate!)
             : null,
       );
 
       // Update transaction
-      await ref.read(transactionControllerProvider.notifier)
+      await ref
+          .read(transactionControllerProvider.notifier)
           .updateTransaction(widget.transaction.id, request);
-      
+
       // Hem dashboard hem de transactions listesini yenile
-      await ref.read(transactionControllerProvider.notifier).refreshTransactions();
+      await ref
+          .read(transactionControllerProvider.notifier)
+          .refreshTransactions();
       await ref.read(dashboardControllerProvider.notifier).refreshDashboard();
-      
+
       // Kategorileri yenile (yeni kategori eklenmiş olabilir)
       ref.read(categoryProvider.notifier).refreshCategories();
-      
+
       if (mounted) {
         Navigator.pop(context);
         CustomSnackBar.showSuccess(
@@ -164,10 +162,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       }
     } catch (e) {
       if (mounted) {
-        CustomSnackBar.showError(
-          context,
-          message: e.toString(),
-        );
+        CustomSnackBar.showError(context, message: e.toString());
       }
     } finally {
       if (mounted) {
@@ -180,20 +175,20 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
 
   String _formatDate(DateTime date) {
     return '${date.year.toString().padLeft(4, '0')}-'
-           '${date.month.toString().padLeft(2, '0')}-'
-           '${date.day.toString().padLeft(2, '0')}';
+        '${date.month.toString().padLeft(2, '0')}-'
+        '${date.day.toString().padLeft(2, '0')}';
   }
 
   void _formatAmountInput(String value) {
     // Sadece rakam ve virgül karakterlerine izin ver (nokta sadece binlik ayırıcı olarak kullanılacak)
     final cleanValue = value.replaceAll(RegExp(r'[^\d,]'), '');
-    
+
     // Virgül kontrolü - sadece bir tane olabilir
     final commaCount = cleanValue.split(',').length - 1;
     if (commaCount > 1) {
       return; // Geçersiz format, değişiklik yapma
     }
-    
+
     // Virgülden sonra maksimum 2 rakam
     if (cleanValue.contains(',')) {
       final parts = cleanValue.split(',');
@@ -201,10 +196,10 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
         return; // Virgülden sonra 2'den fazla rakam
       }
     }
-    
+
     // Formatlanmış değeri hesapla
     String formattedValue = _formatNumberWithSeparators(cleanValue);
-    
+
     // Eğer değer değiştiyse, controller'ı güncelle
     if (formattedValue != value) {
       _amountController.value = TextEditingValue(
@@ -216,17 +211,17 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
 
   String _formatNumberWithSeparators(String value) {
     if (value.isEmpty) return value;
-    
+
     // Virgül varsa, ondalık kısmını ayır
     String integerPart = value;
     String decimalPart = '';
-    
+
     if (value.contains(',')) {
       final parts = value.split(',');
       integerPart = parts[0];
       decimalPart = parts.length > 1 ? parts[1] : '';
     }
-    
+
     // Tam sayı kısmını binlik ayırıcılarla formatla
     if (integerPart.isNotEmpty) {
       final number = int.tryParse(integerPart);
@@ -234,18 +229,18 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
         integerPart = _addThousandSeparators(number.toString());
       }
     }
-    
+
     // Ondalık kısmını ekle
     if (decimalPart.isNotEmpty) {
       return '$integerPart,$decimalPart';
     }
-    
+
     return integerPart;
   }
 
   String _addThousandSeparators(String number) {
     if (number.isEmpty) return number;
-    
+
     // Regex ile binlik ayırıcı ekle
     return number.replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
@@ -264,10 +259,10 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       final parts = amount.toString().split('.');
       final integerPart = parts[0];
       final decimalPart = parts.length > 1 ? parts[1] : '';
-      
+
       // Ondalık kısmını 2 haneli yap
       final formattedDecimal = decimalPart.padRight(2, '0').substring(0, 2);
-      
+
       return '${_addThousandSeparators(integerPart)},$formattedDecimal';
     }
   }
@@ -277,7 +272,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
     final categories = ref.watch(categoriesProvider);
     final isLoading = ref.watch(categoriesLoadingProvider);
     final error = ref.watch(categoriesErrorProvider);
-    
+
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -297,74 +292,83 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-          // Handle bar
-          Container(
-            margin: const EdgeInsets.only(top: 12, bottom: 8),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(2),
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 16, 16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 16, 16),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.edit_outlined,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 24,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.edit_outlined,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'İşlemi Düzenle',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.onSurface,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'İşlemi Düzenle',
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
-                      ),
-                      Text(
-                        'İşlem bilgilerini güncelleyin',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        Text(
+                          'İşlem bilgilerini güncelleyin',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
+                              ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(
-                    Icons.close,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(
+                      Icons.close,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          
-          // Content
-          Flexible(
-            child: isLoading
-                ? _buildLoadingSkeleton()
-                : error != null
-                    ? _buildErrorWidget(error)
-                    : _buildForm(categories),
-          ),
+
+            // Content
+            Flexible(
+              child: isLoading
+                  ? _buildLoadingSkeleton()
+                  : error != null
+                  ? _buildErrorWidget(error)
+                  : _buildForm(categories),
+            ),
           ],
         ),
       ),
@@ -388,31 +392,27 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             ),
           ]),
           const SizedBox(height: 20),
-          
+
           // Category Skeleton
           _buildSkeletonSection('Kategori Seçiniz', [
             _buildSkeletonContainer(height: 56),
           ]),
           const SizedBox(height: 20),
-          
+
           // Amount Skeleton
-          _buildSkeletonSection('Tutar', [
-            _buildSkeletonContainer(height: 56),
-          ]),
+          _buildSkeletonSection('Tutar', [_buildSkeletonContainer(height: 56)]),
           const SizedBox(height: 20),
-          
+
           // Description Skeleton
           _buildSkeletonSection('Açıklama (İsteğe Bağlı)', [
             _buildSkeletonContainer(height: 80),
           ]),
           const SizedBox(height: 20),
-          
+
           // Date Skeleton
-          _buildSkeletonSection('Tarih', [
-            _buildSkeletonContainer(height: 56),
-          ]),
+          _buildSkeletonSection('Tarih', [_buildSkeletonContainer(height: 56)]),
           const SizedBox(height: 20),
-          
+
           // Submit Button Skeleton
           _buildSkeletonContainer(height: 56, isButton: true),
         ],
@@ -447,14 +447,16 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       width: width,
       height: height ?? 16,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
-        borderRadius: isCircle 
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+        borderRadius: isCircle
             ? BorderRadius.circular((height ?? 16) / 2)
             : BorderRadius.circular(isButton ? 16 : 8),
       ),
-      child: isButton ? Center(
-        child: _buildSkeletonContainer(width: 100, height: 16),
-      ) : null,
+      child: isButton
+          ? Center(child: _buildSkeletonContainer(width: 100, height: 16))
+          : null,
     );
   }
 
@@ -462,7 +464,9 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
     return Container(
       height: 80,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
@@ -495,22 +499,24 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             const SizedBox(height: 16),
             Text(
               'Kategoriler Yüklenemedi',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
             ),
             const SizedBox(height: 8),
             Text(
               error,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                ref.read(categoryProvider.notifier).loadCategories(forceRefresh: true);
+                ref
+                    .read(categoryProvider.notifier)
+                    .loadCategories(forceRefresh: true);
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Deneyiniz'),
@@ -532,7 +538,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
         // Category not found, keep as null
       }
     }
-    
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -548,27 +554,27 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
               // Transaction Type
               _buildTypeSelector(),
               const SizedBox(height: 20),
-              
+
               // Category Selector
               _buildCategorySelector(categories),
               const SizedBox(height: 20),
-              
+
               // Amount
               _buildAmountField(),
               const SizedBox(height: 20),
-              
+
               // Description
               _buildDescriptionField(),
               const SizedBox(height: 20),
-              
+
               // Date
               _buildDateSelector(),
               const SizedBox(height: 20),
-              
+
               // Recurring Options
               _buildRecurringOptions(),
               const SizedBox(height: 20),
-              
+
               // Submit Button
               _buildSubmitButton(),
             ],
@@ -584,19 +590,27 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       children: [
         Text(
           'İşlem Türü',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(),
         ),
         const SizedBox(height: 8),
         Row(
           children: [
             Expanded(
-              child: _buildTypeButton('income', 'Gelir', Colors.green, Icons.trending_up),
+              child: _buildTypeButton(
+                'income',
+                'Gelir',
+                Colors.green,
+                Icons.trending_up,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildTypeButton('expense', 'Gider', Colors.red, Icons.trending_down),
+              child: _buildTypeButton(
+                'expense',
+                'Gider',
+                Colors.red,
+                Icons.trending_down,
+              ),
             ),
           ],
         ),
@@ -604,7 +618,12 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
     );
   }
 
-  Widget _buildTypeButton(String type, String label, Color color, IconData icon) {
+  Widget _buildTypeButton(
+    String type,
+    String label,
+    Color color,
+    IconData icon,
+  ) {
     final isSelected = _selectedType == type;
     return GestureDetector(
       onTap: () {
@@ -612,14 +631,18 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
           _selectedType = type;
           _selectedCategory = null; // Reset category when type changes
         });
-        _validateForm(forButtonState: true); // Button state'i için validation yap ama error mesajları gösterme
+        _validateForm(
+          forButtonState: true,
+        ); // Button state'i için validation yap ama error mesajları gösterme
       },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
           border: Border.all(
-            color: isSelected ? color : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+            color: isSelected
+                ? color
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
             width: 2,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -628,14 +651,22 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
           children: [
             Icon(
               icon,
-              color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: isSelected
+                  ? color
+                  : Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
               size: 24,
             ),
             const SizedBox(height: 8),
             Text(
               label,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
+                color: isSelected
+                    ? color
+                    : Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -645,8 +676,10 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
   }
 
   Widget _buildCategorySelector(List<CategoriesApiModel> categories) {
-    final filteredCategories = categories.where((cat) => cat.type == _selectedType).toList();
-    
+    final filteredCategories = categories
+        .where((cat) => cat.type == _selectedType)
+        .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -661,14 +694,13 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             Text(
               'Kategori Seçiniz',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        
+
         // Custom kategori selector
         GestureDetector(
           onTap: () => _showCategoryPicker(filteredCategories),
@@ -676,8 +708,10 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               border: Border.all(
-                color: _selectedCategory == null 
-                    ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)
+                color: _selectedCategory == null
+                    ? Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.3)
                     : Theme.of(context).colorScheme.primary,
                 width: _selectedCategory == null ? 1 : 2,
               ),
@@ -695,8 +729,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                   Expanded(
                     child: Text(
                       _selectedCategory!.nameTr,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
                     ),
                   ),
                 ] else ...[
@@ -704,14 +737,18 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                     child: Text(
                       'Kategori seçiniz',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ),
                 ],
                 Icon(
                   Icons.arrow_drop_down,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ],
             ),
@@ -759,18 +796,22 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            
+
             // Header
             Container(
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -780,7 +821,9 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -796,15 +839,18 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                       children: [
                         Text(
                           'Kategori Seçiniz',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.copyWith(),
                         ),
                         Text(
                           '${_selectedType == 'income' ? 'Gelir' : 'Gider'} kategorisi seçiniz',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
+                              ),
                         ),
                       ],
                     ),
@@ -812,7 +858,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                 ],
               ),
             ),
-            
+
             // Categories grid
             Expanded(
               child: Padding(
@@ -829,19 +875,23 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                     final category = categories[index];
                     return GestureDetector(
                       onTap: () {
-                      setState(() {
-                        _selectedCategory = category;
-                        _hasUserInteracted = true;
-                      });
-                      _validateForm();
-                      Navigator.pop(context);
+                        setState(() {
+                          _selectedCategory = category;
+                          _hasUserInteracted = true;
+                        });
+                        _validateForm();
+                        Navigator.pop(context);
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.1),
                             width: 1,
                           ),
                         ),
@@ -856,7 +906,9 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: _parseColor(category.color).withValues(alpha: 0.3),
+                                    color: _parseColor(
+                                      category.color,
+                                    ).withValues(alpha: 0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -870,13 +922,17 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                             ),
                             const SizedBox(height: 12),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
                               child: Text(
                                 category.nameTr,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
                                 textAlign: TextAlign.center,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
@@ -911,7 +967,6 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             Text(
               'Tutar',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
@@ -941,9 +996,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
               Icons.currency_lira,
               color: Theme.of(context).colorScheme.primary,
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
@@ -953,8 +1006,9 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             ),
           ),
           validator: (value) {
-            if (!_hasUserInteracted) return null; // Kullanıcı etkileşimde bulunmadıysa validation yapma
-            
+            if (!_hasUserInteracted)
+              return null; // Kullanıcı etkileşimde bulunmadıysa validation yapma
+
             if (value == null || value.isEmpty) {
               return 'Lütfen tutar giriniz';
             }
@@ -977,12 +1031,10 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-          Text(
-            'Açıklama (İsteğe Bağlı)',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+        Text(
+          'Açıklama (İsteğe Bağlı)',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(),
+        ),
         const SizedBox(height: 8),
         TextFormField(
           controller: _descriptionController,
@@ -994,12 +1046,12 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
           decoration: InputDecoration(
             hintText: 'İşlem açıklaması...',
             hintStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.5),
               fontSize: 14,
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
       ],
@@ -1012,9 +1064,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       children: [
         Text(
           'Tarih',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(),
         ),
         const SizedBox(height: 8),
         InkWell(
@@ -1035,7 +1085,9 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.3),
               ),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -1056,7 +1108,9 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                 const Spacer(),
                 Icon(
                   Icons.arrow_drop_down,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
               ],
             ),
@@ -1087,9 +1141,9 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             ),
             Text(
               'Tekrarlayan İşlem',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 14,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontSize: 14),
             ),
           ],
         ),
@@ -1097,8 +1151,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
           const SizedBox(height: 16),
           Text(
             'Tekrarlama Sıklığı',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
           ),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
@@ -1123,17 +1176,20 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
           const SizedBox(height: 16),
           Text(
             'Bitiş Tarihi',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
           ),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.primaryContainer.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -1149,7 +1205,9 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                   child: Text(
                     'Tekrarlayan işlemin hangi tarihe kadar devam edeceğini belirtiniz. Böylece işlem bitim tarihine kadar akıllı bildirimler alarak hatırlatıcılar alırsınız.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.8),
                       fontSize: 12,
                     ),
                   ),
@@ -1162,7 +1220,9 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             onTap: () async {
               final date = await showDatePicker(
                 context: context,
-                initialDate: _recurringEndDate ?? DateTime.now().add(const Duration(days: 30)),
+                initialDate:
+                    _recurringEndDate ??
+                    DateTime.now().add(const Duration(days: 30)),
                 firstDate: DateTime.now(),
                 lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
               );
@@ -1178,7 +1238,9 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.3),
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -1193,20 +1255,24 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                   Text(
                     _recurringEndDate != null
                         ? '${_recurringEndDate!.day.toString().padLeft(2, '0')}/'
-                          '${_recurringEndDate!.month.toString().padLeft(2, '0')}/'
-                          '${_recurringEndDate!.year}'
+                              '${_recurringEndDate!.month.toString().padLeft(2, '0')}/'
+                              '${_recurringEndDate!.year}'
                         : 'Bitiş tarihi seçiniz',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontSize: 12,
-                      color: _recurringEndDate != null 
+                      color: _recurringEndDate != null
                           ? Theme.of(context).colorScheme.onSurface
-                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const Spacer(),
                   Icon(
                     Icons.arrow_drop_down,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ],
               ),
@@ -1222,23 +1288,31 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       width: double.infinity,
       height: 56,
       decoration: BoxDecoration(
-        gradient: _isFormValid ? LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary,
-            Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ) : null,
-        color: !_isFormValid ? Theme.of(context).colorScheme.surfaceVariant : null,
+        gradient: _isFormValid
+            ? LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+        color: !_isFormValid
+            ? Theme.of(context).colorScheme.surfaceVariant
+            : null,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: _isFormValid ? [
-          BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ] : null,
+        boxShadow: _isFormValid
+            ? [
+                BoxShadow(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
       ),
       child: ElevatedButton(
         onPressed: (_isSubmitting || !_isFormValid) ? null : _submitTransaction,
@@ -1262,13 +1336,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Güncelle',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  const Text('Güncelle', style: TextStyle(fontSize: 16)),
                 ],
               ),
       ),

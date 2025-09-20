@@ -12,8 +12,6 @@ class TransactionList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionState = ref.watch(transactionControllerProvider);
 
- 
-
     if (transactionState.isLoading) {
       return const TransactionsPageSkeleton();
     }
@@ -25,7 +23,6 @@ class TransactionList extends ConsumerWidget {
     if (transactionState.transactions.isEmpty) {
       return _buildEmptyWidget(context);
     }
-
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -52,23 +49,25 @@ class TransactionList extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               'Bir hata oluştu',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
             ),
             const SizedBox(height: 8),
             Text(
               error,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
                 ref.read(transactionControllerProvider.notifier).clearError();
-                ref.read(transactionControllerProvider.notifier).loadTransactions();
+                ref
+                    .read(transactionControllerProvider.notifier)
+                    .loadTransactions();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
@@ -89,21 +88,23 @@ class TransactionList extends ConsumerWidget {
             Icon(
               Icons.receipt_long_outlined,
               size: 64,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
               'Henüz işlem yok',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
             ),
             const SizedBox(height: 8),
             Text(
               'Seçilen dönemde herhangi bir işlem bulunamadı',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -134,20 +135,9 @@ class _SwipeableTransactionCard extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.delete_outline,
-              color: Colors.white,
-              size: 28,
-            ),
+            Icon(Icons.delete_outline, color: Colors.white, size: 28),
             const SizedBox(height: 4),
-            Text(
-              'Sil',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-            ),
+            Text('Sil', style: TextStyle(color: Colors.white, fontSize: 12)),
           ],
         ),
       ),
@@ -171,36 +161,33 @@ class _SwipeableTransactionCard extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Simple Icon
-                  Icon(
-                    Icons.delete_outline,
-                    color: Colors.red[600],
-                    size: 32,
-                  ),
-                  
+                  Icon(Icons.delete_outline, color: Colors.red[600], size: 32),
+
                   const SizedBox(height: 16),
-                  
+
                   // Title
                   Text(
                     'İşlemi Sil',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   // Transaction Info - Minimal
                   Text(
                     '${transaction.category.nameTr} • ${_formatAmount(transaction.amountAsDouble)} ₺',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Action Buttons - Minimal
                   Row(
                     children: [
@@ -217,13 +204,14 @@ class _SwipeableTransactionCard extends ConsumerWidget {
                           child: Text(
                             'İptal',
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                              fontWeight: FontWeight.w500,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                           ),
                         ),
                       ),
-                      
+
                       // Delete Button
                       Expanded(
                         child: TextButton(
@@ -236,10 +224,7 @@ class _SwipeableTransactionCard extends ConsumerWidget {
                           ),
                           child: Text(
                             'Sil',
-                            style: TextStyle(
-                              color: Colors.red[600],
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: TextStyle(color: Colors.red[600]),
                           ),
                         ),
                       ),
@@ -253,13 +238,12 @@ class _SwipeableTransactionCard extends ConsumerWidget {
       },
       onDismissed: (direction) {
         // İşlemi sil
-        ref.read(transactionControllerProvider.notifier).deleteTransaction(transaction.id);
-        
+        ref
+            .read(transactionControllerProvider.notifier)
+            .deleteTransaction(transaction.id);
+
         // Başarı mesajı göster
-        CustomSnackBar.showSuccess(
-          context,
-          message: 'İşlem başarıyla silindi',
-        );
+        CustomSnackBar.showSuccess(context, message: 'İşlem başarıyla silindi');
       },
       child: _TransactionCard(transaction: transaction),
     );
@@ -274,7 +258,6 @@ class _SwipeableTransactionCard extends ConsumerWidget {
       return amount.toStringAsFixed(0);
     }
   }
-
 }
 
 class _TransactionCard extends StatelessWidget {
@@ -370,7 +353,9 @@ class _TransactionCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: _parseColor(transaction.category.color).withValues(alpha: 0.1),
+              color: _parseColor(
+                transaction.category.color,
+              ).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -379,9 +364,9 @@ class _TransactionCard extends StatelessWidget {
               size: 24,
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // Transaction details
           Expanded(
             child: Column(
@@ -389,16 +374,17 @@ class _TransactionCard extends StatelessWidget {
               children: [
                 Text(
                   transaction.category.nameTr,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(),
                 ),
-                if (transaction.description != null && transaction.description!.isNotEmpty) ...[
+                if (transaction.description != null &&
+                    transaction.description!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     transaction.description!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -408,13 +394,15 @@ class _TransactionCard extends StatelessWidget {
                 Text(
                   _formatDate(transaction.transactionDate),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
               ],
             ),
           ),
-          
+
           // Amount
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -422,7 +410,6 @@ class _TransactionCard extends StatelessWidget {
               Text(
                 '${transaction.isIncome ? '+' : '-'}${_formatAmount(transaction.amountAsDouble)} ₺',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
                   color: transaction.isIncome
                       ? Colors.green[600]
                       : Colors.red[600],
@@ -431,16 +418,20 @@ class _TransactionCard extends StatelessWidget {
               if (transaction.isRecurring) ...[
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     _getRecurringText(transaction.recurringType),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -460,7 +451,6 @@ class _TransactionCard extends StatelessWidget {
     }
   }
 
-
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -473,8 +463,18 @@ class _TransactionCard extends StatelessWidget {
       return 'Dün';
     } else {
       final months = [
-        'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-        'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+        'Oca',
+        'Şub',
+        'Mar',
+        'Nis',
+        'May',
+        'Haz',
+        'Tem',
+        'Ağu',
+        'Eyl',
+        'Eki',
+        'Kas',
+        'Ara',
       ];
       return '${transactionDate.day} ${months[transactionDate.month - 1]} ${transactionDate.year}';
     }

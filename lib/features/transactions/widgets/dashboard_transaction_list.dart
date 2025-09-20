@@ -55,23 +55,25 @@ class DashboardTransactionList extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               'Bir hata oluştu',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
             ),
             const SizedBox(height: 8),
             Text(
               error,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
                 ref.read(dashboardControllerProvider.notifier).clearError();
-                ref.read(dashboardControllerProvider.notifier).loadDashboardData();
+                ref
+                    .read(dashboardControllerProvider.notifier)
+                    .loadDashboardData();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Tekrar Dene'),
@@ -92,21 +94,23 @@ class DashboardTransactionList extends ConsumerWidget {
             Icon(
               Icons.receipt_long_outlined,
               size: 64,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
               'Henüz işlem yok',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
             ),
             const SizedBox(height: 8),
             Text(
               'İlk işleminizi ekleyerek başlayın',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -144,7 +148,9 @@ class _TransactionCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: _parseColor(transaction.category.color).withValues(alpha: 0.1),
+              color: _parseColor(
+                transaction.category.color,
+              ).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -153,9 +159,9 @@ class _TransactionCard extends StatelessWidget {
               size: 20,
             ),
           ),
-          
+
           const SizedBox(width: 16),
-          
+
           // Transaction details
           Expanded(
             child: Column(
@@ -164,18 +170,20 @@ class _TransactionCard extends StatelessWidget {
                 Text(
                   transaction.category.nameTr,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
                     fontSize: 14,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                if (transaction.description != null && transaction.description!.isNotEmpty) ...[
+                if (transaction.description != null &&
+                    transaction.description!.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
                     transaction.description!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontSize: 12,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -186,14 +194,15 @@ class _TransactionCard extends StatelessWidget {
                   _formatDate(transaction.transactionDate),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
               ],
             ),
           ),
-          
+
           // Amount
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -201,7 +210,6 @@ class _TransactionCard extends StatelessWidget {
               Text(
                 '${transaction.isIncome ? '+' : '-'}${_formatAmount(transaction.amountAsDouble)} ₺',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
                   color: transaction.isIncome
                       ? Colors.green[600]
                       : Colors.red[600],
@@ -210,16 +218,20 @@ class _TransactionCard extends StatelessWidget {
               if (transaction.isRecurring) ...[
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     _getRecurringText(transaction.recurringType),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w500,
                       fontSize: 10,
                     ),
                   ),
@@ -274,7 +286,7 @@ class _TransactionCard extends StatelessWidget {
 
     // Gün farkını doğru hesapla
     final difference = today.difference(transactionDate).inDays;
-    
+
     if (difference == 0) {
       return 'Bugün';
     } else if (difference == 1) {
@@ -283,8 +295,18 @@ class _TransactionCard extends StatelessWidget {
       return '$difference gün önce';
     } else {
       final months = [
-        'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-        'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+        'Oca',
+        'Şub',
+        'Mar',
+        'Nis',
+        'May',
+        'Haz',
+        'Tem',
+        'Ağu',
+        'Eyl',
+        'Eki',
+        'Kas',
+        'Ara',
       ];
       return '${transactionDate.day} ${months[transactionDate.month - 1]} ${transactionDate.year}';
     }

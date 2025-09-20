@@ -144,7 +144,6 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                       Text(
                         'Hesap Oluştur',
                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onBackground,
                         ),
                       ),
@@ -191,7 +190,6 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                               'Hata',
                               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                 color: Theme.of(context).colorScheme.error,
-                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -312,7 +310,6 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                             text: 'Giriş Yap',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
