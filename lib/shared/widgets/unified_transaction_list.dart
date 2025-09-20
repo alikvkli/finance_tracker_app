@@ -669,7 +669,7 @@ class _TransactionCard extends StatelessWidget {
         'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
         'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
       ];
-      return '${date.day} ${monthNames[date.month - 1]}';
+      return '${transactionDate.day} ${monthNames[transactionDate.month - 1]}';
     }
   }
 }
@@ -903,7 +903,7 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
         'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
         'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
       ];
-      return '${date.day} ${monthNames[date.month - 1]}';
+      return '${transactionDate.day} ${monthNames[transactionDate.month - 1]}';
     }
   }
 

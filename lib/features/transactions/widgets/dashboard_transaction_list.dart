@@ -269,20 +269,24 @@ class _TransactionCard extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     final now = DateTime.now();
-    final difference = now.difference(date).inDays;
+    final today = DateTime(now.year, now.month, now.day);
+    final transactionDate = DateTime(date.year, date.month, date.day);
+
+    // Gün farkını doğru hesapla
+    final difference = today.difference(transactionDate).inDays;
     
     if (difference == 0) {
       return 'Bugün';
     } else if (difference == 1) {
       return 'Dün';
-    } else if (difference < 7) {
+    } else if (difference < 7 && difference > 0) {
       return '$difference gün önce';
     } else {
       final months = [
         'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
         'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
       ];
-      return '${date.day} ${months[date.month - 1]} ${date.year}';
+      return '${transactionDate.day} ${months[transactionDate.month - 1]} ${transactionDate.year}';
     }
   }
 

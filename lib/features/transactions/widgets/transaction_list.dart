@@ -462,12 +462,22 @@ class _TransactionCard extends StatelessWidget {
 
 
   String _formatDate(DateTime date) {
-    final months = [
-      'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
-      'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
-    ];
-    
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final transactionDate = DateTime(date.year, date.month, date.day);
+
+    if (transactionDate == today) {
+      return 'Bugün';
+    } else if (transactionDate == yesterday) {
+      return 'Dün';
+    } else {
+      final months = [
+        'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
+        'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+      ];
+      return '${transactionDate.day} ${months[transactionDate.month - 1]} ${transactionDate.year}';
+    }
   }
 
   String _formatAmount(double amount) {
