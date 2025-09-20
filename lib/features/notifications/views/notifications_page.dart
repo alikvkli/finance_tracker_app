@@ -5,6 +5,8 @@ import '../models/notification_model.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../transactions/widgets/add_transaction_modal.dart';
+import '../../../shared/widgets/banner_ad_widget.dart';
+import '../../../shared/controllers/config_controller.dart';
 
 class NotificationsPage extends ConsumerStatefulWidget {
   const NotificationsPage({super.key});
@@ -19,12 +21,14 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notificationControllerProvider.notifier).loadNotifications();
+      ref.read(configControllerProvider.notifier).loadConfig();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final notificationState = ref.watch(notificationControllerProvider);
+    final configState = ref.watch(configControllerProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -35,6 +39,13 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                 children: [
                   // Simple Header
                   _buildNotificationHeader(context, notificationState),
+
+                  // Banner Ad (if ads should be shown)
+                  if (configState.config?.userPreferences.showAds == true)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: const BannerAdWidget(screenId: 'notifications'),
+                    ),
 
                   // Content
                   Expanded(child: _buildContent(context, notificationState)),
@@ -503,26 +514,6 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           begin: const Alignment(-1.0, -0.3),
           end: const Alignment(1.0, 0.3),
         ),
-        borderRadius: isCircle
-            ? BorderRadius.circular((height ?? 16) / 2)
-            : BorderRadius.circular(borderRadius ?? 8),
-      ),
-    );
-  }
-
-  Widget _buildSkeletonContainer({
-    double? width,
-    double? height,
-    double? borderRadius,
-    bool isCircle = false,
-  }) {
-    return Container(
-      width: width,
-      height: height ?? 16,
-      decoration: BoxDecoration(
-        color: Theme.of(
-          context,
-        ).colorScheme.surfaceVariant.withValues(alpha: 0.5),
         borderRadius: isCircle
             ? BorderRadius.circular((height ?? 16) / 2)
             : BorderRadius.circular(borderRadius ?? 8),

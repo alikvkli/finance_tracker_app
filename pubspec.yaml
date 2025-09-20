@@ -75,6 +75,9 @@ dependencies:
   
   # Fonts
   google_fonts: ^6.2.1
+  
+  # AdMob
+  google_mobile_ads: ^5.2.0
 
 dev_dependencies:
   flutter_test:

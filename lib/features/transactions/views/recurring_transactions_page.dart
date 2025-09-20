@@ -6,6 +6,9 @@ import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../core/routing/app_router.dart';
 import '../../auth/controllers/auth_controller.dart';
+import '../../../shared/widgets/banner_ad_widget.dart';
+import '../../../shared/controllers/config_controller.dart';
+import '../../../shared/widgets/notification_badge.dart';
 
 class RecurringTransactionsPage extends ConsumerStatefulWidget {
   const RecurringTransactionsPage({super.key});
@@ -31,6 +34,7 @@ class _RecurringTransactionsPageState
   @override
   Widget build(BuildContext context) {
     final recurringState = ref.watch(recurringTransactionControllerProvider);
+    final configState = ref.watch(configControllerProvider);
 
     return PopScope(
       canPop: false, // Geri tuşunu devre dışı bırak
@@ -42,7 +46,14 @@ class _RecurringTransactionsPageState
               : Column(
                   children: [
                     // Custom Header for Recurring Transactions
-                    _buildRecurringHeader(context, recurringState),
+                    _buildRecurringHeader(context, recurringState, configState),
+
+                    // Banner Ad (if ads should be shown)
+                    if (configState.config?.userPreferences.showAds == true)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: const BannerAdWidget(screenId: 'recurring'),
+                      ),
 
                     // Content
                     Expanded(child: _buildContent(context, recurringState)),
@@ -56,6 +67,7 @@ class _RecurringTransactionsPageState
   Widget _buildRecurringHeader(
     BuildContext context,
     RecurringTransactionState state,
+    ConfigState configState,
   ) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
@@ -89,24 +101,27 @@ class _RecurringTransactionsPageState
           // Action Buttons
           Row(
             children: [
-              // Notification Button
-              IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, AppRouter.notifications);
-                },
-                icon: Icon(
-                  Icons.notifications_outlined,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.6),
-                  size: 22,
-                ),
-                tooltip: 'Bildirimler',
-                style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(8),
-                  minimumSize: const Size(40, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              // Notification Button with Badge
+              NotificationBadge(
+                count: configState.config?.notifications.unreadCount ?? 0,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRouter.notifications);
+                  },
+                  icon: Icon(
+                    Icons.notifications_outlined,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    size: 22,
+                  ),
+                  tooltip: 'Bildirimler',
+                  style: IconButton.styleFrom(
+                    padding: const EdgeInsets.all(8),
+                    minimumSize: const Size(40, 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ),

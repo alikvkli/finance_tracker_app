@@ -5,6 +5,8 @@ import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../shared/widgets/financial_header.dart';
 import '../../../shared/widgets/month_badge.dart';
 import '../../../shared/widgets/unified_transaction_list.dart';
+import '../../../shared/widgets/banner_ad_widget.dart';
+import '../../../shared/controllers/config_controller.dart';
 
 class DashboardPage extends ConsumerStatefulWidget {
   final VoidCallback? onNavigateToTransactions;
@@ -23,15 +25,17 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   @override
   void initState() {
     super.initState();
-    // Load dashboard data when the page is initialized
+    // Load dashboard data and config when the page is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(dashboardControllerProvider.notifier).loadDashboardData();
+      ref.read(configControllerProvider.notifier).loadConfig();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final dashboardState = ref.watch(dashboardControllerProvider);
+    final configState = ref.watch(configControllerProvider);
 
     return PopScope(
       canPop: false, // Geri tuşunu devre dışı bırak
@@ -49,10 +53,19 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     totalIncome: dashboardState.totalIncome,
                     totalExpense: dashboardState.totalExpense,
                     monthBadge: MonthBadge.current(),
+                    notificationCount: configState.config?.notifications.unreadCount ?? 0,
                     onNotificationTap: () {
                       // Notification action
+                      Navigator.pushNamed(context, '/notifications');
                     },
                   ),
+
+                  // Banner Ad (if ads should be shown)
+                  if (configState.config?.userPreferences.showAds == true)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: const BannerAdWidget(screenId: 'dashboard'),
+                    ),
 
                   // Recent Transactions Section
                   Expanded(

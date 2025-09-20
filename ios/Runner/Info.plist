@@ -45,5 +45,9 @@
     <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
+    
+    <!-- AdMob App ID -->
+    <key>GADApplicationIdentifier</key>
+    <string>ca-app-pub-7116699745443433~3793603172</string>
   </dict>
 </plist>

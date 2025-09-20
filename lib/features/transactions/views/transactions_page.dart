@@ -4,6 +4,8 @@ import '../controllers/transaction_controller.dart';
 import '../../../shared/widgets/financial_header.dart';
 import '../../../shared/widgets/month_badge.dart';
 import '../../../shared/widgets/unified_transaction_list.dart';
+import '../../../shared/widgets/banner_ad_widget.dart';
+import '../../../shared/controllers/config_controller.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 
 class TransactionsPage extends ConsumerStatefulWidget {
@@ -27,10 +29,7 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
   @override
   Widget build(BuildContext context) {
     final transactionState = ref.watch(transactionControllerProvider);
-    
-    // Debug: Print current state
-    print('🏠 TransactionsPage build - Transaction count: ${transactionState.transactions.length}');
-    print('🏠 Loading: ${transactionState.isLoading}, Error: ${transactionState.error}');
+    final configState = ref.watch(configControllerProvider);
     
     return PopScope(
       canPop: false, // Geri tuşunu devre dışı bırak
@@ -51,10 +50,18 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                       start: transactionState.selectedStartDate,
                       end: transactionState.selectedEndDate,
                     ),
+                    notificationCount: configState.config?.notifications.unreadCount ?? 0,
                     onNotificationTap: () {
-                      // Notification action
+                      Navigator.pushNamed(context, '/notifications');
                     },
                   ),
+                  
+                  // Banner Ad (if ads should be shown)
+                  if (configState.config?.userPreferences.showAds == true)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: const BannerAdWidget(screenId: 'transactions'),
+                    ),
                   
                   // Content
                   Expanded(

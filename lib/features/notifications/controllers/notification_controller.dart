@@ -6,6 +6,7 @@ import '../models/notification_model.dart';
 import '../services/notification_service.dart';
 import '../../../core/di/injection.dart';
 import '../../../shared/services/storage_service.dart';
+import '../../../shared/controllers/config_controller.dart';
 
 class NotificationState extends Equatable {
   final List<NotificationModel> notifications;
@@ -85,8 +86,9 @@ class NotificationState extends Equatable {
 
 class NotificationController extends StateNotifier<NotificationState> {
   final NotificationService _notificationService;
+  final Ref _ref;
 
-  NotificationController(this._notificationService)
+  NotificationController(this._notificationService, this._ref)
       : super(const NotificationState());
 
   Future<void> loadNotifications({bool isRefresh = false}) async {
@@ -109,6 +111,9 @@ class NotificationController extends StateNotifier<NotificationState> {
         unreadCount: response.summary.unreadCount,
         readCount: response.summary.readCount,
       );
+
+      // Config'teki notification count'u da güncelle
+      _ref.read(configControllerProvider.notifier).updateNotificationCount(response.summary.unreadCount);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -202,6 +207,9 @@ class NotificationController extends StateNotifier<NotificationState> {
         markingAsRead: finalMarkingSet,
       );
 
+      // Config'teki notification count'u da güncelle
+      _ref.read(configControllerProvider.notifier).updateNotificationCount(newUnreadCount);
+
     } catch (e) {
       // Loading state'i bitir (hata durumunda)
       final finalMarkingSet = Set<int>.from(currentMarkingSet);
@@ -226,7 +234,6 @@ class NotificationController extends StateNotifier<NotificationState> {
       
       // API response'dan gelen değerleri kullan
       final data = response['data'] as Map<String, dynamic>?;
-      final updatedCount = data?['updated_count'] as int? ?? 0;
       final newUnreadCount = data?['unread_count'] as int? ?? 0;
       
       // Tüm notifications'ları read olarak işaretle
@@ -254,6 +261,9 @@ class NotificationController extends StateNotifier<NotificationState> {
         isMarkingAllAsRead: false,
       );
 
+      // Config'teki notification count'u da güncelle
+      _ref.read(configControllerProvider.notifier).updateNotificationCount(newUnreadCount);
+
     } catch (e) {
       state = state.copyWith(
         error: e.toString().replaceFirst('Exception: ', ''),
@@ -273,7 +283,7 @@ class NotificationController extends StateNotifier<NotificationState> {
     );
 
     try {
-      final response = await _notificationService.deleteNotification(notificationId);
+      await _notificationService.deleteNotification(notificationId);
       
       // Notification'ı listeden kaldır
       final updatedNotifications = state.notifications
@@ -308,6 +318,9 @@ class NotificationController extends StateNotifier<NotificationState> {
         deletingNotifications: finalDeletingSet,
       );
 
+      // Config'teki notification count'u da güncelle
+      _ref.read(configControllerProvider.notifier).updateNotificationCount(newUnreadCount);
+
     } catch (e) {
       // Loading state'i bitir (hata durumunda)
       final finalDeletingSet = Set<int>.from(currentDeletingSet);
@@ -333,5 +346,5 @@ class NotificationController extends StateNotifier<NotificationState> {
 final notificationControllerProvider =
     StateNotifierProvider<NotificationController, NotificationState>((ref) {
       final notificationService = NotificationService(getIt<Dio>(), StorageService(getIt<SharedPreferences>()));
-      return NotificationController(notificationService);
+      return NotificationController(notificationService, ref);
     });

@@ -10,6 +10,8 @@ import '../../shared/services/storage_service.dart';
 import '../../features/auth/services/auth_service.dart';
 import '../../features/transactions/services/transaction_service.dart';
 import '../../features/notifications/services/notification_service.dart';
+import '../../shared/services/config_service.dart';
+import '../../shared/services/admob_service.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -47,4 +49,12 @@ final transactionServiceProvider = Provider<TransactionService>((ref) {
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService(getIt<Dio>(), ref.watch(storageServiceProvider));
+});
+
+final configServiceProvider = Provider<ConfigService>((ref) {
+  return ConfigService(getIt<Dio>(), ref.watch(storageServiceProvider));
+});
+
+final adMobServiceProvider = Provider<AdMobService>((ref) {
+  return getIt<AdMobService>();
 });

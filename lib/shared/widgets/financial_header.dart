@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/routing/app_router.dart';
 import '../../features/auth/controllers/auth_controller.dart';
+import 'notification_badge.dart';
 
 class FinancialHeader extends StatelessWidget {
   final String title;
@@ -10,6 +11,7 @@ class FinancialHeader extends StatelessWidget {
   final double totalExpense;
   final Widget? monthBadge;
   final VoidCallback? onNotificationTap;
+  final int notificationCount;
 
   const FinancialHeader({
     super.key,
@@ -19,6 +21,7 @@ class FinancialHeader extends StatelessWidget {
     required this.totalExpense,
     this.monthBadge,
     this.onNotificationTap,
+    this.notificationCount = 0,
   });
 
   @override
@@ -58,24 +61,27 @@ class FinancialHeader extends StatelessWidget {
               // Action Buttons
               Row(
                 children: [
-                  // Notification Button
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, AppRouter.notifications);
-                    },
-                    icon: Icon(
-                      Icons.notifications_outlined,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withValues(alpha: 0.6),
-                      size: 22,
-                    ),
-                    tooltip: 'Bildirimler',
-                    style: IconButton.styleFrom(
-                      padding: const EdgeInsets.all(8),
-                      minimumSize: const Size(40, 40),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  // Notification Button with Badge
+                  NotificationBadge(
+                    count: notificationCount,
+                    child: IconButton(
+                      onPressed: onNotificationTap ?? () {
+                        Navigator.pushNamed(context, AppRouter.notifications);
+                      },
+                      icon: Icon(
+                        Icons.notifications_outlined,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        size: 22,
+                      ),
+                      tooltip: 'Bildirimler',
+                      style: IconButton.styleFrom(
+                        padding: const EdgeInsets.all(8),
+                        minimumSize: const Size(40, 40),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     ),
                   ),
