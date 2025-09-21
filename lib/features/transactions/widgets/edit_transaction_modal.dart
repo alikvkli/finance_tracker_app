@@ -34,6 +34,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
   bool _isSubmitting = false;
   bool _isFormValid = false;
   bool _hasUserInteracted = false;
+  bool _hasTypeChanged = false;
 
   @override
   void initState() {
@@ -551,7 +552,8 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
 
   Widget _buildForm(List<CategoriesApiModel> categories) {
     // Set selected category to current transaction's category if not already set
-    if (_selectedCategory == null && categories.isNotEmpty) {
+    // Only do this if the type hasn't been changed by the user
+    if (_selectedCategory == null && categories.isNotEmpty && !_hasTypeChanged) {
       try {
         _selectedCategory = categories.firstWhere(
           (category) => category.id == widget.transaction.category.id,
@@ -652,6 +654,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
         setState(() {
           _selectedType = type;
           _selectedCategory = null; // Reset category when type changes
+          _hasTypeChanged = true; // Mark that type has been changed
         });
         _validateForm(
           forButtonState: true,
