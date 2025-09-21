@@ -43,37 +43,37 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () async {
+      onRefresh: () async {
           await ref
               .read(statisticsControllerProvider.notifier)
               .refreshStatistics();
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Summary Cards
-              _buildSummaryCards(context, statistics.summary),
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Summary Cards
+            _buildSummaryCards(context, statistics.summary),
 
-              const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-              // Income Categories
-              CategoryStatisticsWidget(
-                categories: statisticsState.incomeCategories,
+            // Income Categories
+            CategoryStatisticsWidget(
+              categories: statisticsState.incomeCategories,
                 title: 'Gelir Özeti',
-                accentColor: Colors.green,
-              ),
+              accentColor: Colors.green,
+            ),
 
-              const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-              // Expense Categories
-              CategoryStatisticsWidget(
-                categories: statisticsState.expenseCategories,
+            // Expense Categories
+            CategoryStatisticsWidget(
+              categories: statisticsState.expenseCategories,
                 title: 'Gider Özeti',
-                accentColor: Colors.red,
-              ),
-              const SizedBox(height: 32),
+              accentColor: Colors.red,
+            ),
+            const SizedBox(height: 32),
 
               // Daily Chart
               DailyStatisticsChart(
@@ -114,9 +114,9 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
               Icons.account_balance_wallet,
             ),
           ),
-
+          
           const SizedBox(width: 12),
-
+          
           // Transaction Count Card
           Expanded(
             child: _buildSummaryCard(
@@ -713,9 +713,37 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
   }
 }
 
-/// Skeleton widget for statistics loading state
-class _StatisticsSkeleton extends StatelessWidget {
+/// Premium skeleton widget for statistics loading state
+class _StatisticsSkeleton extends StatefulWidget {
   const _StatisticsSkeleton();
+
+  @override
+  State<_StatisticsSkeleton> createState() => _StatisticsSkeletonState();
+}
+
+class _StatisticsSkeletonState extends State<_StatisticsSkeleton>
+    with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    _animationController.repeat();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -727,42 +755,311 @@ class _StatisticsSkeleton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Expanded(child: _buildCardSkeleton(context)),
+                Expanded(child: _buildPremiumCardSkeleton(context)),
                 const SizedBox(width: 12),
-                Expanded(child: _buildCardSkeleton(context)),
+                Expanded(child: _buildPremiumCardSkeleton(context)),
               ],
             ),
           ),
+          
+          const SizedBox(height: 16),
+          
+          // Income Categories Skeleton
+          _buildPremiumCategorySkeleton(context, 'Gelir Özeti', Colors.green),
 
           const SizedBox(height: 16),
 
-          // Categories Skeleton
-          ...List.generate(
-            2,
-            (index) => Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              height: 200,
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(16),
-              ),
+          // Expense Categories Skeleton
+          _buildPremiumCategorySkeleton(context, 'Gider Özeti', Colors.red),
+
+          const SizedBox(height: 32),
+
+          // Daily Chart Skeleton
+          _buildPremiumChartSkeleton(context),
+
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPremiumCardSkeleton(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+              width: 1,
             ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  _buildShimmerBox(
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    animationValue: _animation.value,
+                  ),
+                  const Spacer(),
+                  _buildShimmerBox(
+                    width: 80,
+                    height: 24,
+                    borderRadius: 4,
+                    animationValue: _animation.value,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _buildShimmerBox(
+                width: double.infinity,
+                height: 16,
+                borderRadius: 4,
+                animationValue: _animation.value,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPremiumCategorySkeleton(BuildContext context, String title, Color color) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              _buildShimmerBox(
+                width: 24,
+                height: 24,
+                borderRadius: 12,
+                animationValue: _animation.value,
+                color: color,
+              ),
+              const SizedBox(width: 12),
+              _buildShimmerBox(
+                width: 120,
+                height: 20,
+                borderRadius: 4,
+                animationValue: _animation.value,
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Chart area
+          Row(
+            children: [
+              // Pie chart skeleton
+              _buildShimmerBox(
+                width: 120,
+                height: 120,
+                borderRadius: 60,
+                animationValue: _animation.value,
+              ),
+              
+              const SizedBox(width: 16),
+              
+              // Legend skeleton
+              Expanded(
+                child: Column(
+                  children: List.generate(
+                    4,
+                    (index) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        children: [
+                          _buildShimmerBox(
+                            width: 12,
+                            height: 12,
+                            borderRadius: 6,
+                            animationValue: _animation.value,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _buildShimmerBox(
+                              width: double.infinity,
+                              height: 14,
+                              borderRadius: 4,
+                              animationValue: _animation.value,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildShimmerBox(
+                            width: 40,
+                            height: 14,
+                            borderRadius: 4,
+                            animationValue: _animation.value,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCardSkeleton(BuildContext context) {
+  Widget _buildPremiumChartSkeleton(BuildContext context) {
     return Container(
-      height: 100,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title
+          _buildShimmerBox(
+            width: 140,
+            height: 20,
+            borderRadius: 4,
+            animationValue: _animation.value,
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Chart bars skeleton
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: List.generate(
+              7,
+              (index) => Column(
+                children: [
+                  _buildShimmerBox(
+                    width: 24,
+                    height: (60 + (index * 10)).toDouble(),
+                    borderRadius: 4,
+                    animationValue: _animation.value,
+                  ),
+                  const SizedBox(height: 8),
+                  _buildShimmerBox(
+                    width: 20,
+                    height: 12,
+                    borderRadius: 4,
+                    animationValue: _animation.value,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Legend
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildShimmerBox(
+                width: 12,
+                height: 12,
+                borderRadius: 6,
+                animationValue: _animation.value,
+                color: Colors.green,
+              ),
+              const SizedBox(width: 8),
+              _buildShimmerBox(
+                width: 40,
+                height: 14,
+                borderRadius: 4,
+                animationValue: _animation.value,
+              ),
+              const SizedBox(width: 24),
+              _buildShimmerBox(
+                width: 12,
+                height: 12,
+                borderRadius: 6,
+                animationValue: _animation.value,
+                color: Colors.red,
+              ),
+              const SizedBox(width: 8),
+              _buildShimmerBox(
+                width: 40,
+                height: 14,
+                borderRadius: 4,
+                animationValue: _animation.value,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerBox({
+    required double width,
+    required double height,
+    required double borderRadius,
+    required double animationValue,
+    Color? color,
+  }) {
+    final shimmerColor = color ?? Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3);
+    
+    return Container(
+      width: width,
+      height: height,
       decoration: BoxDecoration(
-        color: Theme.of(
-          context,
-        ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(16),
+        color: shimmerColor,
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(borderRadius),
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    shimmerColor,
+                    shimmerColor.withValues(alpha: 0.5),
+                    shimmerColor,
+                  ],
+                  stops: [
+                    (animationValue - 0.3).clamp(0.0, 1.0),
+                    animationValue.clamp(0.0, 1.0),
+                    (animationValue + 0.3).clamp(0.0, 1.0),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
