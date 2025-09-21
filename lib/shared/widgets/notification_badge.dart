@@ -50,7 +50,6 @@ class NotificationBadge extends StatelessWidget {
                     style: TextStyle(
                       color: textColor ?? Colors.white,
                       fontSize: 10,
-                      fontWeight: FontWeight.w700,
                       height: 1,
                     ),
                     textAlign: TextAlign.center,

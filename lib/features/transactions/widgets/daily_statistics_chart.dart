@@ -138,7 +138,6 @@ class _DailyStatisticsChartState extends ConsumerState<DailyStatisticsChart> {
               Text(
                 widget.title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
@@ -468,7 +467,6 @@ class _DailyStatisticsChartState extends ConsumerState<DailyStatisticsChart> {
                 content,
                 TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.w600,
                   fontSize: 11,
                   height: 1.2,
                   shadows: [

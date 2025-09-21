@@ -79,7 +79,6 @@ class _CategoryStatisticsWidgetState extends ConsumerState<CategoryStatisticsWid
                 Text(
                   widget.title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
@@ -214,7 +213,6 @@ class _CategoryStatisticsWidgetState extends ConsumerState<CategoryStatisticsWid
         radius: radius,
         titleStyle: TextStyle(
           fontSize: isTouched ? 11 : 9,
-          fontWeight: FontWeight.w700,
           color: Colors.white,
           shadows: [
             Shadow(
@@ -308,7 +306,6 @@ class _CategoryStatisticsWidgetState extends ConsumerState<CategoryStatisticsWid
                     child: Text(
                       category.category.nameTr,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w500,
                         color: isTouched 
                           ? categoryColor
                           : Theme.of(context).colorScheme.onSurface,
@@ -325,7 +322,6 @@ class _CategoryStatisticsWidgetState extends ConsumerState<CategoryStatisticsWid
                       Text(
                         '${percentage.toStringAsFixed(1)}%',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w700,
                           color: categoryColor,
                             fontSize: 10,
                         ),
@@ -333,7 +329,6 @@ class _CategoryStatisticsWidgetState extends ConsumerState<CategoryStatisticsWid
                       Text(
                         category.totalAmount.formatAsTurkishLira(),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w500,
                             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 8,
                         ),
@@ -379,7 +374,6 @@ class _CategoryStatisticsWidgetState extends ConsumerState<CategoryStatisticsWid
                   Text(
                     _showAllCategories ? 'Daha Az Göster' : 'Tümünü Göster',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500,
                       color: Theme.of(context).colorScheme.primary,
                       fontSize: 10,
                     ),
@@ -429,7 +423,6 @@ class _CategoryStatisticsWidgetState extends ConsumerState<CategoryStatisticsWid
                     Text(
                       '${percentage.toStringAsFixed(1)}%',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w500,
                         color: categoryColor,
                         fontSize: 8,
                       ),

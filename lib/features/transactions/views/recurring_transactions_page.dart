@@ -220,12 +220,10 @@ class _RecurringTransactionsPageState
             labelColor: Colors.transparent,
             unselectedLabelColor: Colors.transparent,
             labelStyle: const TextStyle(
-              fontWeight: FontWeight.w700,
               fontSize: 15,
               letterSpacing: 0.5,
             ),
             unselectedLabelStyle: const TextStyle(
-              fontWeight: FontWeight.w500,
               fontSize: 14,
               letterSpacing: 0.3,
             ),
@@ -248,7 +246,6 @@ class _RecurringTransactionsPageState
                         color: _tabController.index == 0 
                           ? Colors.white 
                           : Colors.black87,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -272,7 +269,6 @@ class _RecurringTransactionsPageState
                         color: _tabController.index == 1 
                           ? Colors.white 
                           : Colors.black87,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],

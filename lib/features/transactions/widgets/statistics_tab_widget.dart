@@ -176,16 +176,14 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
               if (isCount)
                 Text(
                   value.toInt().toString(),
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: color,
                   ),
                 )
               else
                 Text(
                   value.formatAsTurkishLira(),
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: color,
                   ),
                 ),
@@ -222,7 +220,7 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
               'Bir hata oluştu',
               style: Theme.of(
                 context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+              ).textTheme.bodyMedium?.copyWith(),
             ),
             const SizedBox(height: 8),
             Text(
@@ -280,7 +278,7 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
               'Henüz veri yok',
               style: Theme.of(
                 context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+              ).textTheme.titleLarge?.copyWith(),
             ),
             const SizedBox(height: 8),
             Text(
@@ -318,7 +316,7 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
                 'Sonuç bulunamadı',
                 style: Theme.of(
                   context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                ).textTheme.titleLarge?.copyWith(),
               ),
               const SizedBox(height: 8),
               Text(
@@ -415,7 +413,6 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
                   Text(
                     'Tarih Aralığı Filtresi',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
@@ -505,7 +502,6 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                                 color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w500,
                               ),
                         ),
                       ),
@@ -634,7 +630,6 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
                     color: Theme.of(
                       context,
                     ).colorScheme.onSurface.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -645,7 +640,6 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
                   ? '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}'
                   : 'Tarih seçiniz',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
                 color: date != null
                     ? Theme.of(context).colorScheme.onSurface
                     : Theme.of(

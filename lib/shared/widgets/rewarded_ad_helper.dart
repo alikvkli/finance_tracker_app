@@ -161,7 +161,6 @@ class RewardedAdHelper {
               Text(
                 actionTitle,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
                   fontSize: 20,
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
@@ -258,7 +257,6 @@ class RewardedAdHelper {
                       label: const Text(
                         'Reklam İzle',
                         style: TextStyle(
-                          fontWeight: FontWeight.w600,
                           fontSize: 15,
                         ),
                       ),

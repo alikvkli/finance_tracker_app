@@ -192,7 +192,6 @@ class UpcomingRemindersCalendar extends ConsumerWidget {
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontSize: 18,
                     color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -255,7 +254,6 @@ class UpcomingRemindersCalendar extends ConsumerWidget {
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -267,7 +265,6 @@ class UpcomingRemindersCalendar extends ConsumerWidget {
                       Text(
                         reminder.dayNameTr,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
@@ -291,7 +288,6 @@ class UpcomingRemindersCalendar extends ConsumerWidget {
                     '${reminder.reminders.length} hatırlatma',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -357,7 +353,6 @@ class UpcomingRemindersCalendar extends ConsumerWidget {
                 Text(
                   reminderData.category,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
@@ -375,7 +370,6 @@ class UpcomingRemindersCalendar extends ConsumerWidget {
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: iconColor,
                           fontSize: 10,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -390,7 +384,6 @@ class UpcomingRemindersCalendar extends ConsumerWidget {
             reminderData.amount,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: amountColor,
-              fontWeight: FontWeight.w600,
               fontSize: 16,
             ),
           ),

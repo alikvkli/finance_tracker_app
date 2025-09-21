@@ -127,12 +127,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                   labelColor: Colors.transparent, // Hide default label colors
                   unselectedLabelColor: Colors.transparent, // Hide default unselected colors
                   labelStyle: const TextStyle(
-                    fontWeight: FontWeight.w700,
                     fontSize: 15,
                     letterSpacing: 0.5,
                   ),
                   unselectedLabelStyle: const TextStyle(
-                    fontWeight: FontWeight.w500,
                     fontSize: 14,
                     letterSpacing: 0.3,
                   ),
@@ -155,7 +153,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                               color: _tabController.index == 0 
                                 ? Colors.white 
                                 : Colors.black87,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -179,7 +176,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                               color: _tabController.index == 1 
                                 ? Colors.white 
                                 : Colors.black87,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -396,7 +392,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -429,7 +424,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                     'ali.kavakli4598@gmail.com',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
@@ -520,7 +514,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
               'E-posta Adresi Kopyalandı',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface,
-                fontWeight: FontWeight.w600,
               ),
             ),
 
@@ -562,7 +555,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                       'ali.kavakli4598@gmail.com',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
-                        fontWeight: FontWeight.w500,
                         fontFamily: 'monospace',
                       ),
                     ),
@@ -595,7 +587,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         'Nasıl gönderebilirsiniz:',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -681,7 +672,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                     'Dikkat!',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.error,
-                      fontWeight: FontWeight.w600,
                       fontSize: 14,
                     ),
                   ),
@@ -695,7 +685,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                 'Hesabınızı sildiğinizde aşağıdaki veriler kalıcı olarak silinir:',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
-                  fontWeight: FontWeight.w500,
                 ),
               ),
               
@@ -738,7 +727,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                         'Bu işlem geri alınamaz. Emin olmadan devam etmeyin.',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.error,
-                          fontWeight: FontWeight.w500,
                           height: 1.3,
                         ),
                       ),

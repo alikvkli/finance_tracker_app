@@ -170,15 +170,12 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 ),
                 defaultTextStyle: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.w500,
                 ),
                 selectedTextStyle: const TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.w600,
                 ),
                 todayTextStyle: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w600,
                 ),
                 selectedDecoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
@@ -208,10 +205,8 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 rightChevronVisible: false, // Sağ ok butonunu gizle
                 titleTextStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
                 ) ?? TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
               onDaySelected: _onDaySelected,
@@ -266,7 +261,6 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
               'Bu tarihte hatırlatma yok',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 8),
@@ -324,7 +318,6 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                     _formatSelectedDate(),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -351,7 +344,6 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                         '${reminders.length} hatırlatma',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w500,
                           fontSize: 12,
                         ),
                       ),
@@ -418,7 +410,6 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                     Text(
                       reminderData.category,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
@@ -436,7 +427,6 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: reminderData.isIncome ? Colors.green[700] : Colors.red[700],
                           fontSize: 10,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -448,7 +438,6 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 reminderData.amount,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: reminderData.isIncome ? Colors.green[600] : Colors.red[600],
-                  fontWeight: FontWeight.w600,
                   fontSize: 15,
                 ),
               ),
