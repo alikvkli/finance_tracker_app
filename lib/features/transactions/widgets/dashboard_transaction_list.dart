@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction_model.dart';
 import '../../home/controllers/dashboard_controller.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
+import '../../../core/extensions/category_icon_extension.dart';
 
 class DashboardTransactionList extends ConsumerWidget {
   const DashboardTransactionList({super.key});
@@ -154,7 +155,7 @@ class _TransactionCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
-              _getCategoryIcon(transaction.category.icon),
+              transaction.category.icon.getCategoryIcon(),
               color: _parseColor(transaction.category.color),
               size: 20,
             ),
@@ -252,32 +253,6 @@ class _TransactionCard extends StatelessWidget {
     }
   }
 
-  IconData _getCategoryIcon(String iconName) {
-    switch (iconName.toLowerCase()) {
-      case 'home':
-        return Icons.home;
-      case 'salary':
-        return Icons.work;
-      case 'food':
-        return Icons.restaurant;
-      case 'transport':
-        return Icons.directions_car;
-      case 'shopping':
-        return Icons.shopping_bag;
-      case 'entertainment':
-        return Icons.movie;
-      case 'health':
-        return Icons.health_and_safety;
-      case 'education':
-        return Icons.school;
-      case 'travel':
-        return Icons.flight;
-      case 'gift':
-        return Icons.card_giftcard;
-      default:
-        return Icons.category;
-    }
-  }
 
   String _formatDate(DateTime date) {
     final now = DateTime.now();
