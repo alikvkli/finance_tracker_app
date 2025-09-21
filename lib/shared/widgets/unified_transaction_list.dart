@@ -95,7 +95,10 @@ class UnifiedTransactionList extends ConsumerWidget {
                   transaction: transaction,
                   onDelete: onDelete!,
                 )
-              : _TransactionCard(transaction: transaction);
+              : _TransactionCard(
+                  transaction: transaction,
+                  onTap: () => _showEditTransactionModal(context, transaction),
+                );
         },
       ),
     );
@@ -240,6 +243,18 @@ class UnifiedTransactionList extends ConsumerWidget {
       ),
     );
   }
+
+  void _showEditTransactionModal(
+    BuildContext context,
+    TransactionModel transaction,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => EditTransactionModal(transaction: transaction),
+    );
+  }
 }
 
 class _SwipeableTransactionCard extends ConsumerWidget {
@@ -281,7 +296,10 @@ class _SwipeableTransactionCard extends ConsumerWidget {
       },
       child: GestureDetector(
         onLongPress: () => _showContextMenu(context, ref),
-        child: _TransactionCard(transaction: transaction),
+        child: _TransactionCard(
+          transaction: transaction,
+          onTap: () => _showEditTransactionModal(context, transaction),
+        ),
       ),
     );
   }
@@ -441,33 +459,39 @@ class _SwipeableTransactionCard extends ConsumerWidget {
 
 class _TransactionCard extends StatelessWidget {
   final TransactionModel transaction;
+  final VoidCallback? onTap;
 
-  const _TransactionCard({required this.transaction});
+  const _TransactionCard({
+    required this.transaction,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isExpense = transaction.type == 'expense';
     final amountColor = isExpense ? Colors.red[600] : Colors.green[600];
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+            width: 1,
           ),
-        ],
-      ),
-      child: Row(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
         children: [
           // Category Icon
           Container(
@@ -549,6 +573,7 @@ class _TransactionCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
       ),
     );
   }
