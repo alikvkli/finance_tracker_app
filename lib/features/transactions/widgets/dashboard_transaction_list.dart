@@ -4,6 +4,10 @@ import '../models/transaction_model.dart';
 import '../../home/controllers/dashboard_controller.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../core/extensions/category_icon_extension.dart';
+import '../../../core/extensions/color_extension.dart';
+import '../../../core/extensions/amount_formatting_extension.dart';
+import '../../../core/extensions/date_formatting_extension.dart';
+import '../../../core/extensions/recurring_text_extension.dart';
 
 class DashboardTransactionList extends ConsumerWidget {
   const DashboardTransactionList({super.key});
@@ -149,14 +153,12 @@ class _TransactionCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: _parseColor(
-                transaction.category.color,
-              ).withValues(alpha: 0.1),
+              color: transaction.category.color.parseColor().withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               transaction.category.icon.getCategoryIcon(),
-              color: _parseColor(transaction.category.color),
+              color: transaction.category.color.parseColor(),
               size: 20,
             ),
           ),
@@ -192,7 +194,7 @@ class _TransactionCard extends StatelessWidget {
                 ],
                 const SizedBox(height: 4),
                 Text(
-                  _formatDate(transaction.transactionDate),
+                  transaction.transactionDate.formatForDashboard(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontSize: 12,
                     color: Theme.of(
@@ -209,7 +211,7 @@ class _TransactionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${transaction.isIncome ? '+' : '-'}${_formatAmount(transaction.amountAsDouble)} ₺',
+                '${transaction.isIncome ? '+' : '-'}${transaction.amountAsDouble.formatForDashboard()} ₺',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: transaction.isIncome
                       ? Colors.green[600]
@@ -230,7 +232,7 @@ class _TransactionCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    _getRecurringText(transaction.recurringType),
+                    transaction.recurringType.getRecurringDisplayText(),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                       fontSize: 10,
@@ -245,70 +247,4 @@ class _TransactionCard extends StatelessWidget {
     );
   }
 
-  Color _parseColor(String colorString) {
-    try {
-      return Color(int.parse(colorString.replaceFirst('#', '0xff')));
-    } catch (e) {
-      return Colors.grey;
-    }
-  }
-
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final transactionDate = DateTime(date.year, date.month, date.day);
-
-    // Gün farkını doğru hesapla
-    final difference = today.difference(transactionDate).inDays;
-
-    if (difference == 0) {
-      return 'Bugün';
-    } else if (difference == 1) {
-      return 'Dün';
-    } else if (difference < 7 && difference > 0) {
-      return '$difference gün önce';
-    } else {
-      final months = [
-        'Oca',
-        'Şub',
-        'Mar',
-        'Nis',
-        'May',
-        'Haz',
-        'Tem',
-        'Ağu',
-        'Eyl',
-        'Eki',
-        'Kas',
-        'Ara',
-      ];
-      return '${transactionDate.day} ${months[transactionDate.month - 1]} ${transactionDate.year}';
-    }
-  }
-
-  String _formatAmount(double amount) {
-    if (amount >= 1000000) {
-      return '${(amount / 1000000).toStringAsFixed(1)}M';
-    } else if (amount >= 1000) {
-      return '${(amount / 1000).toStringAsFixed(1)}K';
-    } else {
-      return amount.toStringAsFixed(0);
-    }
-  }
-
-  String _getRecurringText(String? recurringType) {
-    switch (recurringType) {
-      case 'daily':
-        return 'Günlük';
-      case 'weekly':
-        return 'Haftalık';
-      case 'monthly':
-        return 'Aylık';
-      case 'yearly':
-        return 'Yıllık';
-      default:
-        return 'Tekrarlayan';
-    }
-  }
 }

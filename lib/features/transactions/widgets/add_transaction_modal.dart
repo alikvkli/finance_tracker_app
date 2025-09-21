@@ -10,6 +10,8 @@ import '../../../core/di/injection.dart';
 import '../../notifications/models/notification_model.dart';
 import '../../../shared/widgets/rewarded_ad_helper.dart';
 import '../../../core/extensions/category_icon_extension.dart';
+import '../../../core/extensions/color_extension.dart';
+import '../../../core/extensions/amount_formatting_extension.dart';
 
 class AddTransactionModal extends ConsumerStatefulWidget {
   final NotificationAutoFill? autoFillData;
@@ -158,7 +160,7 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
     final integerPart = amount.truncate();
     final decimalPart = amount - integerPart;
 
-    String formattedInteger = _addThousandSeparators(integerPart.toString());
+    String formattedInteger = integerPart.toString().addThousandSeparators();
 
     if (decimalPart > 0) {
       // Add decimal part with comma
@@ -332,7 +334,7 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
     }
 
     // Formatlanmış değeri hesapla
-    String formattedValue = _formatNumberWithSeparators(cleanValue);
+    String formattedValue = cleanValue.formatNumberWithSeparators();
 
     // Eğer değer değiştiyse, controller'ı güncelle
     if (formattedValue != value) {
@@ -343,44 +345,6 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
     }
   }
 
-  String _formatNumberWithSeparators(String value) {
-    if (value.isEmpty) return value;
-
-    // Virgül varsa, ondalık kısmını ayır
-    String integerPart = value;
-    String decimalPart = '';
-
-    if (value.contains(',')) {
-      final parts = value.split(',');
-      integerPart = parts[0];
-      decimalPart = parts.length > 1 ? parts[1] : '';
-    }
-
-    // Tam sayı kısmını binlik ayırıcılarla formatla
-    if (integerPart.isNotEmpty) {
-      final number = int.tryParse(integerPart);
-      if (number != null) {
-        integerPart = _addThousandSeparators(number.toString());
-      }
-    }
-
-    // Ondalık kısmını ekle
-    if (decimalPart.isNotEmpty) {
-      return '$integerPart,$decimalPart';
-    }
-
-    return integerPart;
-  }
-
-  String _addThousandSeparators(String number) {
-    if (number.isEmpty) return number;
-
-    // Regex ile binlik ayırıcı ekle
-    return number.replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match match) => '${match[1]}.',
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -845,7 +809,7 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
                   if (_selectedCategory != null) ...[
                     Icon(
                       _selectedCategory!.icon.getCategoryIcon(),
-                      color: _parseColor(_selectedCategory!.color),
+                      color: _selectedCategory!.color.parseColor(),
                       size: 20,
                     ),
                     const SizedBox(width: 12),
@@ -1031,13 +995,11 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: _parseColor(category.color),
+                                color: category.color.parseColor(),
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: _parseColor(
-                                      category.color,
-                                    ).withValues(alpha: 0.3),
+                                    color: category.color.parseColor().withValues(alpha: 0.3),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -1471,12 +1433,5 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
     );
   }
 
-  Color _parseColor(String colorString) {
-    try {
-      return Color(int.parse(colorString.replaceFirst('#', '0xff')));
-    } catch (e) {
-      return Colors.grey;
-    }
-  }
 
 }

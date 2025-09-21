@@ -6,6 +6,9 @@ import '../../shared/widgets/transaction_skeleton.dart';
 import '../../shared/widgets/custom_snackbar.dart';
 import '../../shared/widgets/rewarded_ad_helper.dart';
 import '../../core/extensions/category_icon_extension.dart';
+import '../../core/extensions/color_extension.dart';
+import '../../core/extensions/amount_formatting_extension.dart';
+import '../../core/extensions/date_formatting_extension.dart';
 
 class UnifiedTransactionList extends ConsumerWidget {
   final List<TransactionModel> transactions;
@@ -499,7 +502,7 @@ class _TransactionCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: _parseColor(transaction.category.color),
+              color: transaction.category.color.parseColor(),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -536,7 +539,7 @@ class _TransactionCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _formatDate(transaction.transactionDate),
+                  transaction.transactionDate.formatForTransaction(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(
                       context,
@@ -555,7 +558,7 @@ class _TransactionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${isExpense ? '-' : '+'}${_formatAmount(transaction.amount)}',
+                '${isExpense ? '-' : '+'}${transaction.amount.formatAsTurkishLira()}',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: amountColor,
                   fontSize: 15,
@@ -579,73 +582,8 @@ class _TransactionCard extends StatelessWidget {
     );
   }
 
-  Color _parseColor(String colorString) {
-    try {
-      return Color(int.parse(colorString.replaceFirst('#', '0xff')));
-    } catch (e) {
-      return Colors.grey;
-    }
-  }
 
 
-  String _formatAmount(dynamic amount) {
-    // Amount'u double'a çevir
-    double amountValue;
-    if (amount is String) {
-      amountValue = double.tryParse(amount) ?? 0.0;
-    } else if (amount is num) {
-      amountValue = amount.toDouble();
-    } else {
-      amountValue = 0.0;
-    }
-
-    // Tam sayı kısmını al
-    final integerPart = amountValue.floor();
-
-    // Binlik ayırıcılarla formatla
-    final formattedAmount = _addThousandSeparators(integerPart.toString());
-
-    return '₺$formattedAmount';
-  }
-
-  String _addThousandSeparators(String number) {
-    if (number.isEmpty) return number;
-
-    // Regex ile binlik ayırıcı ekle (nokta kullanarak)
-    return number.replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match match) => '${match[1]}.',
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final transactionDate = DateTime(date.year, date.month, date.day);
-
-    if (transactionDate == today) {
-      return 'Bugün';
-    } else if (transactionDate == yesterday) {
-      return 'Dün';
-    } else {
-      final monthNames = [
-        'Oca',
-        'Şub',
-        'Mar',
-        'Nis',
-        'May',
-        'Haz',
-        'Tem',
-        'Ağu',
-        'Eyl',
-        'Eki',
-        'Kas',
-        'Ara',
-      ];
-      return '${transactionDate.day} ${monthNames[transactionDate.month - 1]}';
-    }
-  }
 }
 
 class _TransactionActionsBottomSheet extends StatelessWidget {
@@ -746,7 +684,7 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        _formatDateHelper(transaction.transactionDate),
+                        transaction.transactionDate.formatForTransaction(),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(
                             context,
@@ -765,7 +703,7 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '${transaction.type == 'expense' ? '-' : '+'}${_formatAmount(transaction.amount)}',
+                      '${transaction.type == 'expense' ? '-' : '+'}${transaction.amount.formatAsTurkishLira()}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
@@ -871,63 +809,6 @@ class _TransactionActionsBottomSheet extends StatelessWidget {
     );
   }
 
-  String _formatDateHelper(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final transactionDate = DateTime(date.year, date.month, date.day);
-
-    if (transactionDate == today) {
-      return 'Bugün';
-    } else if (transactionDate == yesterday) {
-      return 'Dün';
-    } else {
-      final monthNames = [
-        'Oca',
-        'Şub',
-        'Mar',
-        'Nis',
-        'May',
-        'Haz',
-        'Tem',
-        'Ağu',
-        'Eyl',
-        'Eki',
-        'Kas',
-        'Ara',
-      ];
-      return '${transactionDate.day} ${monthNames[transactionDate.month - 1]}';
-    }
-  }
 
 
-  String _formatAmount(dynamic amount) {
-    // Amount'u double'a çevir
-    double amountValue;
-    if (amount is String) {
-      amountValue = double.tryParse(amount) ?? 0.0;
-    } else if (amount is num) {
-      amountValue = amount.toDouble();
-    } else {
-      amountValue = 0.0;
-    }
-
-    // Tam sayı kısmını al
-    final integerPart = amountValue.floor();
-
-    // Binlik ayırıcılarla formatla
-    final formattedAmount = _addThousandSeparators(integerPart.toString());
-
-    return '₺$formattedAmount';
-  }
-
-  String _addThousandSeparators(String number) {
-    if (number.isEmpty) return number;
-
-    // Regex ile binlik ayırıcı ekle (nokta kullanarak)
-    return number.replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match match) => '${match[1]}.',
-    );
-  }
 }
