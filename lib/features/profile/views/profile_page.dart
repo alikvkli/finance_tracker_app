@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
-import '../../auth/controllers/auth_controller.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/di/injection.dart';
+import '../../../core/utils/logout_helper.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -19,7 +19,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   String? _userEmail;
   String? _userName;
   String? _userSurname;
-  String? _userPhone;
 
   @override
   void initState() {
@@ -32,7 +31,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     _userEmail = storageService.getUserEmail();
     _userName = storageService.getUserName();
     _userSurname = storageService.getUserSurname();
-    _userPhone = storageService.getUserPhone();
 
     // Trigger rebuild to show loaded data
     if (mounted) {
@@ -539,14 +537,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {
-                      Navigator.of(context).pop();
-                      await ref.read(authControllerProvider.notifier).logout();
-                      if (context.mounted) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          AppRouter.onboarding,
-                          (route) => false,
-                        );
-                      }
+                      await LogoutHelper.logout(context, ref);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,

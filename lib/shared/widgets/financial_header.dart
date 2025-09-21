@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/routing/app_router.dart';
-import '../../features/auth/controllers/auth_controller.dart';
 import 'notification_badge.dart';
+import '../../core/utils/logout_helper.dart';
 
 class FinancialHeader extends StatelessWidget {
   final String title;
@@ -378,17 +378,7 @@ class FinancialHeader extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        Navigator.of(context).pop();
-                        await ref
-                            .read(authControllerProvider.notifier)
-                            .logout();
-                        if (context.mounted) {
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            AppRouter.login,
-                            (route) => false,
-                          );
-                        }
+                        await LogoutHelper.logout(context, ref);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red[600],

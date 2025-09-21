@@ -239,7 +239,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                 
                 CustomTextField(
                   label: 'E-posta',
-                  hint: 'ornek@email.com',
+                  hint: 'E-posta adresinizi girin',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icon(

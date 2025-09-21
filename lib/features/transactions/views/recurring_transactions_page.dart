@@ -5,11 +5,11 @@ import '../models/recurring_transaction_model.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../core/routing/app_router.dart';
-import '../../auth/controllers/auth_controller.dart';
 import '../../../shared/widgets/banner_ad_widget.dart';
 import '../../../shared/controllers/config_controller.dart';
 import '../../../shared/widgets/notification_badge.dart';
 import '../../../core/extensions/category_icon_extension.dart';
+import '../../../core/utils/logout_helper.dart';
 
 class RecurringTransactionsPage extends ConsumerStatefulWidget {
   const RecurringTransactionsPage({super.key});
@@ -717,17 +717,7 @@ class _RecurringTransactionsPageState
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
-                        Navigator.of(context).pop();
-                        await ref
-                            .read(authControllerProvider.notifier)
-                            .logout();
-                        if (context.mounted) {
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            AppRouter.login,
-                            (route) => false,
-                          );
-                        }
+                        await LogoutHelper.logout(context, ref);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red[600],

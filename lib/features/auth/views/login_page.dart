@@ -196,7 +196,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 // Form Fields
                 CustomTextField(
                   label: 'E-posta',
-                  hint: 'ornek@email.com',
+                  hint: 'E-posta adresinizi girin',
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icon(
