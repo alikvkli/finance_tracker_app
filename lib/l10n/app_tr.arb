@@ -1,0 +1,18 @@
+{
+  "@@locale": "tr",
+  "calendar": "Takvim",
+  "month": "Ay",
+  "week": "Hafta",
+  "today": "Bugün",
+  "yesterday": "Dün",
+  "tomorrow": "Yarın",
+  "skip": "Geç",
+  "next": "İleri",
+  "getStarted": "Başlayın",
+  "onboardingWelcome": "Finance Tracker'a Hoş Geldiniz",
+  "onboardingWelcomeDescription": "Finanslarınızı kolay ve verimli bir şekilde yönetin",
+  "onboardingTrack": "Harcamalarınızı Takip Edin",
+  "onboardingTrackDescription": "Günlük harcamalarınızı ve gelirlerinizi takip edin",
+  "onboardingAnalyze": "Harcamalarınızı Analiz Edin",
+  "onboardingAnalyzeDescription": "Harcama alışkanlıklarınız hakkında içgörüler elde edin"
+}

@@ -94,7 +94,7 @@ class OnboardingPageWidget extends StatelessWidget {
                 TextButton(
                   onPressed: onSkip,
                   child: Text(
-                    localizations.skip,
+                    localizations?.skip ?? 'Geç',
                     style: TextStyle(
                       color: Theme.of(
                         context,
@@ -118,7 +118,7 @@ class OnboardingPageWidget extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  isLastPage ? localizations.getStarted : localizations.next,
+                  isLastPage ? (localizations?.getStarted ?? 'Başlayın') : (localizations?.next ?? 'İleri'),
                   style: const TextStyle(fontSize: 16),
                 ),
               ),
@@ -179,7 +179,9 @@ class OnboardingPageWidget extends StatelessWidget {
     }
   }
 
-  String _getLocalizedText(AppLocalizations localizations, String key) {
+  String _getLocalizedText(AppLocalizations? localizations, String key) {
+    if (localizations == null) return key;
+    
     switch (key) {
       case 'onboarding_welcome':
         return localizations.onboardingWelcome;

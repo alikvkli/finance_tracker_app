@@ -1,0 +1,18 @@
+{
+  "@@locale": "en",
+  "calendar": "Calendar",
+  "month": "Month",
+  "week": "Week",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "tomorrow": "Tomorrow",
+  "skip": "Skip",
+  "next": "Next",
+  "getStarted": "Get Started",
+  "onboardingWelcome": "Welcome to Finance Tracker",
+  "onboardingWelcomeDescription": "Manage your finances easily and efficiently",
+  "onboardingTrack": "Track Your Expenses",
+  "onboardingTrackDescription": "Keep track of your daily expenses and income",
+  "onboardingAnalyze": "Analyze Your Spending",
+  "onboardingAnalyzeDescription": "Get insights into your spending patterns"
+}

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/recurring_transaction_controller.dart';
 import '../controllers/upcoming_reminders_controller.dart';
 import '../models/recurring_transaction_model.dart';
-import '../widgets/upcoming_reminders_calendar.dart';
+import '../widgets/calendar_view_widget.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../core/routing/app_router.dart';
@@ -301,7 +301,7 @@ class _RecurringTransactionsPageState
           ref.read(upcomingRemindersControllerProvider.notifier).refreshUpcomingReminders(),
         ]);
       },
-      child: const UpcomingRemindersCalendar(),
+      child: const CalendarViewWidget(),
     );
   }
 
