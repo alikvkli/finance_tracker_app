@@ -593,6 +593,7 @@ class _RecurringTransactionsPageState
             .updateTransaction(
               transaction.id,
               amount: result['amount'] as double?,
+              startDate: result['start_date'] as DateTime?,
               endDate: result['end_date'] as DateTime?,
             );
 
@@ -1293,6 +1294,7 @@ class _EditRecurringTransactionDialog extends StatefulWidget {
 class _EditRecurringTransactionDialogState
     extends State<_EditRecurringTransactionDialog> {
   late TextEditingController _amountController;
+  late DateTime _selectedStartDate;
   late DateTime _selectedEndDate;
 
   @override
@@ -1302,6 +1304,7 @@ class _EditRecurringTransactionDialogState
     final amountValue = widget.transaction.amountAsDouble;
     final formattedAmount = _formatAmountForDisplay(amountValue);
     _amountController = TextEditingController(text: formattedAmount);
+    _selectedStartDate = widget.transaction.startDate;
     _selectedEndDate = widget.transaction.endDate;
 
     // Amount input listener ekle
@@ -1387,6 +1390,59 @@ class _EditRecurringTransactionDialogState
 
             const SizedBox(height: 16),
 
+            // Start Date Field
+            InkWell(
+              onTap: () => _selectStartDate(context),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.5),
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.event_available_outlined,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Başlangıç Tarihi',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface
+                                      .withValues(alpha: 0.6),
+                                  fontSize: 12,
+                                ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _formatDate(_selectedStartDate),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
             // End Date Field
             InkWell(
               onTap: () => _selectEndDate(context),
@@ -1403,7 +1459,7 @@ class _EditRecurringTransactionDialogState
                 child: Row(
                   children: [
                     Icon(
-                      Icons.calendar_today_outlined,
+                      Icons.event_busy_outlined,
                       color: Theme.of(
                         context,
                       ).colorScheme.onSurface.withValues(alpha: 0.6),
@@ -1482,17 +1538,40 @@ class _EditRecurringTransactionDialogState
     );
   }
 
+  Future<void> _selectStartDate(BuildContext context) async {
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedStartDate,
+      firstDate: DateTime(2020), // Allow past dates
+      lastDate: _selectedEndDate, // Can't be after end date
+    );
+
+    if (selectedDate != null) {
+      setState(() {
+        _selectedStartDate = selectedDate;
+        // If start date is after end date, adjust end date
+        if (_selectedStartDate.isAfter(_selectedEndDate)) {
+          _selectedEndDate = _selectedStartDate.add(const Duration(days: 30));
+        }
+      });
+    }
+  }
+
   Future<void> _selectEndDate(BuildContext context) async {
     final selectedDate = await showDatePicker(
       context: context,
       initialDate: _selectedEndDate,
-      firstDate: DateTime.now(),
+      firstDate: _selectedStartDate, // Can't be before start date
       lastDate: DateTime.now().add(const Duration(days: 3650)), // 10 years
     );
 
     if (selectedDate != null) {
       setState(() {
         _selectedEndDate = selectedDate;
+        // If end date is before start date, adjust start date
+        if (_selectedEndDate.isBefore(_selectedStartDate)) {
+          _selectedStartDate = _selectedEndDate.subtract(const Duration(days: 30));
+        }
       });
     }
   }
@@ -1601,7 +1680,18 @@ class _EditRecurringTransactionDialogState
       return;
     }
 
-    Navigator.of(context).pop({'amount': amount, 'end_date': _selectedEndDate});
+    if (_selectedStartDate.isAfter(_selectedEndDate)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Başlangıç tarihi bitiş tarihinden sonra olamaz')),
+      );
+      return;
+    }
+
+    Navigator.of(context).pop({
+      'amount': amount, 
+      'start_date': _selectedStartDate,
+      'end_date': _selectedEndDate
+    });
   }
 
   String _formatDate(DateTime date) {

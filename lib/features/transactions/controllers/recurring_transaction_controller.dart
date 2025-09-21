@@ -213,7 +213,7 @@ class RecurringTransactionController extends StateNotifier<RecurringTransactionS
     }
   }
 
-  Future<void> updateTransaction(int transactionId, {double? amount, DateTime? endDate}) async {
+  Future<void> updateTransaction(int transactionId, {double? amount, DateTime? startDate, DateTime? endDate}) async {
     // Loading state'i başlat
     final currentEditingSet = Set<int>.from(state.editingTransactions);
     currentEditingSet.add(transactionId);
@@ -226,6 +226,7 @@ class RecurringTransactionController extends StateNotifier<RecurringTransactionS
     try {
       final updateData = <String, dynamic>{};
       if (amount != null) updateData['amount'] = amount;
+      if (startDate != null) updateData['start_date'] = startDate.toIso8601String();
       if (endDate != null) updateData['end_date'] = endDate.toIso8601String();
 
       await _recurringTransactionService.updateRecurringTransaction(transactionId, updateData);
@@ -242,7 +243,7 @@ class RecurringTransactionController extends StateNotifier<RecurringTransactionS
             currency: transaction.currency,
             description: transaction.description,
             recurringType: transaction.recurringType,
-            startDate: transaction.startDate,
+            startDate: startDate ?? transaction.startDate,
             endDate: endDate ?? transaction.endDate,
             isActive: transaction.isActive,
             metadata: transaction.metadata,
