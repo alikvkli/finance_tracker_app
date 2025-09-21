@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/recurring_transaction_controller.dart';
+import '../controllers/upcoming_reminders_controller.dart';
 import '../models/recurring_transaction_model.dart';
+import '../widgets/upcoming_reminders_calendar.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../core/routing/app_router.dart';
@@ -20,16 +22,28 @@ class RecurringTransactionsPage extends ConsumerStatefulWidget {
 }
 
 class _RecurringTransactionsPageState
-    extends ConsumerState<RecurringTransactionsPage> {
+    extends ConsumerState<RecurringTransactionsPage> with TickerProviderStateMixin {
+  late TabController _tabController;
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    
     // Load recurring transactions when the page is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(recurringTransactionControllerProvider.notifier)
           .loadRecurringTransactions();
+      ref
+          .read(upcomingRemindersControllerProvider.notifier)
+          .loadUpcomingReminders();
     });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -42,24 +56,36 @@ class _RecurringTransactionsPageState
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: SafeArea(
-          child: recurringState.isLoading
-              ? _buildLoadingSkeleton(context)
-              : Column(
+          child: Column(
+            children: [
+              // Custom Header for Recurring Transactions
+              _buildRecurringHeader(context, recurringState, configState),
+
+              // Banner Ad (if ads should be shown)
+              if (configState.config?.userPreferences.showAds == true)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: const BannerAdWidget(screenId: 'recurring'),
+                ),
+
+              // Tab Bar
+              _buildTabBar(context),
+
+              // Tab Content
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
                   children: [
-                    // Custom Header for Recurring Transactions
-                    _buildRecurringHeader(context, recurringState, configState),
-
-                    // Banner Ad (if ads should be shown)
-                    if (configState.config?.userPreferences.showAds == true)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: const BannerAdWidget(screenId: 'recurring'),
-                      ),
-
-                    // Content
-                    Expanded(child: _buildContent(context, recurringState)),
+                    // Hatırlatıcılar Tab
+                    _buildRemindersTab(context, recurringState),
+                    
+                    // Takvim Tab with Pull-to-Refresh
+                    _buildCalendarTab(context),
                   ],
                 ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -152,6 +178,130 @@ class _RecurringTransactionsPageState
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTabBar(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: AnimatedBuilder(
+        animation: _tabController,
+        builder: (context, child) {
+          return TabBar(
+            controller: _tabController,
+            indicator: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary,
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            indicatorSize: TabBarIndicatorSize.tab,
+            dividerColor: Colors.transparent,
+            labelColor: Colors.transparent,
+            unselectedLabelColor: Colors.transparent,
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              letterSpacing: 0.5,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+              letterSpacing: 0.3,
+            ),
+            tabs: [
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.list_alt,
+                      size: 18,
+                      color: _tabController.index == 0 
+                        ? Colors.white 
+                        : Colors.black87,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Hatırlatıcılar',
+                      style: TextStyle(
+                        color: _tabController.index == 0 
+                          ? Colors.white 
+                          : Colors.black87,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.calendar_month,
+                      size: 18,
+                      color: _tabController.index == 1 
+                        ? Colors.white 
+                        : Colors.black87,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Takvim',
+                      style: TextStyle(
+                        color: _tabController.index == 1 
+                          ? Colors.white 
+                          : Colors.black87,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildRemindersTab(BuildContext context, RecurringTransactionState state) {
+    if (state.isLoading) {
+      return _buildLoadingSkeleton(context);
+    }
+    return _buildContent(context, state);
+  }
+
+  Widget _buildCalendarTab(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        // Both recurring transactions and upcoming reminders'i refresh et
+        await Future.wait([
+          ref.read(recurringTransactionControllerProvider.notifier).refreshRecurringTransactions(),
+          ref.read(upcomingRemindersControllerProvider.notifier).refreshUpcomingReminders(),
+        ]);
+      },
+      child: const UpcomingRemindersCalendar(),
     );
   }
 

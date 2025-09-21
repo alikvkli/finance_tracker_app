@@ -71,6 +71,8 @@ extension CategoryIconExtension on String {
         return Icons.receipt;
       case 'market':
         return Icons.shopping_cart;
+      case 'bes':
+        return Icons.waving_hand;
       default:
         return Icons.category;
     }
