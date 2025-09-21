@@ -19,6 +19,8 @@ import 'package:finance_tracker_app/features/onboarding/controllers/onboarding_c
     as _i552;
 import 'package:finance_tracker_app/features/transactions/services/recurring_transaction_service.dart'
     as _i956;
+import 'package:finance_tracker_app/features/transactions/services/statistics_service.dart'
+    as _i496;
 import 'package:finance_tracker_app/features/transactions/services/transaction_service.dart'
     as _i6;
 import 'package:finance_tracker_app/shared/services/admob_service.dart'
@@ -58,6 +60,10 @@ extension GetItInjectableX on _i174.GetIt {
               gh<_i361.Dio>(),
               gh<_i329.StorageService>(),
             ));
+    gh.factory<_i496.StatisticsService>(() => _i496.StatisticsService(
+          gh<_i361.Dio>(),
+          gh<_i329.StorageService>(),
+        ));
     gh.factory<_i971.NotificationService>(() => _i971.NotificationService(
           gh<_i361.Dio>(),
           gh<_i329.StorageService>(),

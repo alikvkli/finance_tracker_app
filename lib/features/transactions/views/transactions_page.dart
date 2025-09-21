@@ -16,10 +16,10 @@ class TransactionsPage extends ConsumerStatefulWidget {
 }
 
 class _TransactionsPageState extends ConsumerState<TransactionsPage> {
-
   @override
   void initState() {
     super.initState();
+    
     // Load transactions when the page is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(transactionControllerProvider.notifier).loadTransactions();
@@ -63,10 +63,10 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                       child: const BannerAdWidget(screenId: 'transactions'),
                     ),
                   
-                  // Content
+                  // Transaction List
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 16),
+                      padding: const EdgeInsets.only(top: 8),
                       child: UnifiedTransactionList(
                         transactions: transactionState.transactions,
                         isLoading: false, // Already handled at page level

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/utils/logout_helper.dart';
+import '../../transactions/controllers/statistics_controller.dart';
+import '../../transactions/controllers/transaction_controller.dart';
+import '../../transactions/widgets/statistics_tab_widget.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -12,9 +17,11 @@ class ProfilePage extends ConsumerStatefulWidget {
   ConsumerState<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends ConsumerState<ProfilePage> {
+class _ProfilePageState extends ConsumerState<ProfilePage>
+    with SingleTickerProviderStateMixin {
   final _passwordController = TextEditingController();
   bool _isDeleting = false;
+  late TabController _tabController;
 
   String? _userEmail;
   String? _userName;
@@ -23,7 +30,30 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this, initialIndex: 1); // Start with Statistics tab (index 1)
+    _tabController.addListener(_onTabChanged);
     _loadUserData();
+    
+    // Load statistics after the widget tree is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadStatistics();
+    });
+  }
+
+  void _onTabChanged() {
+    if (mounted) {
+      setState(() {
+        // Trigger rebuild to update tab icon colors
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.removeListener(_onTabChanged);
+    _tabController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   void _loadUserData() {
@@ -38,10 +68,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
   }
 
-  @override
-  void dispose() {
-    _passwordController.dispose();
-    super.dispose();
+  void _loadStatistics() {
+    final transactionState = ref.read(transactionControllerProvider);
+    ref.read(statisticsControllerProvider.notifier).loadStatistics(
+      startDate: transactionState.selectedStartDate,
+      endDate: transactionState.selectedEndDate,
+    );
   }
 
   @override
@@ -56,8 +88,124 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               // Header
               _buildProfileHeader(context),
 
-              // Content
-              Expanded(child: _buildProfileContent(context)),
+              // Tab Bar
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
+                ),
+                child: AnimatedBuilder(
+                  animation: _tabController,
+                  builder: (context, child) {
+                    return TabBar(
+                  controller: _tabController,
+                  indicator: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context).colorScheme.primary,
+                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: Colors.transparent,
+                  labelColor: Colors.transparent, // Hide default label colors
+                  unselectedLabelColor: Colors.transparent, // Hide default unselected colors
+                  labelStyle: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    letterSpacing: 0.5,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                    letterSpacing: 0.3,
+                  ),
+                  tabs: [
+                    Tab(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.person_outline,
+                            size: 18,
+                            color: _tabController.index == 0 
+                              ? Colors.white 
+                              : Colors.black87,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Hesap',
+                            style: TextStyle(
+                              color: _tabController.index == 0 
+                                ? Colors.white 
+                                : Colors.black87,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Tab(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.analytics_outlined,
+                            size: 18,
+                            color: _tabController.index == 1 
+                              ? Colors.white 
+                              : Colors.black87,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'İstatistikler',
+                            style: TextStyle(
+                              color: _tabController.index == 1 
+                                ? Colors.white 
+                                : Colors.black87,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                    );
+                  },
+                ),
+              ),
+
+              // Tab Content
+              Expanded(
+                child: AnimatedBuilder(
+                  animation: _tabController,
+                  builder: (context, child) {
+                    return TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildProfileContent(context),
+                        const StatisticsTabWidget(),
+                      ],
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -184,9 +332,306 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
+          // Support Section
+          _buildSupportSection(context),
+          
+          const SizedBox(height: 24),
+          
           // Danger Zone
           _buildDangerZone(context),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSupportSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Support Section Title
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 16),
+          child: Text(
+            'Destek',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 18,
+            ),
+          ),
+        ),
+
+        // Support Card
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with icon
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.support_agent,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Destek ve Geri Bildirim',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              // Description
+              Text(
+                'Önerileriniz, görüşleriniz ve sorularınız için bize ulaşabilirsiniz.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  height: 1.4,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Email button
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _sendSupportEmail(),
+                  icon: Icon(
+                    Icons.email_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 18,
+                  ),
+                  label: Text(
+                    'ali.kavakli4598@gmail.com',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _sendSupportEmail() async {
+    const email = 'ali.kavakli4598@gmail.com';
+    const subject = 'Finans Takip Uygulaması - Destek';
+    const body = 'Merhaba,\n\nUygulama hakkında görüş ve önerilerim:\n\n';
+    
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: email,
+      query: 'subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}',
+    );
+
+    try {
+      if (await canLaunchUrl(emailUri)) {
+        await launchUrl(emailUri);
+      } else {
+        // E-posta uygulaması açılamadı, adresi clipboard'a kopyala
+        await Clipboard.setData(const ClipboardData(text: 'ali.kavakli4598@gmail.com'));
+        
+        if (mounted) {
+          _showEmailFallbackDialog(context);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('E-posta uygulaması açılamadı'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  void _showEmailFallbackDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        contentPadding: const EdgeInsets.all(24),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Icon
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.copy_all,
+                color: Theme.of(context).colorScheme.primary,
+                size: 32,
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Title
+            Text(
+              'E-posta Adresi Kopyalandı',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Description
+            Text(
+              'E-posta uygulaması açılamadı. E-posta adresi panoya kopyalandı.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                height: 1.4,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Email address container
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.email_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'ali.kavakli4598@gmail.com',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Instructions
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Nasıl gönderebilirsiniz:',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '1. E-posta uygulamanızı manuel olarak açın\n2. Yeni e-posta oluşturun\n3. Alıcı alanına yapıştırın\n4. Konu: "Finans Takip Uygulaması - Destek"',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Action Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text('Anladım'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -204,6 +649,104 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
             ),
+          ),
+        ),
+
+        // Warning Container
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.error.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Warning header
+              Row(
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    color: Theme.of(context).colorScheme.error,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Dikkat!',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Warning content
+              Text(
+                'Hesabınızı sildiğinizde aşağıdaki veriler kalıcı olarak silinir:',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              
+              const SizedBox(height: 8),
+              
+              // Data list
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildWarningItem(context, '• Tüm işlem verileriniz'),
+                  _buildWarningItem(context, '• İstatistik verileriniz'),
+                  _buildWarningItem(context, '• Kişisel bilgileriniz'),
+                  _buildWarningItem(context, '• Uygulama tercihleriniz'),
+                ],
+              ),
+              
+              const SizedBox(height: 12),
+              
+              // Final warning
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.error.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: Theme.of(context).colorScheme.error,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Bu işlem geri alınamaz. Emin olmadan devam etmeyin.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.error,
+                          fontWeight: FontWeight.w500,
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
 
@@ -250,6 +793,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildWarningItem(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          fontSize: 12,
+          height: 1.2,
+        ),
+      ),
     );
   }
 
