@@ -5,6 +5,7 @@ import '../models/categories_api_model.dart';
 import '../models/add_transaction_request.dart';
 import '../controllers/transaction_controller.dart';
 import '../providers/category_provider.dart';
+import '../providers/category_usage_provider.dart';
 import '../../home/controllers/dashboard_controller.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/widgets/rewarded_ad_helper.dart';
@@ -167,6 +168,11 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       await ref
           .read(transactionControllerProvider.notifier)
           .updateTransaction(widget.transaction.id, request);
+
+      // Kategori kullanımını artır (sadece kategori değiştiyse)
+      if (widget.transaction.category.id != _selectedCategory!.id) {
+        ref.read(categoryUsageProvider.notifier).incrementUsage(_selectedCategory!.id.toString());
+      }
 
       // Hem dashboard hem de transactions listesini yenile
       await ref
@@ -799,182 +805,248 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.7,
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
+      builder: (context) => Consumer(
+        builder: (context, ref, child) {
+          final mostUsedCategoryIds = ref.read(categoryUsageProvider.notifier).getMostUsedCategories(limit: 6);
+          
+          // Kategorileri sık kullanılan ve diğerleri olarak ayır
+          final frequentCategories = categories.where((cat) => mostUsedCategoryIds.contains(cat.id.toString())).toList();
+          final otherCategories = categories.where((cat) => !mostUsedCategoryIds.contains(cat.id.toString())).toList();
+          
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
             ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // Handle bar
-            Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                ),
+              ],
             ),
-
-            // Header
-            Container(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
+            child: Column(
+              children: [
+                // Handle bar
+                Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.outline.withValues(alpha: 0.1),
-                    width: 1,
+                    ).colorScheme.onSurface.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.apps_rounded,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Harcamayı hangi kategoriye',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.copyWith(),
-                        ),
-                        Text(
-                          'eklemek istersiniz?',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.6),
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
 
-            // Categories grid
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 0.85,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
+                // Header
+                Container(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.1),
+                        width: 1,
+                      ),
+                    ),
                   ),
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    final category = categories[index];
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedCategory = category;
-                          _hasUserInteracted = true;
-                        });
-                        _validateForm();
-                        Navigator.pop(context);
-                      },
-                      child: Container(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: Theme.of(
                             context,
-                          ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.1),
-                            width: 1,
-                          ),
+                          ).colorScheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
                         ),
+                        child: Icon(
+                          Icons.apps_rounded,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: _parseColor(category.color),
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _parseColor(
-                                      category.color,
-                                    ).withValues(alpha: 0.3),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                category.icon.getCategoryIcon(),
-                                color: Colors.white,
-                                size: 24,
-                              ),
+                            Text(
+                              _selectedType == 'income' ? 'Geliri hangi kategoriye' : 'Harcamayı hangi kategoriye',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.copyWith(),
                             ),
-                            const SizedBox(height: 12),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                              ),
-                              child: Text(
-                                category.nameTr,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                    ),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            Text(
+                              'değiştirmek istersiniz?',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withValues(alpha: 0.6),
+                                  ),
                             ),
                           ],
                         ),
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
+
+                // Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Sık Kullanılan Kategoriler
+                        if (frequentCategories.isNotEmpty) ...[
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.star_rounded,
+                                size: 18,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Sık Kullanılanlar',
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          _buildCategoryGrid(frequentCategories),
+                          const SizedBox(height: 24),
+                        ],
+                        
+                        // Diğer Kategoriler
+                        if (otherCategories.isNotEmpty) ...[
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.category_rounded,
+                                size: 18,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Tüm Kategoriler',
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          _buildCategoryGrid(otherCategories),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCategoryGrid(List<CategoriesApiModel> categories) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.85,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+      ),
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        final category = categories[index];
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedCategory = category;
+              _hasUserInteracted = true;
+            });
+            _validateForm();
+            Navigator.pop(context);
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(
+                context,
+              ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.1),
+                width: 1,
               ),
             ),
-          ],
-        ),
-      ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: _parseColor(category.color),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _parseColor(
+                          category.color,
+                        ).withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    category.icon.getCategoryIcon(),
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                  ),
+                  child: Text(
+                    category.nameTr,
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface,
+                        ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
