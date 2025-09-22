@@ -149,7 +149,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                           const SizedBox(width: 8),
                           Text(
                             'Hesap',
-                            style: TextStyle(
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: _tabController.index == 0 
                                 ? Colors.white 
                                 : Colors.black87,
@@ -172,7 +172,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage>
                           const SizedBox(width: 8),
                           Text(
                             'İstatistikler',
-                            style: TextStyle(
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: _tabController.index == 1 
                                 ? Colors.white 
                                 : Colors.black87,

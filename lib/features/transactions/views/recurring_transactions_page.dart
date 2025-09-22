@@ -22,13 +22,14 @@ class RecurringTransactionsPage extends ConsumerStatefulWidget {
 }
 
 class _RecurringTransactionsPageState
-    extends ConsumerState<RecurringTransactionsPage> with TickerProviderStateMixin {
+    extends ConsumerState<RecurringTransactionsPage>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
+
     // Load recurring transactions when the page is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
@@ -64,7 +65,10 @@ class _RecurringTransactionsPageState
               // Banner Ad (if ads should be shown)
               if (configState.config?.userPreferences.showAds == true)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: const BannerAdWidget(screenId: 'recurring'),
                 ),
 
@@ -78,7 +82,7 @@ class _RecurringTransactionsPageState
                   children: [
                     // Hatırlatıcılar Tab
                     _buildRemindersTab(context, recurringState),
-                    
+
                     // Takvim Tab with Pull-to-Refresh
                     _buildCalendarTab(context),
                   ],
@@ -185,7 +189,9 @@ class _RecurringTransactionsPageState
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.2),
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceVariant.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
@@ -209,7 +215,9 @@ class _RecurringTransactionsPageState
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -219,10 +227,7 @@ class _RecurringTransactionsPageState
             dividerColor: Colors.transparent,
             labelColor: Colors.transparent,
             unselectedLabelColor: Colors.transparent,
-            labelStyle: const TextStyle(
-              fontSize: 15,
-              letterSpacing: 0.5,
-            ),
+            labelStyle: const TextStyle(fontSize: 15, letterSpacing: 0.5),
             unselectedLabelStyle: const TextStyle(
               fontSize: 14,
               letterSpacing: 0.3,
@@ -235,17 +240,17 @@ class _RecurringTransactionsPageState
                     Icon(
                       Icons.list_alt,
                       size: 18,
-                      color: _tabController.index == 0 
-                        ? Colors.white 
-                        : Colors.black87,
+                      color: _tabController.index == 0
+                          ? Colors.white
+                          : Colors.black87,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Hatırlatıcılar',
-                      style: TextStyle(
-                        color: _tabController.index == 0 
-                          ? Colors.white 
-                          : Colors.black87,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: _tabController.index == 0
+                            ? Colors.white
+                            : Colors.black87,
                       ),
                     ),
                   ],
@@ -258,17 +263,17 @@ class _RecurringTransactionsPageState
                     Icon(
                       Icons.calendar_month,
                       size: 18,
-                      color: _tabController.index == 1 
-                        ? Colors.white 
-                        : Colors.black87,
+                      color: _tabController.index == 1
+                          ? Colors.white
+                          : Colors.black87,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Takvim',
-                      style: TextStyle(
-                        color: _tabController.index == 1 
-                          ? Colors.white 
-                          : Colors.black87,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: _tabController.index == 1
+                            ? Colors.white
+                            : Colors.black87,
                       ),
                     ),
                   ],
@@ -281,7 +286,10 @@ class _RecurringTransactionsPageState
     );
   }
 
-  Widget _buildRemindersTab(BuildContext context, RecurringTransactionState state) {
+  Widget _buildRemindersTab(
+    BuildContext context,
+    RecurringTransactionState state,
+  ) {
     if (state.isLoading) {
       return _buildLoadingSkeleton(context);
     }
@@ -293,8 +301,12 @@ class _RecurringTransactionsPageState
       onRefresh: () async {
         // Both recurring transactions and upcoming reminders'i refresh et
         await Future.wait([
-          ref.read(recurringTransactionControllerProvider.notifier).refreshRecurringTransactions(),
-          ref.read(upcomingRemindersControllerProvider.notifier).refreshUpcomingReminders(),
+          ref
+              .read(recurringTransactionControllerProvider.notifier)
+              .refreshRecurringTransactions(),
+          ref
+              .read(upcomingRemindersControllerProvider.notifier)
+              .refreshUpcomingReminders(),
         ]);
       },
       child: const CalendarViewWidget(),
@@ -1279,7 +1291,6 @@ class _RecurringTransactionCard extends StatelessWidget {
     }
   }
 
-
   String _formatAmount(double amount) {
     // Tam sayı kısmını al
     final integerPart = amount.floor();
@@ -1716,7 +1727,9 @@ class _EditRecurringTransactionDialogState
         _selectedEndDate = selectedDate;
         // If end date is before start date, adjust start date
         if (_selectedEndDate.isBefore(_selectedStartDate)) {
-          _selectedStartDate = _selectedEndDate.subtract(const Duration(days: 30));
+          _selectedStartDate = _selectedEndDate.subtract(
+            const Duration(days: 30),
+          );
         }
       });
     }
@@ -1828,15 +1841,17 @@ class _EditRecurringTransactionDialogState
 
     if (_selectedStartDate.isAfter(_selectedEndDate)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Başlangıç tarihi bitiş tarihinden sonra olamaz')),
+        const SnackBar(
+          content: Text('Başlangıç tarihi bitiş tarihinden sonra olamaz'),
+        ),
       );
       return;
     }
 
     Navigator.of(context).pop({
-      'amount': amount, 
+      'amount': amount,
       'start_date': _selectedStartDate,
-      'end_date': _selectedEndDate
+      'end_date': _selectedEndDate,
     });
   }
 
