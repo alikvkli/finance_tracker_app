@@ -5,7 +5,6 @@ import '../../transactions/views/transactions_page.dart';
 import '../../transactions/views/recurring_transactions_page.dart';
 import '../../profile/views/profile_page.dart';
 import '../../transactions/widgets/add_transaction_modal.dart';
-import '../../transactions/widgets/transaction_filters.dart';
 import '../../../shared/widgets/bottom_navigation.dart';
 
 class MainPage extends ConsumerStatefulWidget {
@@ -69,19 +68,7 @@ class _MainPageState extends ConsumerState<MainPage>
           currentIndex: _currentIndex,
           onTap: _onItemTapped,
         ),
-        floatingActionButton: _currentIndex == 1
-            ? FloatingActionButton(
-                onPressed: () => _showFilterBottomSheet(context),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Colors.white,
-                elevation: 4,
-                shape: const CircleBorder(),
-                child: const Icon(
-                  Icons.tune_rounded,
-                  size: 24,
-                ),
-              )
-            : null,
+        // Floating action button kaldırıldı - artık her sayfa kendi floating action button'unu yönetiyor
       ),
     );
   }
@@ -115,15 +102,4 @@ class _MainPageState extends ConsumerState<MainPage>
     );
   }
 
-  void _showFilterBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-      ),
-      builder: (context) => const TransactionFilters(),
-    );
-  }
 }

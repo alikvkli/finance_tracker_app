@@ -184,11 +184,12 @@ class UnifiedTransactionList extends ConsumerWidget {
 
   Widget _buildEmptyWidget(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
             // Modern empty illustration
             Container(
               width: 120,
@@ -242,7 +243,8 @@ class UnifiedTransactionList extends ConsumerWidget {
 
             // Action button if provided
             if (emptyActionButton != null) emptyActionButton!,
-          ],
+            ],
+          ),
         ),
       ),
     );

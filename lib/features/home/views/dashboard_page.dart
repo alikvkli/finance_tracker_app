@@ -9,6 +9,7 @@ import '../../../shared/widgets/banner_ad_widget.dart';
 import '../../../shared/controllers/config_controller.dart';
 import '../../../shared/services/admob_service.dart';
 import '../../../core/di/injection.dart';
+import '../../transactions/widgets/add_transaction_modal.dart';
 
 class DashboardPage extends ConsumerStatefulWidget {
   final VoidCallback? onNavigateToTransactions;
@@ -478,6 +479,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               skeletonBuilder: () => const DashboardTransactionSkeleton(),
               emptyTitle: 'Henüz işlem yok',
               emptySubtitle: 'Son 30 günde herhangi bir işlem bulunamadı',
+              emptyActionButton: _buildAddTransactionButton(context),
             ),
           ),
         ],
@@ -485,7 +487,40 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
+  Widget _buildAddTransactionButton(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 24),
+      child: ElevatedButton.icon(
+        onPressed: () {
+          // İşlem ekleme modal'ını aç
+          _showAddTransactionModal(context);
+        },
+        icon: const Icon(Icons.add_rounded, size: 20),
+        label: const Text('İşlem Ekle'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 2,
+        ),
+      ),
+    );
+  }
 
-
-
+  void _showAddTransactionModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddTransactionModal(
+        onTransactionCreated: () {
+          // İşlem eklendikten sonra dashboard'ı refresh et
+          ref.read(dashboardControllerProvider.notifier).loadDashboardData();
+        },
+      ),
+    );
+  }
 }

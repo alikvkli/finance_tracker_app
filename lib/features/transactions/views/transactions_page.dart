@@ -7,6 +7,8 @@ import '../../../shared/widgets/unified_transaction_list.dart';
 import '../../../shared/widgets/banner_ad_widget.dart';
 import '../../../shared/controllers/config_controller.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
+import '../widgets/add_transaction_modal.dart';
+import '../widgets/transaction_filters.dart';
 
 class TransactionsPage extends ConsumerStatefulWidget {
   const TransactionsPage({super.key});
@@ -38,70 +40,86 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
         body: SafeArea(
         child: transactionState.isLoading
             ? _buildTransactionsPageSkeleton(context)
-            : Column(
-                children: [
-                  // Financial Header
-                  FinancialHeader(
-                    title: 'İşlemler',
-                    balance: transactionState.balance,
-                    totalIncome: transactionState.totalIncome,
-                    totalExpense: transactionState.totalExpense,
-                    monthBadge: MonthBadge.dateRange(
-                      start: transactionState.selectedStartDate,
-                      end: transactionState.selectedEndDate,
+            : Scaffold(
+                body: Column(
+                  children: [
+                    // Financial Header
+                    FinancialHeader(
+                      title: 'İşlemler',
+                      balance: transactionState.balance,
+                      totalIncome: transactionState.totalIncome,
+                      totalExpense: transactionState.totalExpense,
+                      monthBadge: MonthBadge.dateRange(
+                        start: transactionState.selectedStartDate,
+                        end: transactionState.selectedEndDate,
+                      ),
+                      notificationCount: configState.config?.notifications.unreadCount ?? 0,
+                      onNotificationTap: () {
+                        Navigator.pushNamed(context, '/notifications');
+                      },
                     ),
-                    notificationCount: configState.config?.notifications.unreadCount ?? 0,
-                    onNotificationTap: () {
-                      Navigator.pushNamed(context, '/notifications');
-                    },
-                  ),
-                  
-                  // Banner Ad (if ads should be shown)
-                  if (configState.config?.userPreferences.showAds == true)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: const BannerAdWidget(screenId: 'transactions'),
-                    ),
-                  
-                  // Transaction List
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: UnifiedTransactionList(
-                        transactions: transactionState.transactions,
-                        isLoading: false, // Already handled at page level
-                        isLoadingMore: transactionState.isLoadingMore,
-                        error: transactionState.error,
-                        enableSwipeToDelete: true, // Enable swipe to delete
-                        hasMorePages: transactionState.hasMorePages,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        onRefresh: () async {
-                          ref.read(transactionControllerProvider.notifier).refreshTransactions();
-                        },
-                        onDelete: (transaction) async {
-                          // Delete transaction and refresh list
-                          await ref.read(transactionControllerProvider.notifier).deleteTransaction(transaction.id);
-                        },
-                        onLoadMore: () async {
-                          // Load more transactions for infinite scroll
-                          await ref.read(transactionControllerProvider.notifier).loadMoreTransactions();
-                        },
-                        skeletonBuilder: () => const TransactionsPageSkeleton(),
-                        emptyTitle: 'Henüz işlem yok',
-                        emptySubtitle: 'Seçilen tarih aralığında herhangi bir işlem bulunamadı',
-                        emptyActionButton: _buildClearFiltersButton(context, transactionState),
+                    
+                    // Banner Ad (if ads should be shown)
+                    if (configState.config?.userPreferences.showAds == true)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: const BannerAdWidget(screenId: 'transactions'),
+                      ),
+                    
+                    // Transaction List
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: UnifiedTransactionList(
+                          transactions: transactionState.transactions,
+                          isLoading: false, // Already handled at page level
+                          isLoadingMore: transactionState.isLoadingMore,
+                          error: transactionState.error,
+                          enableSwipeToDelete: true, // Enable swipe to delete
+                          hasMorePages: transactionState.hasMorePages,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          onRefresh: () async {
+                            ref.read(transactionControllerProvider.notifier).refreshTransactions();
+                          },
+                          onDelete: (transaction) async {
+                            // Delete transaction and refresh list
+                            await ref.read(transactionControllerProvider.notifier).deleteTransaction(transaction.id);
+                          },
+                          onLoadMore: () async {
+                            // Load more transactions for infinite scroll
+                            await ref.read(transactionControllerProvider.notifier).loadMoreTransactions();
+                          },
+                          skeletonBuilder: () => const TransactionsPageSkeleton(),
+                          emptyTitle: 'Henüz işlem yok',
+                          emptySubtitle: 'Seçilen tarih aralığında herhangi bir işlem bulunamadı',
+                          emptyActionButton: _buildEmptyStateButtons(context, transactionState),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                // Floating Action Button - sadece işlem varsa göster
+                floatingActionButton: transactionState.transactions.isNotEmpty
+                    ? FloatingActionButton(
+                        onPressed: () {
+                          _showFilterBottomSheet(context);
+                        },
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        shape: const CircleBorder(),
+                        child: const Icon(Icons.filter_alt),
+                        tooltip: 'Filtrele',
+                      )
+                    : null,
+                floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
               ),
         ),
       ),
     );
   }
 
-  Widget? _buildClearFiltersButton(BuildContext context, TransactionState transactionState) {
-    // Eğer herhangi bir filtre aktifse buton göster
+  Widget? _buildEmptyStateButtons(BuildContext context, TransactionState transactionState) {
+    // Eğer herhangi bir filtre aktifse filtreleri temizle butonu göster
     final now = DateTime.now();
     final defaultStartDate = DateTime(now.year, now.month, 1);
     final defaultEndDate = DateTime(now.year, now.month + 1, 0);
@@ -114,32 +132,74 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
     
     final isFiltered = isDateFiltered || isCategoryFiltered || isSearchFiltered;
     
-    if (!isFiltered) return null;
-    
     return Container(
       margin: const EdgeInsets.only(top: 24),
       child: Column(
-        children: [          
-            // Clear filters button
-            ElevatedButton.icon(
+        children: [
+          // İşlem Ekle butonu
+          ElevatedButton.icon(
+            onPressed: () {
+              _showAddTransactionModal(context);
+            },
+            icon: const Icon(Icons.add_rounded, size: 20),
+            label: const Text('İşlem Ekle'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+            ),
+          ),
+          
+          // Filtreleri temizle butonu (sadece filtre varsa göster)
+          if (isFiltered) ...[
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
               onPressed: () {
-                // Tüm filtreleri temizle
                 ref.read(transactionControllerProvider.notifier).clearFilters();
               },
               icon: const Icon(Icons.clear_all, size: 18),
               label: const Text('Filtreleri Temizle'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                elevation: 2,
               ),
             ),
+          ],
         ],
       ),
+    );
+  }
+
+  void _showAddTransactionModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddTransactionModal(
+        onTransactionCreated: () {
+          // İşlem eklendikten sonra transactions'ı refresh et
+          ref.read(transactionControllerProvider.notifier).loadTransactions();
+        },
+      ),
+    );
+  }
+
+  void _showFilterBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      builder: (context) => const TransactionFilters(),
     );
   }
 
