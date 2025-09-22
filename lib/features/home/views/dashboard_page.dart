@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/dashboard_controller.dart';
+import '../../transactions/providers/category_usage_provider.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../shared/widgets/financial_header.dart';
 import '../../../shared/widgets/month_badge.dart';
@@ -469,6 +470,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 ref.read(dashboardControllerProvider.notifier).refreshDashboard();
               },
               onDelete: (transaction) async {
+                // Kategori kullanımını azalt
+                ref.read(categoryUsageProvider.notifier).decrementUsage(transaction.category.id.toString());
                 // Delete transaction and refresh dashboard
                 await ref.read(dashboardControllerProvider.notifier).deleteTransaction(transaction.id);
               },

@@ -169,10 +169,36 @@ class DashboardController extends StateNotifier<DashboardState> {
   }
 
   Future<void> deleteTransaction(int transactionId) async {
+    // Silinecek işlemi bul
+    final transactionToDelete = state.transactions.firstWhere(
+      (transaction) => transaction.id == transactionId,
+      orElse: () => throw Exception('Transaction not found'),
+    );
+
     try {
       await _transactionService.deleteTransaction(transactionId);
-      // Refresh dashboard data after deletion
-      await refreshDashboard();
+      
+      // UI'dan kaldır
+      final updatedTransactions = state.transactions
+          .where((transaction) => transaction.id != transactionId)
+          .toList();
+
+      // Sadece silinen işlemin değerini summary'den çıkar
+      double newIncome = state.totalIncome;
+      double newExpense = state.totalExpense;
+      
+      if (transactionToDelete.isIncome) {
+        newIncome -= transactionToDelete.amountAsDouble;
+      } else {
+        newExpense -= transactionToDelete.amountAsDouble;
+      }
+
+      state = state.copyWith(
+        transactions: updatedTransactions,
+        totalIncome: newIncome,
+        totalExpense: newExpense,
+        balance: newIncome - newExpense,
+      );
     } catch (e) {
       state = state.copyWith(
         error: e.toString().replaceFirst('Exception: ', ''),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/transaction_controller.dart';
+import '../providers/category_usage_provider.dart';
 import '../../../shared/widgets/financial_header.dart';
 import '../../../shared/widgets/month_badge.dart';
 import '../../../shared/widgets/unified_transaction_list.dart';
@@ -82,6 +83,8 @@ class _TransactionsPageState extends ConsumerState<TransactionsPage> {
                             ref.read(transactionControllerProvider.notifier).refreshTransactions();
                           },
                           onDelete: (transaction) async {
+                            // Kategori kullanımını azalt
+                            ref.read(categoryUsageProvider.notifier).decrementUsage(transaction.category.id.toString());
                             // Delete transaction and refresh list
                             await ref.read(transactionControllerProvider.notifier).deleteTransaction(transaction.id);
                           },

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/recurring_transaction_controller.dart';
 import '../controllers/upcoming_reminders_controller.dart';
 import '../models/recurring_transaction_model.dart';
+import '../providers/category_usage_provider.dart';
 import '../widgets/calendar_view_widget.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
@@ -446,6 +447,8 @@ class _RecurringTransactionsPageState
               );
               if (shouldDelete == true) {
                 try {
+                  // Kategori kullanımını azalt
+                  ref.read(categoryUsageProvider.notifier).decrementUsage(transaction.category.id.toString());
                   await ref
                       .read(recurringTransactionControllerProvider.notifier)
                       .deleteTransaction(transaction.id);

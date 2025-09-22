@@ -40,8 +40,31 @@ class CategoryUsageProvider extends StateNotifier<Map<String, int>> {
     _saveUsageData();
   }
 
+  void decrementUsage(String categoryId) {
+    final currentCount = state[categoryId] ?? 0;
+    if (currentCount > 0) {
+      final newCount = currentCount - 1;
+      if (newCount == 0) {
+        // Eğer sayı 0'a düşerse, kategoriyi state'den tamamen kaldır
+        final newState = Map<String, int>.from(state);
+        newState.remove(categoryId);
+        state = newState;
+      } else {
+        // Sayıyı azalt
+        state = {
+          ...state,
+          categoryId: newCount,
+        };
+      }
+      _saveUsageData();
+    }
+  }
+
   List<String> getMostUsedCategories({int limit = 6}) {
-    final sortedEntries = state.entries.toList()
+    // Sadece sayısı 0'dan büyük olan kategorileri al
+    final validEntries = state.entries.where((entry) => entry.value > 0).toList();
+    
+    final sortedEntries = validEntries
       ..sort((a, b) => b.value.compareTo(a.value));
     
     return sortedEntries

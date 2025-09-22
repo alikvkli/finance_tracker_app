@@ -339,6 +339,6 @@ final recurringTransactionServiceProvider = Provider<RecurringTransactionService
 
 final recurringTransactionControllerProvider =
     StateNotifierProvider<RecurringTransactionController, RecurringTransactionState>((ref) {
-      final recurringTransactionService = ref.watch(recurringTransactionServiceProvider);
-      return RecurringTransactionController(recurringTransactionService);
-    });
+  final recurringTransactionService = ref.watch(recurringTransactionServiceProvider);
+  return RecurringTransactionController(recurringTransactionService);
+});

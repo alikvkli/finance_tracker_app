@@ -285,6 +285,11 @@ class TransactionController extends StateNotifier<TransactionState> {
   }
 
   Future<void> deleteTransaction(int transactionId) async {
+    // Silinecek işlemi bul
+    final transactionToDelete = state.transactions.firstWhere(
+      (transaction) => transaction.id == transactionId,
+      orElse: () => throw Exception('Transaction not found'),
+    );
 
     try {
       // API'den sil
@@ -295,20 +300,21 @@ class TransactionController extends StateNotifier<TransactionState> {
           .where((transaction) => transaction.id != transactionId)
           .toList();
 
-      // Totalleri yeniden hesapla
-      final income = updatedTransactions
-          .where((t) => t.isIncome)
-          .fold(0.0, (sum, t) => sum + t.amountAsDouble);
-
-      final expense = updatedTransactions
-          .where((t) => t.isExpense)
-          .fold(0.0, (sum, t) => sum + t.amountAsDouble);
+      // Sadece silinen işlemin değerini summary'den çıkar
+      double newIncome = state.totalIncome;
+      double newExpense = state.totalExpense;
+      
+      if (transactionToDelete.isIncome) {
+        newIncome -= transactionToDelete.amountAsDouble;
+      } else {
+        newExpense -= transactionToDelete.amountAsDouble;
+      }
 
       state = state.copyWith(
         transactions: updatedTransactions,
-        totalIncome: income,
-        totalExpense: expense,
-        balance: income - expense,
+        totalIncome: newIncome,
+        totalExpense: newExpense,
+        balance: newIncome - newExpense,
       );
 
     } catch (e) {
