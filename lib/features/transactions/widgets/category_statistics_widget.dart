@@ -420,12 +420,24 @@ class _CategoryStatisticsWidgetState extends ConsumerState<CategoryStatisticsWid
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Text(
-                      '${percentage.toStringAsFixed(1)}%',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: categoryColor,
-                        fontSize: 8,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '${percentage.toStringAsFixed(1)}%',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: categoryColor,
+                            fontSize: 8,
+                          ),
+                        ),
+                        Text(
+                          category.totalAmount.formatAsTurkishLira(),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            fontSize: 7,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
