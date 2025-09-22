@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/routing/app_router.dart';
 import 'notification_badge.dart';
 import '../../core/utils/logout_helper.dart';
+import '../../core/extensions/amount_formatting_extension.dart';
 
 class FinancialHeader extends StatelessWidget {
   final String title;
@@ -138,7 +139,7 @@ class FinancialHeader extends StatelessWidget {
               child: _buildStatItem(
                 context,
                 'Gelir',
-                _formatAmount(totalIncome),
+                totalIncome.formatAsTurkishLira(),
                 Icons.arrow_upward_rounded,
                 const Color(0xFF059669),
               ),
@@ -154,7 +155,7 @@ class FinancialHeader extends StatelessWidget {
               child: _buildStatItem(
                 context,
                 'Gider',
-                _formatAmount(totalExpense),
+                totalExpense.formatAsTurkishLira(),
                 Icons.arrow_downward_rounded,
                 const Color(0xFFDC2626),
               ),
@@ -197,7 +198,7 @@ class FinancialHeader extends StatelessWidget {
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
-              _formatAmount(balance),
+              balance.formatAsTurkishLira(),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: color,
                 fontSize: 32,
@@ -259,20 +260,6 @@ class FinancialHeader extends StatelessWidget {
     );
   }
 
-  String _formatAmount(double amount) {
-    if (amount == 0) return '₺0,00';
-
-    // Negatif değerleri pozitif yap
-    final absAmount = amount.abs();
-
-    if (absAmount >= 1000000) {
-      return '₺${(absAmount / 1000000).toStringAsFixed(1)}M';
-    } else if (absAmount >= 1000) {
-      return '₺${(absAmount / 1000).toStringAsFixed(1)}K';
-    } else {
-      return '₺${absAmount.toStringAsFixed(0)}';
-    }
-  }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     showDialog(

@@ -178,6 +178,7 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
                   value.toInt().toString(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: color,
+                    fontSize: 18
                   ),
                 )
               else
@@ -185,6 +186,7 @@ class _StatisticsTabWidgetState extends ConsumerState<StatisticsTabWidget> {
                   value.formatAsTurkishLira(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: color,
+                    fontSize: 18
                   ),
                 ),
             ],

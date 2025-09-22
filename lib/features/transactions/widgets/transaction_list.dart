@@ -4,6 +4,10 @@ import '../models/transaction_model.dart';
 import '../controllers/transaction_controller.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
+import '../../../core/extensions/amount_formatting_extension.dart';
+import '../../../core/extensions/date_formatting_extension.dart';
+import '../../../core/extensions/color_extension.dart';
+import '../../../core/extensions/category_icon_extension.dart';
 
 class TransactionList extends ConsumerWidget {
   const TransactionList({super.key});
@@ -177,7 +181,7 @@ class _SwipeableTransactionCard extends ConsumerWidget {
 
                   // Transaction Info - Minimal
                   Text(
-                    '${transaction.category.nameTr} • ${_formatAmount(transaction.amountAsDouble)} ₺',
+                    '${transaction.category.nameTr} • ${transaction.amountAsDouble.formatAsTurkishLira()}',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(
@@ -249,15 +253,6 @@ class _SwipeableTransactionCard extends ConsumerWidget {
     );
   }
 
-  String _formatAmount(double amount) {
-    if (amount >= 1000000) {
-      return '${(amount / 1000000).toStringAsFixed(1)}M';
-    } else if (amount >= 1000) {
-      return '${(amount / 1000).toStringAsFixed(1)}K';
-    } else {
-      return amount.toStringAsFixed(0);
-    }
-  }
 }
 
 class _TransactionCard extends StatelessWidget {
@@ -265,70 +260,6 @@ class _TransactionCard extends StatelessWidget {
 
   const _TransactionCard({required this.transaction});
 
-  IconData _getCategoryIcon(String iconName) {
-    switch (iconName) {
-      case 'home':
-        return Icons.home;
-      case 'salary':
-        return Icons.work;
-      case 'business':
-        return Icons.business;
-      case 'trending_up':
-        return Icons.trending_up;
-      case 'work':
-        return Icons.work_outline;
-      case 'more':
-        return Icons.more_horiz;
-      case 'receipt':
-        return Icons.receipt;
-      case 'restaurant':
-        return Icons.restaurant;
-      case 'directions_car':
-        return Icons.directions_car;
-      case 'local_hospital':
-        return Icons.local_hospital;
-      case 'school':
-        return Icons.school;
-      case 'movie':
-        return Icons.movie;
-      case 'credit_card':
-        return Icons.credit_card;
-      case 'account_balance':
-        return Icons.account_balance;
-      case 'shopping_cart':
-        return Icons.shopping_cart;
-      case 'flight':
-        return Icons.flight;
-      case 'fitness_center':
-        return Icons.fitness_center;
-      case 'sports_soccer':
-        return Icons.sports_soccer;
-      case 'music_note':
-        return Icons.music_note;
-      case 'book':
-        return Icons.book;
-      case 'gavel':
-        return Icons.gavel;
-      case 'build':
-        return Icons.build;
-      case 'computer':
-        return Icons.computer;
-      case 'phone':
-        return Icons.phone;
-      case 'wifi':
-        return Icons.wifi;
-      case 'water_drop':
-        return Icons.water_drop;
-      case 'local_fire_department':
-        return Icons.local_fire_department;
-      case 'currency_bitcoin':
-        return Icons.currency_bitcoin;
-      case 'receipt_long':
-        return Icons.receipt_long;
-      default:
-        return Icons.category;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -353,14 +284,12 @@ class _TransactionCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: _parseColor(
-                transaction.category.color,
-              ).withValues(alpha: 0.1),
+              color: transaction.category.color.parseColor().withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
-              _getCategoryIcon(transaction.category.icon),
-              color: _parseColor(transaction.category.color),
+              transaction.category.icon.getCategoryIcon(),
+              color: transaction.category.color.parseColor(),
               size: 24,
             ),
           ),
@@ -392,7 +321,7 @@ class _TransactionCard extends StatelessWidget {
                 ],
                 const SizedBox(height: 4),
                 Text(
-                  _formatDate(transaction.transactionDate),
+                  transaction.transactionDate.formatForTransaction(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(
                       context,
@@ -408,7 +337,7 @@ class _TransactionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${transaction.isIncome ? '+' : '-'}${_formatAmount(transaction.amountAsDouble)} ₺',
+                '${transaction.isIncome ? '+' : '-'}${transaction.amountAsDouble.formatAsTurkishLira()}',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: transaction.isIncome
                       ? Colors.green[600]
@@ -443,52 +372,7 @@ class _TransactionCard extends StatelessWidget {
     );
   }
 
-  Color _parseColor(String colorString) {
-    try {
-      return Color(int.parse(colorString.replaceFirst('#', '0xff')));
-    } catch (e) {
-      return Colors.grey;
-    }
-  }
 
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-    final transactionDate = DateTime(date.year, date.month, date.day);
-
-    if (transactionDate == today) {
-      return 'Bugün';
-    } else if (transactionDate == yesterday) {
-      return 'Dün';
-    } else {
-      final months = [
-        'Oca',
-        'Şub',
-        'Mar',
-        'Nis',
-        'May',
-        'Haz',
-        'Tem',
-        'Ağu',
-        'Eyl',
-        'Eki',
-        'Kas',
-        'Ara',
-      ];
-      return '${transactionDate.day} ${months[transactionDate.month - 1]} ${transactionDate.year}';
-    }
-  }
-
-  String _formatAmount(double amount) {
-    if (amount >= 1000000) {
-      return '${(amount / 1000000).toStringAsFixed(1)}M';
-    } else if (amount >= 1000) {
-      return '${(amount / 1000).toStringAsFixed(1)}K';
-    } else {
-      return amount.toStringAsFixed(0);
-    }
-  }
 
   String _getRecurringText(String? recurringType) {
     switch (recurringType) {

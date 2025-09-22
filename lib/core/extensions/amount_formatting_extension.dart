@@ -4,7 +4,7 @@ extension AmountFormattingExtension on num {
   String formatAsTurkishLira() {
     final integerPart = floor();
     final formattedAmount = integerPart.toString().addThousandSeparators();
-    return '₺$formattedAmount';
+    return '$formattedAmount₺';
   }
 
   /// Formats amount for display with Turkish Lira symbol
@@ -14,7 +14,7 @@ extension AmountFormattingExtension on num {
     if (this == floor()) {
       // Tam sayı ise ondalık gösterme
       final integerPart = floor().toString();
-      return integerPart.addThousandSeparators();
+      return '${integerPart.addThousandSeparators()}₺';
     } else {
       // Ondalık varsa göster
       final parts = toString().split('.');
@@ -24,19 +24,15 @@ extension AmountFormattingExtension on num {
       // Ondalık kısmını 2 haneli yap
       final formattedDecimal = decimalPart.padRight(2, '0').substring(0, 2);
 
-      return '${integerPart.addThousandSeparators()},$formattedDecimal';
+      return '${integerPart.addThousandSeparators()},$formattedDecimal₺';
     }
   }
 
-  /// Formats amount for dashboard display (with K, M suffixes)
+  /// Formats amount for dashboard display with thousand separators
   String formatForDashboard() {
-    if (this >= 1000000) {
-      return '${(this / 1000000).toStringAsFixed(1)}M';
-    } else if (this >= 1000) {
-      return '${(this / 1000).toStringAsFixed(1)}K';
-    } else {
-      return toStringAsFixed(0);
-    }
+    final integerPart = floor();
+    final formattedAmount = integerPart.toString().addThousandSeparators();
+    return '$formattedAmount₺';
   }
 }
 
@@ -55,7 +51,7 @@ extension DynamicAmountFormattingExtension on dynamic {
 
     final integerPart = amountValue.floor();
     final formattedAmount = integerPart.toString().addThousandSeparators();
-    return '₺$formattedAmount';
+    return '$formattedAmount₺';
   }
 }
 
@@ -100,5 +96,41 @@ extension StringNumberFormattingExtension on String {
     }
 
     return integerPart;
+  }
+
+  /// Formats amount input with Turkish formatting (thousand separators and decimal handling)
+  String formatAmountInput() {
+    // Sadece rakam ve virgül karakterlerine izin ver (nokta sadece binlik ayırıcı olarak kullanılacak)
+    final cleanValue = replaceAll(RegExp(r'[^\d,]'), '');
+
+    // Virgül kontrolü - sadece bir tane olabilir
+    final commaCount = cleanValue.split(',').length - 1;
+    if (commaCount > 1) {
+      return this; // Geçersiz format, değişiklik yapma
+    }
+
+    // Virgülden sonra maksimum 2 rakam
+    if (cleanValue.contains(',')) {
+      final parts = cleanValue.split(',');
+      if (parts.length == 2 && parts[1].length > 2) {
+        return this; // Virgülden sonra 2'den fazla rakam
+      }
+    }
+
+    // Formatlanmış değeri hesapla
+    return cleanValue.formatNumberWithSeparators();
+  }
+
+  /// Parses amount text input to double value
+  double parseAmountFromText() {
+    // Nokta ve virgül karakterlerini temizle
+    String cleanText = replaceAll('.', '').replaceAll(',', '.');
+    return double.tryParse(cleanText) ?? 0.0;
+  }
+
+  /// Formats amount for display with Turkish Lira symbol
+  String formatAmountForDisplay() {
+    final amount = parseAmountFromText();
+    return amount.formatForDisplay();
   }
 }

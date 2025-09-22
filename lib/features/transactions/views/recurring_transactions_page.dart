@@ -11,6 +11,9 @@ import '../../../shared/widgets/banner_ad_widget.dart';
 import '../../../shared/controllers/config_controller.dart';
 import '../../../shared/widgets/notification_badge.dart';
 import '../../../core/extensions/category_icon_extension.dart';
+import '../../../core/extensions/amount_formatting_extension.dart';
+import '../../../core/extensions/date_formatting_extension.dart';
+import '../../../core/extensions/color_extension.dart';
 import '../../../core/utils/logout_helper.dart';
 
 class RecurringTransactionsPage extends ConsumerStatefulWidget {
@@ -960,13 +963,11 @@ class _RecurringTransactionCard extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: _parseColor(transaction.category.color),
+                      color: transaction.category.color.parseColor(),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: _parseColor(
-                            transaction.category.color,
-                          ).withValues(alpha: 0.3),
+                          color: transaction.category.color.parseColor().withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -1078,7 +1079,7 @@ class _RecurringTransactionCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '${isExpense ? '-' : '+'}${_formatAmount(transaction.amountAsDouble)}',
+                        '${isExpense ? '-' : '+'}${transaction.amountAsDouble.formatAsTurkishLira()}',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: amountColor,
                           fontSize: 16,
@@ -1191,7 +1192,7 @@ class _RecurringTransactionCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '${_formatDate(transaction.startDate)} - ${_formatDate(transaction.endDate)}',
+                      '${transaction.startDate.formatForRecurring()} - ${transaction.endDate.formatForRecurring()}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(
                           context,
@@ -1283,51 +1284,6 @@ class _RecurringTransactionCard extends StatelessWidget {
     );
   }
 
-  Color _parseColor(String colorString) {
-    try {
-      return Color(int.parse(colorString.replaceFirst('#', '0xff')));
-    } catch (e) {
-      return Colors.grey;
-    }
-  }
-
-  String _formatAmount(double amount) {
-    // Tam sayı kısmını al
-    final integerPart = amount.floor();
-
-    // Binlik ayırıcılarla formatla
-    final formattedAmount = _addThousandSeparators(integerPart.toString());
-
-    return '₺$formattedAmount';
-  }
-
-  String _addThousandSeparators(String number) {
-    if (number.isEmpty) return number;
-
-    // Regex ile binlik ayırıcı ekle (nokta kullanarak)
-    return number.replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match match) => '${match[1]}.',
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final monthNames = [
-      'Oca',
-      'Şub',
-      'Mar',
-      'Nis',
-      'May',
-      'Haz',
-      'Tem',
-      'Ağu',
-      'Eyl',
-      'Eki',
-      'Kas',
-      'Ara',
-    ];
-    return '${date.day} ${monthNames[date.month - 1]} ${date.year}';
-  }
 }
 
 class _DeleteConfirmationDialog extends StatelessWidget {
@@ -1459,14 +1415,20 @@ class _EditRecurringTransactionDialogState
     super.initState();
     // Amount'u Turkish format ile göster
     final amountValue = widget.transaction.amountAsDouble;
-    final formattedAmount = _formatAmountForDisplay(amountValue);
+    final formattedAmount = amountValue.formatForDisplay();
     _amountController = TextEditingController(text: formattedAmount);
     _selectedStartDate = widget.transaction.startDate;
     _selectedEndDate = widget.transaction.endDate;
 
     // Amount input listener ekle
     _amountController.addListener(() {
-      _formatAmountInput(_amountController.text);
+      final formattedText = _amountController.text.formatAmountInput();
+      if (formattedText != _amountController.text) {
+        _amountController.value = TextEditingValue(
+          text: formattedText,
+          selection: TextSelection.collapsed(offset: formattedText.length),
+        );
+      }
     });
   }
 
@@ -1585,7 +1547,7 @@ class _EditRecurringTransactionDialogState
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            _formatDate(_selectedStartDate),
+                            _selectedStartDate.formatForRecurring(),
                             style: Theme.of(
                               context,
                             ).textTheme.bodyMedium?.copyWith(),
@@ -1638,7 +1600,7 @@ class _EditRecurringTransactionDialogState
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            _formatDate(_selectedEndDate),
+                            _selectedEndDate.formatForRecurring(),
                             style: Theme.of(
                               context,
                             ).textTheme.bodyMedium?.copyWith(),
@@ -1735,102 +1697,9 @@ class _EditRecurringTransactionDialogState
     }
   }
 
-  void _formatAmountInput(String value) {
-    // Sadece rakam ve virgül karakterlerine izin ver (nokta sadece binlik ayırıcı olarak kullanılacak)
-    final cleanValue = value.replaceAll(RegExp(r'[^\d,]'), '');
-
-    // Virgül kontrolü - sadece bir tane olabilir
-    final commaCount = cleanValue.split(',').length - 1;
-    if (commaCount > 1) {
-      return; // Geçersiz format, değişiklik yapma
-    }
-
-    // Virgülden sonra maksimum 2 rakam
-    if (cleanValue.contains(',')) {
-      final parts = cleanValue.split(',');
-      if (parts.length == 2 && parts[1].length > 2) {
-        return; // Virgülden sonra 2'den fazla rakam
-      }
-    }
-
-    // Formatlanmış değeri hesapla
-    String formattedValue = _formatNumberWithSeparators(cleanValue);
-
-    // Eğer değer değiştiyse, controller'ı güncelle
-    if (formattedValue != value) {
-      _amountController.value = TextEditingValue(
-        text: formattedValue,
-        selection: TextSelection.collapsed(offset: formattedValue.length),
-      );
-    }
-  }
-
-  String _formatNumberWithSeparators(String value) {
-    if (value.isEmpty) return value;
-
-    // Virgül varsa, ondalık kısmını ayır
-    String integerPart = value;
-    String decimalPart = '';
-
-    if (value.contains(',')) {
-      final parts = value.split(',');
-      integerPart = parts[0];
-      decimalPart = parts.length > 1 ? parts[1] : '';
-    }
-
-    // Tam sayı kısmını binlik ayırıcılarla formatla
-    if (integerPart.isNotEmpty) {
-      final number = int.tryParse(integerPart);
-      if (number != null) {
-        integerPart = _addThousandSeparators(number.toString());
-      }
-    }
-
-    // Ondalık kısmını ekle
-    if (decimalPart.isNotEmpty) {
-      return '$integerPart,$decimalPart';
-    }
-
-    return integerPart;
-  }
-
-  String _addThousandSeparators(String number) {
-    if (number.isEmpty) return number;
-
-    // Regex ile binlik ayırıcı ekle (nokta kullanarak)
-    return number.replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match match) => '${match[1]}.',
-    );
-  }
-
-  String _formatAmountForDisplay(double amount) {
-    // Ondalık kısmı var mı kontrol et
-    if (amount == amount.floor()) {
-      // Tam sayı ise ondalık gösterme
-      final integerPart = amount.floor().toString();
-      return _addThousandSeparators(integerPart);
-    } else {
-      // Ondalık varsa göster
-      final parts = amount.toString().split('.');
-      final integerPart = parts[0];
-      final decimalPart = parts.length > 1 ? parts[1] : '';
-
-      // Ondalık kısmını 2 haneli yap
-      final formattedDecimal = decimalPart.padRight(2, '0').substring(0, 2);
-
-      return '${_addThousandSeparators(integerPart)},$formattedDecimal';
-    }
-  }
-
-  double _parseAmountFromText(String text) {
-    // Nokta ve virgül karakterlerini temizle
-    String cleanText = text.replaceAll('.', '').replaceAll(',', '.');
-    return double.tryParse(cleanText) ?? 0.0;
-  }
 
   void _saveChanges(BuildContext context) {
-    final amount = _parseAmountFromText(_amountController.text);
+    final amount = _amountController.text.parseAmountFromText();
 
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1855,21 +1724,4 @@ class _EditRecurringTransactionDialogState
     });
   }
 
-  String _formatDate(DateTime date) {
-    final monthNames = [
-      'Oca',
-      'Şub',
-      'Mar',
-      'Nis',
-      'May',
-      'Haz',
-      'Tem',
-      'Ağu',
-      'Eyl',
-      'Eki',
-      'Kas',
-      'Ara',
-    ];
-    return '${date.day} ${monthNames[date.month - 1]} ${date.year}';
-  }
 }
