@@ -135,8 +135,10 @@ class _RecurringTransactionsPageState
               Row(
                 children: [
                   // Notification Button with Badge
-                  NotificationBadge(
+                  AnimatedNotificationBadge(
                     count: configState.config?.notifications.unreadCount ?? 0,
+                    badgeColor: const Color(0xFFFF3B30),
+                    showPulse: true,
                     child: IconButton(
                       onPressed: () {
                         Navigator.pushNamed(context, AppRouter.notifications);

@@ -61,8 +61,10 @@ class FinancialHeader extends StatelessWidget {
               Row(
                 children: [
                   // Notification Button with Badge
-                  NotificationBadge(
+                  AnimatedNotificationBadge(
                     count: notificationCount,
+                    badgeColor: const Color(0xFFFF3B30),
+                    showPulse: true,
                     child: IconButton(
                       onPressed: onNotificationTap ?? () {
                         Navigator.pushNamed(context, AppRouter.notifications);
