@@ -14,7 +14,6 @@ import '../../../core/extensions/category_icon_extension.dart';
 import '../../../core/extensions/amount_formatting_extension.dart';
 import '../../../core/extensions/date_formatting_extension.dart';
 import '../../../core/extensions/color_extension.dart';
-import '../../../core/utils/logout_helper.dart';
 
 class RecurringTransactionsPage extends ConsumerStatefulWidget {
   const RecurringTransactionsPage({super.key});
@@ -132,57 +131,35 @@ class _RecurringTransactionsPageState
             ),
           ),
 
-          // Action Buttons
-          Row(
-            children: [
-              // Notification Button with Badge
-              NotificationBadge(
-                count: configState.config?.notifications.unreadCount ?? 0,
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRouter.notifications);
-                  },
-                  icon: Icon(
-                    Icons.notifications_outlined,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.6),
-                    size: 22,
-                  ),
-                  tooltip: 'Bildirimler',
-                  style: IconButton.styleFrom(
-                    padding: const EdgeInsets.all(8),
-                    minimumSize: const Size(40, 40),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+              // Action Buttons
+              Row(
+                children: [
+                  // Notification Button with Badge
+                  NotificationBadge(
+                    count: configState.config?.notifications.unreadCount ?? 0,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, AppRouter.notifications);
+                      },
+                      icon: Icon(
+                        Icons.notifications_outlined,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
+                        size: 22,
+                      ),
+                      tooltip: 'Bildirimler',
+                      style: IconButton.styleFrom(
+                        padding: const EdgeInsets.all(8),
+                        minimumSize: const Size(40, 40),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-
-              const SizedBox(width: 4),
-
-              // Logout Button
-              IconButton(
-                onPressed: () => _showLogoutDialog(context),
-                icon: Icon(
-                  Icons.logout_rounded,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.6),
-                  size: 22,
-                ),
-                tooltip: 'Çıkış Yap',
-                style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(8),
-                  minimumSize: const Size(40, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -775,135 +752,6 @@ class _RecurringTransactionsPageState
     }
   }
 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        elevation: 20,
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Icon Container
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.red.withValues(alpha: 0.2),
-                    width: 2,
-                  ),
-                ),
-                child: Icon(
-                  Icons.logout_rounded,
-                  color: Colors.red[600],
-                  size: 36,
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Title
-              Text(
-                'Çıkış Yap',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Description
-              Text(
-                'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.7),
-                  height: 1.5,
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Action Buttons
-              Row(
-                children: [
-                  // Cancel Button
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.outline.withValues(alpha: 0.3),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        'İptal',
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.7),
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 12),
-
-                  // Logout Button
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        await LogoutHelper.logout(context, ref);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[600],
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Çıkış Yap',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _RecurringTransactionCard extends StatelessWidget {
