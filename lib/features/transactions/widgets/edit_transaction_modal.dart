@@ -902,7 +902,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                 // Content
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(16), // 24'ten 16'ya düşürüldü
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -912,22 +912,23 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                             children: [
                               Icon(
                                 Icons.star_rounded,
-                                size: 18,
+                                size: 16, // 18'den 16'ya düşürüldü
                                 color: Theme.of(context).colorScheme.primary,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6), // 8'den 6'ya düşürüldü
                               Text(
                                 'Sık Kullanılanlar',
                                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.w600,
+                                  fontSize: 13, // Font boyutu küçültüldü
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12), // 16'dan 12'ye düşürüldü
                           _buildCategoryGrid(frequentCategories),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16), // 24'ten 16'ya düşürüldü
                         ],
                         
                         // Diğer Kategoriler
@@ -936,20 +937,21 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                             children: [
                               Icon(
                                 Icons.category_rounded,
-                                size: 18,
+                                size: 16, // 18'den 16'ya düşürüldü
                                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6), // 8'den 6'ya düşürüldü
                               Text(
                                 'Tüm Kategoriler',
                                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w600,
+                                  fontSize: 13, // Font boyutu küçültüldü
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12), // 16'dan 12'ye düşürüldü
                           _buildCategoryGrid(otherCategories),
                         ],
                       ],
@@ -969,10 +971,10 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 0.85,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+        crossAxisCount: 4, // 3'ten 4'e çıkarıldı
+        childAspectRatio: 0.75, // Daha kompakt
+        crossAxisSpacing: 12, // 16'dan 12'ye düşürüldü
+        mainAxisSpacing: 12, // 16'dan 12'ye düşürüldü
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) {
@@ -1003,17 +1005,17 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 36, // 48'den 36'ya düşürüldü
+                  height: 36, // 48'den 36'ya düşürüldü
                   decoration: BoxDecoration(
                     color: _parseColor(category.color),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10), // 12'den 10'a düşürüldü
                     boxShadow: [
                       BoxShadow(
                         color: _parseColor(
                           category.color,
                         ).withValues(alpha: 0.3),
-                        blurRadius: 8,
+                        blurRadius: 6, // 8'den 6'ya düşürüldü
                         offset: const Offset(0, 2),
                       ),
                     ],
@@ -1021,13 +1023,13 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                   child: Icon(
                     category.icon.getCategoryIcon(),
                     color: Colors.white,
-                    size: 24,
+                    size: 20, // 24'ten 20'ye düşürüldü
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8), // 12'den 8'e düşürüldü
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
+                    horizontal: 4, // 8'den 4'e düşürüldü
                   ),
                   child: Text(
                     category.nameTr,
@@ -1036,6 +1038,7 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
                           color: Theme.of(
                             context,
                           ).colorScheme.onSurface,
+                          fontSize: 11, // Font boyutu küçültüldü
                         ),
                     textAlign: TextAlign.center,
                     maxLines: 2,
