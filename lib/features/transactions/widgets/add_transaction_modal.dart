@@ -931,13 +931,13 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Kategori Seçiniz',
+                          'Harcamayı hangi kategoriye',
                           style: Theme.of(
                             context,
                           ).textTheme.bodyMedium?.copyWith(),
                         ),
                         Text(
-                          '${_selectedType == 'income' ? 'Gelir' : 'Gider'} kategorisi seçiniz',
+                          'eklemek istersiniz?',
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                                 color: Theme.of(
