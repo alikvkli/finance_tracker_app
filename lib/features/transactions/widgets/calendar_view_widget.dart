@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../controllers/upcoming_reminders_controller.dart';
 import '../models/upcoming_reminder_model.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
 import '../../../core/extensions/amount_formatting_extension.dart';
+import '../providers/category_provider.dart';
+import '../models/categories_api_model.dart';
 
 class CalendarViewWidget extends ConsumerStatefulWidget {
   const CalendarViewWidget({super.key});
@@ -101,7 +104,7 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 Text(
                   error,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
@@ -135,11 +138,12 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
       }
     }
 
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Scaffold(
+      body: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           // Calendar
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -175,19 +179,15 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 outsideDaysVisible: false,
                 weekendTextStyle: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w500,
                 ),
                 defaultTextStyle: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.w500,
                 ),
                 selectedTextStyle: const TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.w700,
                 ),
                 todayTextStyle: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w700,
                 ),
                 selectedDecoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -272,6 +272,17 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
           const SizedBox(height: 20),
         ],
       ),
+    ),
+    floatingActionButton: FloatingActionButton(
+      onPressed: () => _showCalculationBottomSheet(context),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      shape: const CircleBorder(),
+      child: Icon(
+        Icons.calculate_outlined,
+        color: Colors.white,
+        size: 24,
+      ),
+    ),
     );
   }
 
@@ -299,14 +310,14 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
             const SizedBox(height: 16),
             Text(
               'Bu tarihte hatırlatma yok',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               _formatSelectedDate(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
@@ -356,7 +367,7 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 Expanded(
                   child: Text(
                     _formatSelectedDate(),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
@@ -466,9 +477,8 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 children: [
                   Text(
                     reminder.category,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.w500,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -486,9 +496,8 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
             // Amount
             Text(
               amount.formatAsTurkishLira(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: amountColor,
-                fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),
             ),
@@ -508,4 +517,798 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
     
     return '${_selectedDay!.day} ${monthNames[_selectedDay!.month - 1]} ${_selectedDay!.year}';
   }
+
+  void _showCalculationBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const _FinancialCalculatorBottomSheet(),
+    );
+  }
+}
+
+class _FinancialCalculatorBottomSheet extends StatefulWidget {
+  const _FinancialCalculatorBottomSheet();
+
+  @override
+  State<_FinancialCalculatorBottomSheet> createState() => _FinancialCalculatorBottomSheetState();
+}
+
+class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBottomSheet> with TickerProviderStateMixin {
+  final List<FinancialTransactionItem> _financialTransactions = [];
+  final TextEditingController _amountInputController = TextEditingController();
+  String _selectedTransactionType = 'expense';
+  CategoriesApiModel? _selectedCategory;
+  late TabController _tabController;
+  
+  List<CategoriesApiModel> _getIncomeCategories(WidgetRef ref) {
+    final categories = ref.read(categoriesProvider);
+    return categories.where((cat) => cat.type == 'income' && cat.isActive).toList()
+      ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+  }
+  
+  List<CategoriesApiModel> _getExpenseCategories(WidgetRef ref) {
+    final categories = ref.read(categoriesProvider);
+    return categories.where((cat) => cat.type == 'expense' && cat.isActive).toList()
+      ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCategoriesAndSetDefault();
+    });
+  }
+
+  void _loadCategoriesAndSetDefault() {
+    // Kategorileri yükle
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Bu metod artık gerekli değil, Consumer içinde yapılacak
+    });
+  }
+
+  @override
+  void dispose() {
+    _amountInputController.dispose();
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.calculate_outlined,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Finansal Hesaplama',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Gelecek dönem bütçe planlaması',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      '${_financialTransactions.length} işlem',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Tab Bar
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.4),
+                    Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.2),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: Colors.white,
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                labelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                tabs: [
+                  Tab(
+                    height: 48,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          child: const Icon(
+                            Icons.add_circle_outline,
+                            size: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text('İşlem Ekle'),
+                      ],
+                    ),
+                  ),
+                  Tab(
+                    height: 48,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          child: const Icon(
+                            Icons.analytics_outlined,
+                            size: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text('Bütçe Özeti'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Tab Content
+            SizedBox(
+              height: 500,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildAddTransactionFormTab(),
+                  _buildFinancialOverviewTab(),
+                ],
+              ),
+            ),
+            
+            
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddTransactionFormTab() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Type Selection
+          Text(
+            'İşlem Kategorisi',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          Row(
+            children: [
+              Expanded(
+                child: _buildTransactionTypeButton('expense', 'Gider', Icons.trending_down_rounded, const Color(0xFFDC2626)),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildTransactionTypeButton('income', 'Gelir', Icons.trending_up_rounded, const Color(0xFF059669)),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Category Selection
+          Text(
+            'Kategori',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          Consumer(
+            builder: (context, ref, child) {
+              // Kategorileri yükle
+              ref.read(categoryProvider.notifier).loadCategories();
+              final categories = _selectedTransactionType == 'income' ? _getIncomeCategories(ref) : _getExpenseCategories(ref);
+              
+              // Type değişiminde kategoriyi güncelle
+              if (_selectedCategory == null || !categories.contains(_selectedCategory)) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (categories.isNotEmpty) {
+                    setState(() {
+                      _selectedCategory = categories.first;
+                    });
+                  }
+                });
+              }
+              
+              return DropdownButtonFormField<CategoriesApiModel>(
+                value: _selectedCategory != null && categories.contains(_selectedCategory) 
+                    ? _selectedCategory 
+                    : categories.isNotEmpty ? categories.first : null,
+                decoration: InputDecoration(
+                  hintText: 'Kategori seçin',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surface,
+                ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w400,
+                ),
+                items: categories.map((category) => DropdownMenuItem(
+                      value: category,
+                      child: Text(
+                        category.nameTr,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    )).toList(),
+                onChanged: (value) => setState(() => _selectedCategory = value),
+              );
+            },
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Amount Input
+          Text(
+            'İşlem Tutarı',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          TextFormField(
+            controller: _amountInputController,
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
+            onChanged: (value) {
+              _formatAmountInput(value);
+            },
+            onFieldSubmitted: (value) {
+              FocusScope.of(context).unfocus();
+            },
+            decoration: InputDecoration(
+              hintText: '0,00',
+              suffixText: '₺',
+              prefixIcon: Icon(
+                Icons.currency_lira,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
+              ),
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Add Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _addFinancialTransaction,
+              icon: Icon(
+                _selectedTransactionType == 'income' ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                size: 20,
+              ),
+              label: Text('${_selectedTransactionType == 'income' ? 'Gelir' : 'Gider'} İşlemi Ekle'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _selectedTransactionType == 'income' ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinancialOverviewTab() {
+    final totalIncome = _financialTransactions.where((t) => t.type == 'income').fold(0.0, (sum, t) => sum + t.amount);
+    final totalExpense = _financialTransactions.where((t) => t.type == 'expense').fold(0.0, (sum, t) => sum + t.amount);
+    final balance = totalIncome - totalExpense;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Summary Cards
+          Row(
+            children: [
+              Expanded(
+                child: _buildSummaryCard(
+                  context,
+                  'Gelir',
+                  totalIncome,
+                  Icons.trending_up_rounded,
+                  const Color(0xFF059669),
+                  const Color(0xFFF0FDF4),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildSummaryCard(
+                  context,
+                  'Gider',
+                  totalExpense,
+                  Icons.trending_down_rounded,
+                  const Color(0xFFDC2626),
+                  const Color(0xFFFEF2F2),
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Balance Card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.account_balance_wallet_outlined,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Net Bakiye',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        balance.formatAsTurkishLira(),
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: balance >= 0 ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Financial Transactions List
+          if (_financialTransactions.isNotEmpty) ...[
+            Text(
+              'Planlanan İşlemler (${_financialTransactions.length})',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _financialTransactions.length,
+                itemBuilder: (context, index) {
+                  final transaction = _financialTransactions[index];
+                  return _buildFinancialTransactionItem(transaction);
+                },
+              ),
+            ),
+          ] else ...[
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.receipt_long_outlined,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Henüz planlanmış işlem yok',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'İşlem Ekle sekmesinden yeni işlem planlayabilirsiniz',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransactionTypeButton(String type, String label, IconData icon, Color color) {
+    final isSelected = _selectedTransactionType == type;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedTransactionType = type;
+        });
+        // Kategori seçimi Consumer içinde yapılacak
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? color : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildSummaryCard(
+    BuildContext context,
+    String title,
+    double amount,
+    IconData icon,
+    Color color,
+    Color bgColor,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            amount.formatAsTurkishLira(),
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinancialTransactionItem(FinancialTransactionItem transaction) {
+    final color = transaction.type == 'income' ? const Color(0xFF059669) : const Color(0xFFDC2626);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              transaction.type == 'income' ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+              color: color,
+              size: 16,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              transaction.category,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ),
+          Text(
+            transaction.amount.formatAsTurkishLira(),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color,
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () => setState(() => _financialTransactions.remove(transaction)),
+            child: Icon(
+              Icons.close,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+              size: 18,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _formatAmountInput(String value) {
+    // Sadece rakam ve virgül karakterlerine izin ver (nokta sadece binlik ayırıcı olarak kullanılacak)
+    final cleanValue = value.replaceAll(RegExp(r'[^\d,]'), '');
+
+    // Virgül kontrolü - sadece bir tane olabilir
+    final commaCount = cleanValue.split(',').length - 1;
+    if (commaCount > 1) {
+      return; // Geçersiz format, değişiklik yapma
+    }
+
+    // Virgülden sonra maksimum 2 rakam
+    if (cleanValue.contains(',')) {
+      final parts = cleanValue.split(',');
+      if (parts.length == 2 && parts[1].length > 2) {
+        return; // Virgülden sonra 2'den fazla rakam
+      }
+    }
+
+    // Formatlanmış değeri hesapla
+    String formattedValue = cleanValue.formatNumberWithSeparators();
+
+    // Eğer değer değiştiyse, controller'ı güncelle
+    if (formattedValue != value) {
+      _amountInputController.value = TextEditingValue(
+        text: formattedValue,
+        selection: TextSelection.collapsed(offset: formattedValue.length),
+      );
+    }
+  }
+
+  void _addFinancialTransaction() {
+    final amountText = _amountInputController.text.trim();
+    if (amountText.isEmpty || _selectedCategory == null) return;
+    
+    // Formatlanmış değeri temizle ve sayıya çevir
+    final cleanValue = amountText.replaceAll('.', '').replaceAll(',', '.');
+    final amount = double.tryParse(cleanValue) ?? 0.0;
+    
+    if (amount <= 0) return;
+    
+    setState(() {
+      _financialTransactions.add(FinancialTransactionItem(
+        type: _selectedTransactionType,
+        category: _selectedCategory!.nameTr,
+        amount: amount,
+      ));
+      _amountInputController.clear();
+    });
+  }
+}
+
+class FinancialTransactionItem {
+  final String type;
+  final String category;
+  final double amount;
+
+  FinancialTransactionItem({
+    required this.type,
+    required this.category,
+    required this.amount,
+  });
 }
