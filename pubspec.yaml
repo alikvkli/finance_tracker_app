@@ -37,6 +37,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   
+  # Icon Packages
+  font_awesome_flutter: ^10.7.0
+  lucide_icons: ^0.257.0
+  
   # State Management
   flutter_riverpod: ^2.5.1
   
