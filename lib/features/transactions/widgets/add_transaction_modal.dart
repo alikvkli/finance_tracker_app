@@ -74,7 +74,7 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
         final categories = ref.read(categoriesProvider);
 
         if (categories.isNotEmpty) {
-          final targetCategoryId = widget.autoFillData!.categoryId;
+          final targetCategoryId = int.tryParse(widget.autoFillData!.categoryId) ?? 0;
 
           // Filter categories by transaction type first
           final filteredCategories = categories
