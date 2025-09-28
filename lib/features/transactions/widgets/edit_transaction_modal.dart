@@ -971,8 +971,8 @@ class _EditTransactionModalState extends ConsumerState<EditTransactionModal> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4, // 3'ten 4'e çıkarıldı
-        childAspectRatio: 0.75, // Daha kompakt
+        crossAxisCount: 3, // 4'ten 3'e düşürüldü
+        childAspectRatio: 1.0, // 0.75'ten 1.0'a çıkarıldı - daha kısa kartlar
         crossAxisSpacing: 12, // 16'dan 12'ye düşürüldü
         mainAxisSpacing: 12, // 16'dan 12'ye düşürüldü
       ),
