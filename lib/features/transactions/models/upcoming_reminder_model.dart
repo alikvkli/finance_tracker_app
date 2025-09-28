@@ -2,7 +2,7 @@ class UpcomingReminderModel {
   final String date;
   final String dayName;
   final String dayNameTr;
-  final Map<String, ReminderData> reminders;
+  final List<ReminderData> reminders;
 
   const UpcomingReminderModel({
     required this.date,
@@ -12,14 +12,11 @@ class UpcomingReminderModel {
   });
 
   factory UpcomingReminderModel.fromJson(Map<String, dynamic> json) {
-    final remindersJson = json['reminders'] as Map<String, dynamic>? ?? {};
+    final remindersJson = json['reminders'] as List<dynamic>? ?? [];
     
-    final reminders = remindersJson.map(
-      (key, value) => MapEntry(
-        key,
-        ReminderData.fromJson(value as Map<String, dynamic>),
-      ),
-    );
+    final reminders = remindersJson
+        .map((item) => ReminderData.fromJson(item as Map<String, dynamic>))
+        .toList();
 
     return UpcomingReminderModel(
       date: json['date'] ?? '',
@@ -34,9 +31,7 @@ class UpcomingReminderModel {
       'date': date,
       'day_name': dayName,
       'day_name_tr': dayNameTr,
-      'reminders': reminders.map(
-        (key, value) => MapEntry(key, value.toJson()),
-      ),
+      'reminders': reminders.map((reminder) => reminder.toJson()).toList(),
     };
   }
 }

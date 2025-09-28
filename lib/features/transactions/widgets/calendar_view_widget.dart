@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../controllers/upcoming_reminders_controller.dart';
 import '../models/upcoming_reminder_model.dart';
 import '../../../shared/widgets/transaction_skeleton.dart';
+import '../../../core/extensions/amount_formatting_extension.dart';
 
 class CalendarViewWidget extends ConsumerStatefulWidget {
   const CalendarViewWidget({super.key});
@@ -13,7 +14,7 @@ class CalendarViewWidget extends ConsumerStatefulWidget {
 }
 
 class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
-  late final ValueNotifier<List<UpcomingReminderModel>> _selectedReminders;
+  late final ValueNotifier<List<ReminderData>> _selectedReminders;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -32,11 +33,14 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
     super.dispose();
   }
 
-  List<UpcomingReminderModel> _getRemindersForDay(DateTime day) {
-    final reminders = ref.read(upcomingRemindersControllerProvider).reminders;
+  List<ReminderData> _getRemindersForDay(DateTime day) {
+    final upcomingReminders = ref.read(upcomingRemindersControllerProvider).reminders;
     final dayString = _formatDateForAPI(day);
     
-    return reminders.where((reminder) => reminder.date == dayString).toList();
+    // Find the UpcomingReminderModel for this day
+    final dayReminder = upcomingReminders.where((reminder) => reminder.date == dayString).firstOrNull;
+    
+    return dayReminder?.reminders ?? [];
   }
 
   String _formatDateForAPI(DateTime date) {
@@ -117,16 +121,15 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
     );
   }
 
-  Widget _buildCalendarView(BuildContext context, List<UpcomingReminderModel> reminders) {
+  Widget _buildCalendarView(BuildContext context, List<UpcomingReminderModel> upcomingReminders) {
     // Create a map of dates with reminders for calendar markers
-    final Map<DateTime, List<UpcomingReminderModel>> remindersMap = {};
+    final Map<DateTime, List<ReminderData>> remindersMap = {};
     
-    for (final reminder in reminders) {
+    for (final dayReminder in upcomingReminders) {
       try {
-        final date = DateTime.parse(reminder.date);
+        final date = DateTime.parse(dayReminder.date);
         final dayKey = DateTime(date.year, date.month, date.day);
-        remindersMap[dayKey] = remindersMap[dayKey] ?? [];
-        remindersMap[dayKey]!.add(reminder);
+        remindersMap[dayKey] = dayReminder.reminders;
       } catch (e) {
         // Skip invalid dates
       }
@@ -155,9 +158,9 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 ),
               ],
             ),
-            child: TableCalendar<UpcomingReminderModel>(
+            child: TableCalendar<ReminderData>(
               firstDay: DateTime.now(), // Sadece bugünden itibaren
-              lastDay: DateTime.utc(2030, 12, 31),
+              lastDay: DateTime.now().add(const Duration(days: 15)), // 15 günlük sınır
               focusedDay: _focusedDay,
               calendarFormat: _calendarFormat,
               eventLoader: (day) => remindersMap[DateTime(day.year, day.month, day.day)] ?? [],
@@ -178,20 +181,38 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 selectedDecoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 todayDecoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Theme.of(context).colorScheme.primary,
-                    width: 2,
+                    width: 1.5,
                   ),
                 ),
                 markerDecoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
                   shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 1,
+                  ),
                 ),
                 markersMaxCount: 3,
                 markerSize: 6,
@@ -201,8 +222,18 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 formatButtonVisible: false, // Format butonunu gizle
                 titleCentered: true,
                 formatButtonShowsNext: false,
-                leftChevronVisible: false, // Sol ok butonunu gizle
-                rightChevronVisible: false, // Sağ ok butonunu gizle
+                leftChevronVisible: true, // Sol ok butonunu göster
+                rightChevronVisible: true, // Sağ ok butonunu göster
+                leftChevronIcon: Icon(
+                  Icons.chevron_left,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 24,
+                ),
+                rightChevronIcon: Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 24,
+                ),
                 titleTextStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
                 ) ?? TextStyle(
@@ -222,7 +253,7 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
           const SizedBox(height: 20),
           
           // Selected Day Reminders
-          ValueListenableBuilder<List<UpcomingReminderModel>>(
+          ValueListenableBuilder<List<ReminderData>>(
             valueListenable: _selectedReminders,
             builder: (context, selectedReminders, _) {
               return _buildSelectedDayReminders(context, selectedReminders);
@@ -236,7 +267,7 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
   }
 
 
-  Widget _buildSelectedDayReminders(BuildContext context, List<UpcomingReminderModel> reminders) {
+  Widget _buildSelectedDayReminders(BuildContext context, List<ReminderData> reminders) {
     if (reminders.isEmpty) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -368,83 +399,93 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
     );
   }
 
-  Widget _buildReminderItem(BuildContext context, UpcomingReminderModel reminder) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: reminder.reminders.values.map((reminderData) => 
-        Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: reminderData.isIncome 
-                    ? Colors.green[50] 
-                    : Colors.red[50],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  reminderData.isIncome ? Icons.trending_up : Icons.trending_down,
-                  color: reminderData.isIncome ? Colors.green[600] : Colors.red[600],
-                  size: 18,
-                ),
-              ),
-              
-              const SizedBox(width: 12),
-              
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      reminderData.category,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: reminderData.isIncome 
-                          ? Colors.green[100] 
-                          : Colors.red[100],
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        reminderData.recurringType,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: reminderData.isIncome ? Colors.green[700] : Colors.red[700],
-                          fontSize: 10,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              Text(
-                reminderData.amount,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: reminderData.isIncome ? Colors.green[600] : Colors.red[600],
-                  fontSize: 15,
-                ),
-              ),
-            ],
-          ),
+  Widget _buildReminderItem(BuildContext context, ReminderData reminder) {
+    final isIncome = reminder.isIncome;
+    final amountColor = isIncome ? const Color(0xFF059669) : const Color(0xFFDC2626);
+    final iconColor = isIncome ? const Color(0xFF16A34A) : const Color(0xFFEF4444);
+    
+    // Parse amount from string (e.g., "15,000.00 TRY" -> 15000.0)
+    final amountString = reminder.amount.replaceAll(RegExp(r'[^\d.,]'), '');
+    final amount = double.tryParse(amountString.replaceAll(',', '.')) ?? 0.0;
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+          width: 1,
         ),
-      ).toList(),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            // Compact Icon
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: iconColor.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Icon(
+                isIncome ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                color: iconColor,
+                size: 16,
+              ),
+            ),
+            
+            const SizedBox(width: 12),
+            
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    reminder.category,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    reminder.recurringType,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Amount
+            Text(
+              amount.formatAsTurkishLira(),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: amountColor,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -299,7 +299,7 @@ class UpcomingRemindersCalendar extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              children: reminder.reminders.values.map((reminderData) => 
+              children: reminder.reminders.map((reminderData) => 
                 _buildReminderItem(context, reminderData)
               ).toList(),
             ),
