@@ -823,11 +823,9 @@ class _FinancialCalculatorBottomSheetState
                         const SizedBox(width: 8),
                         Text(
                           'İşlem Ekle',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                fontSize: 18,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.copyWith(color: Colors.white),
                         ),
                       ],
                     ),
@@ -844,11 +842,9 @@ class _FinancialCalculatorBottomSheetState
                         const SizedBox(width: 8),
                         Text(
                           'Bütçe Özeti',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                fontSize: 18,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodySmall?.copyWith(color: Colors.white),
                         ),
                       ],
                     ),
@@ -913,6 +909,47 @@ class _FinancialCalculatorBottomSheetState
                 ),
               ),
             ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Amount Input
+          Text(
+            'İşlem Tutarı',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          TextFormField(
+            controller: _amountInputController,
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
+            onChanged: (value) {
+              _formatAmountInput(value);
+            },
+            onFieldSubmitted: (value) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            },
+            decoration: InputDecoration(
+              hintText: '0,00',
+              suffixText: '₺',
+              prefixIcon: Icon(
+                Icons.currency_lira,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 2,
+                ),
+              ),
+            ),
           ),
 
           const SizedBox(height: 24),
@@ -982,47 +1019,6 @@ class _FinancialCalculatorBottomSheetState
                 onChanged: (value) => setState(() => _selectedCategory = value),
               );
             },
-          ),
-
-          const SizedBox(height: 24),
-
-          // Amount Input
-          Text(
-            'İşlem Tutarı',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          TextFormField(
-            controller: _amountInputController,
-            keyboardType: TextInputType.number,
-            textInputAction: TextInputAction.done,
-            onChanged: (value) {
-              _formatAmountInput(value);
-            },
-            onFieldSubmitted: (value) {
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
-            decoration: InputDecoration(
-              hintText: '0,00',
-              suffixText: '₺',
-              prefixIcon: Icon(
-                Icons.currency_lira,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.primary,
-                  width: 2,
-                ),
-              ),
-            ),
           ),
 
           const SizedBox(height: 24),
