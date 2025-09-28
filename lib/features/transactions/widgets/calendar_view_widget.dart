@@ -37,12 +37,16 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
   }
 
   List<ReminderData> _getRemindersForDay(DateTime day) {
-    final upcomingReminders = ref.read(upcomingRemindersControllerProvider).reminders;
+    final upcomingReminders = ref
+        .read(upcomingRemindersControllerProvider)
+        .reminders;
     final dayString = _formatDateForAPI(day);
-    
+
     // Find the UpcomingReminderModel for this day
-    final dayReminder = upcomingReminders.where((reminder) => reminder.date == dayString).firstOrNull;
-    
+    final dayReminder = upcomingReminders
+        .where((reminder) => reminder.date == dayString)
+        .firstOrNull;
+
     return dayReminder?.reminders ?? [];
   }
 
@@ -98,20 +102,26 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 const SizedBox(height: 16),
                 Text(
                   'Bir hata oluştu',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontSize: 18),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   error,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: () {
-                    ref.read(upcomingRemindersControllerProvider.notifier).loadUpcomingReminders();
+                    ref
+                        .read(upcomingRemindersControllerProvider.notifier)
+                        .loadUpcomingReminders();
                   },
                   icon: const Icon(Icons.refresh),
                   label: const Text('Tekrar Deneyiniz'),
@@ -124,10 +134,13 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
     );
   }
 
-  Widget _buildCalendarView(BuildContext context, List<UpcomingReminderModel> upcomingReminders) {
+  Widget _buildCalendarView(
+    BuildContext context,
+    List<UpcomingReminderModel> upcomingReminders,
+  ) {
     // Create a map of dates with reminders for calendar markers
     final Map<DateTime, List<ReminderData>> remindersMap = {};
-    
+
     for (final dayReminder in upcomingReminders) {
       try {
         final date = DateTime.parse(dayReminder.date);
@@ -144,156 +157,166 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          // Calendar
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+            // Calendar
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.2),
+                  width: 1.5,
                 ),
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: TableCalendar<ReminderData>(
-              firstDay: DateTime.now(), // Sadece bugünden itibaren
-              lastDay: DateTime.now().add(const Duration(days: 15)), // 15 günlük sınır
-              focusedDay: _focusedDay,
-              calendarFormat: _calendarFormat,
-              eventLoader: (day) => remindersMap[DateTime(day.year, day.month, day.day)] ?? [],
-              startingDayOfWeek: StartingDayOfWeek.monday,
-              locale: 'tr_TR', // Türkçe lokalizasyon
-              calendarStyle: CalendarStyle(
-                outsideDaysVisible: false,
-                weekendTextStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                ),
-                defaultTextStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                selectedTextStyle: const TextStyle(
-                  color: Colors.white,
-                ),
-                todayTextStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                selectedDecoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                todayDecoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                  border: Border.all(
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: TableCalendar<ReminderData>(
+                firstDay: DateTime.now(), // Sadece bugünden itibaren
+                lastDay: DateTime.now().add(
+                  const Duration(days: 15),
+                ), // 15 günlük sınır
+                focusedDay: _focusedDay,
+                calendarFormat: _calendarFormat,
+                eventLoader: (day) =>
+                    remindersMap[DateTime(day.year, day.month, day.day)] ?? [],
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                locale: 'tr_TR', // Türkçe lokalizasyon
+                calendarStyle: CalendarStyle(
+                  outsideDaysVisible: false,
+                  weekendTextStyle: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                  defaultTextStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  selectedTextStyle: const TextStyle(color: Colors.white),
+                  todayTextStyle: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
-                    width: 2,
                   ),
-                ),
-                markerDecoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1.5,
+                  selectedDecoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Theme.of(context).colorScheme.primary,
+                        Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
+                  todayDecoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 2,
+                    ),
+                  ),
+                  markerDecoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  markersMaxCount: 3,
+                  markerSize: 7,
+                  markerMargin: const EdgeInsets.symmetric(horizontal: 1.5),
                 ),
-                markersMaxCount: 3,
-                markerSize: 7,
-                markerMargin: const EdgeInsets.symmetric(horizontal: 1.5),
+                headerStyle: HeaderStyle(
+                  formatButtonVisible: false, // Format butonunu gizle
+                  titleCentered: true,
+                  formatButtonShowsNext: false,
+                  leftChevronVisible: true, // Sol ok butonunu göster
+                  rightChevronVisible: true, // Sağ ok butonunu göster
+                  leftChevronIcon: Icon(
+                    Icons.chevron_left,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 24,
+                  ),
+                  rightChevronIcon: Icon(
+                    Icons.chevron_right,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 24,
+                  ),
+                  titleTextStyle:
+                      Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ) ??
+                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                ),
+                onDaySelected: _onDaySelected,
+                onPageChanged: (focusedDay) {
+                  _focusedDay = focusedDay;
+                },
+                selectedDayPredicate: (day) {
+                  return isSameDay(_selectedDay, day);
+                },
               ),
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false, // Format butonunu gizle
-                titleCentered: true,
-                formatButtonShowsNext: false,
-                leftChevronVisible: true, // Sol ok butonunu göster
-                rightChevronVisible: true, // Sağ ok butonunu göster
-                leftChevronIcon: Icon(
-                  Icons.chevron_left,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 24,
-                ),
-                rightChevronIcon: Icon(
-                  Icons.chevron_right,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 24,
-                ),
-                titleTextStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ) ?? TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              onDaySelected: _onDaySelected,
-              onPageChanged: (focusedDay) {
-                _focusedDay = focusedDay;
-              },
-              selectedDayPredicate: (day) {
-                return isSameDay(_selectedDay, day);
+            ),
+
+            const SizedBox(height: 20),
+
+            // Selected Day Reminders
+            ValueListenableBuilder<List<ReminderData>>(
+              valueListenable: _selectedReminders,
+              builder: (context, selectedReminders, _) {
+                return _buildSelectedDayReminders(context, selectedReminders);
               },
             ),
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // Selected Day Reminders
-          ValueListenableBuilder<List<ReminderData>>(
-            valueListenable: _selectedReminders,
-            builder: (context, selectedReminders, _) {
-              return _buildSelectedDayReminders(context, selectedReminders);
-            },
-          ),
-          
-          const SizedBox(height: 20),
-        ],
+
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
-    ),
-    floatingActionButton: FloatingActionButton(
-      onPressed: () => _showCalculationBottomSheet(context),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      shape: const CircleBorder(),
-      child: Icon(
-        Icons.calculate_outlined,
-        color: Colors.white,
-        size: 24,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showCalculationBottomSheet(context),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        shape: const CircleBorder(),
+        child: Icon(Icons.calculate_outlined, color: Colors.white, size: 24),
       ),
-    ),
     );
   }
 
-
-  Widget _buildSelectedDayReminders(BuildContext context, List<ReminderData> reminders) {
+  Widget _buildSelectedDayReminders(
+    BuildContext context,
+    List<ReminderData> reminders,
+  ) {
     if (reminders.isEmpty) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+          color: Theme.of(
+            context,
+          ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
@@ -305,20 +328,26 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
             Icon(
               Icons.event_available,
               size: 48,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.4),
             ),
             const SizedBox(height: 16),
             Text(
               'Bu tarihte hatırlatma yok',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               _formatSelectedDate(),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -350,7 +379,9 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -360,7 +391,9 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
               children: [
                 Icon(
                   Icons.calendar_today,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -373,12 +406,19 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -404,14 +444,14 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
               ],
             ),
           ),
-          
+
           // Reminders List
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              children: reminders.map((reminder) => 
-                _buildReminderItem(context, reminder)
-              ).toList(),
+              children: reminders
+                  .map((reminder) => _buildReminderItem(context, reminder))
+                  .toList(),
             ),
           ),
         ],
@@ -421,13 +461,17 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
 
   Widget _buildReminderItem(BuildContext context, ReminderData reminder) {
     final isIncome = reminder.isIncome;
-    final amountColor = isIncome ? const Color(0xFF059669) : const Color(0xFFDC2626);
-    final iconColor = isIncome ? const Color(0xFF16A34A) : const Color(0xFFEF4444);
-    
+    final amountColor = isIncome
+        ? const Color(0xFF059669)
+        : const Color(0xFFDC2626);
+    final iconColor = isIncome
+        ? const Color(0xFF16A34A)
+        : const Color(0xFFEF4444);
+
     // Parse amount from string (e.g., "15,000.00 TRY" -> 15000.0)
     final amountString = reminder.amount.replaceAll(RegExp(r'[^\d.,]'), '');
     final amount = double.tryParse(amountString.replaceAll(',', '.')) ?? 0.0;
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -462,14 +506,16 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                 ),
               ),
               child: Icon(
-                isIncome ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                isIncome
+                    ? Icons.trending_up_rounded
+                    : Icons.trending_down_rounded,
                 color: iconColor,
                 size: 16,
               ),
             ),
-            
+
             const SizedBox(width: 12),
-            
+
             // Content
             Expanded(
               child: Column(
@@ -478,28 +524,29 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                   Text(
                     reminder.category,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     reminder.recurringType,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
                       fontSize: 11,
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             // Amount
             Text(
               amount.formatAsTurkishLira(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: amountColor,
-                fontSize: 14,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: amountColor, fontSize: 14),
             ),
           ],
         ),
@@ -509,12 +556,22 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
 
   String _formatSelectedDate() {
     if (_selectedDay == null) return '';
-    
+
     final monthNames = [
-      'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-      'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+      'Ocak',
+      'Şubat',
+      'Mart',
+      'Nisan',
+      'Mayıs',
+      'Haziran',
+      'Temmuz',
+      'Ağustos',
+      'Eylül',
+      'Ekim',
+      'Kasım',
+      'Aralık',
     ];
-    
+
     return '${_selectedDay!.day} ${monthNames[_selectedDay!.month - 1]} ${_selectedDay!.year}';
   }
 
@@ -532,25 +589,32 @@ class _FinancialCalculatorBottomSheet extends StatefulWidget {
   const _FinancialCalculatorBottomSheet();
 
   @override
-  State<_FinancialCalculatorBottomSheet> createState() => _FinancialCalculatorBottomSheetState();
+  State<_FinancialCalculatorBottomSheet> createState() =>
+      _FinancialCalculatorBottomSheetState();
 }
 
-class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBottomSheet> with TickerProviderStateMixin {
+class _FinancialCalculatorBottomSheetState
+    extends State<_FinancialCalculatorBottomSheet>
+    with TickerProviderStateMixin {
   final List<FinancialTransactionItem> _financialTransactions = [];
   final TextEditingController _amountInputController = TextEditingController();
   String _selectedTransactionType = 'expense';
   CategoriesApiModel? _selectedCategory;
   late TabController _tabController;
-  
+
   List<CategoriesApiModel> _getIncomeCategories(WidgetRef ref) {
     final categories = ref.read(categoriesProvider);
-    return categories.where((cat) => cat.type == 'income' && cat.isActive).toList()
+    return categories
+        .where((cat) => cat.type == 'income' && cat.isActive)
+        .toList()
       ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
   }
-  
+
   List<CategoriesApiModel> _getExpenseCategories(WidgetRef ref) {
     final categories = ref.read(categoriesProvider);
-    return categories.where((cat) => cat.type == 'expense' && cat.isActive).toList()
+    return categories
+        .where((cat) => cat.type == 'expense' && cat.isActive)
+        .toList()
       ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
   }
 
@@ -579,7 +643,6 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -604,14 +667,16 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -620,7 +685,9 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -636,24 +703,33 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                       children: [
                         Text(
                           'Finansal Hesaplama',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Gelecek dönem bütçe planlaması',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurface.withValues(alpha: 0.6),
+                              ),
                         ),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
@@ -666,29 +742,37 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Tab Bar
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.4),
-                    Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.2),
+                    Theme.of(
+                      context,
+                    ).colorScheme.surfaceVariant.withValues(alpha: 0.4),
+                    Theme.of(
+                      context,
+                    ).colorScheme.surfaceVariant.withValues(alpha: 0.2),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.1),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -700,7 +784,9 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                   gradient: LinearGradient(
                     colors: [
                       Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+                      Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.8),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -708,7 +794,9 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -717,15 +805,11 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
                 labelColor: Colors.white,
-                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                labelStyle: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-                unselectedLabelStyle: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+                unselectedLabelColor: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.5),
+                labelStyle: const TextStyle(fontSize: 14),
+                unselectedLabelStyle: const TextStyle(fontSize: 14),
                 tabs: [
                   Tab(
                     height: 48,
@@ -734,10 +818,7 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                       children: [
                         Container(
                           padding: const EdgeInsets.all(6),
-                          child: const Icon(
-                            Icons.add_circle_outline,
-                            size: 18,
-                          ),
+                          child: const Icon(Icons.add_circle_outline, size: 18),
                         ),
                         const SizedBox(width: 8),
                         const Text('İşlem Ekle'),
@@ -751,10 +832,7 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                       children: [
                         Container(
                           padding: const EdgeInsets.all(6),
-                          child: const Icon(
-                            Icons.analytics_outlined,
-                            size: 18,
-                          ),
+                          child: const Icon(Icons.analytics_outlined, size: 18),
                         ),
                         const SizedBox(width: 8),
                         const Text('Bütçe Özeti'),
@@ -764,9 +842,9 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Tab Content
             SizedBox(
               height: 500,
@@ -778,8 +856,7 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                 ],
               ),
             ),
-            
-            
+
             const SizedBox(height: 24),
           ],
         ),
@@ -797,42 +874,55 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
           Text(
             'İşlem Kategorisi',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 12),
-          
+
           Row(
             children: [
               Expanded(
-                child: _buildTransactionTypeButton('expense', 'Gider', Icons.trending_down_rounded, const Color(0xFFDC2626)),
+                child: _buildTransactionTypeButton(
+                  'expense',
+                  'Gider',
+                  Icons.trending_down_rounded,
+                  const Color(0xFFDC2626),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildTransactionTypeButton('income', 'Gelir', Icons.trending_up_rounded, const Color(0xFF059669)),
+                child: _buildTransactionTypeButton(
+                  'income',
+                  'Gelir',
+                  Icons.trending_up_rounded,
+                  const Color(0xFF059669),
+                ),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Category Selection
           Text(
             'Kategori',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 12),
-          
+
           Consumer(
             builder: (context, ref, child) {
               // Kategorileri yükle
               ref.read(categoryProvider.notifier).loadCategories();
-              final categories = _selectedTransactionType == 'income' ? _getIncomeCategories(ref) : _getExpenseCategories(ref);
-              
+              final categories = _selectedTransactionType == 'income'
+                  ? _getIncomeCategories(ref)
+                  : _getExpenseCategories(ref);
+
               // Type değişiminde kategoriyi güncelle
-              if (_selectedCategory == null || !categories.contains(_selectedCategory)) {
+              if (_selectedCategory == null ||
+                  !categories.contains(_selectedCategory)) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (categories.isNotEmpty) {
                     setState(() {
@@ -841,11 +931,15 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                   }
                 });
               }
-              
+
               return DropdownButtonFormField<CategoriesApiModel>(
-                value: _selectedCategory != null && categories.contains(_selectedCategory) 
-                    ? _selectedCategory 
-                    : categories.isNotEmpty ? categories.first : null,
+                value:
+                    _selectedCategory != null &&
+                        categories.contains(_selectedCategory)
+                    ? _selectedCategory
+                    : categories.isNotEmpty
+                    ? categories.first
+                    : null,
                 decoration: InputDecoration(
                   hintText: 'Kategori seçin',
                   border: OutlineInputBorder(
@@ -854,27 +948,30 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                   filled: true,
                   fillColor: Theme.of(context).colorScheme.surface,
                 ),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurface,
-                  fontWeight: FontWeight.w400,
                 ),
-                items: categories.map((category) => DropdownMenuItem(
-                      value: category,
-                      child: Text(
-                        category.nameTr,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.w400,
+                items: categories
+                    .map(
+                      (category) => DropdownMenuItem(
+                        value: category,
+                        child: Text(
+                          category.nameTr,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                       ),
-                    )).toList(),
+                    )
+                    .toList(),
                 onChanged: (value) => setState(() => _selectedCategory = value),
               );
             },
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Amount Input
           Text(
             'İşlem Tutarı',
@@ -883,7 +980,7 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
             ),
           ),
           const SizedBox(height: 12),
-          
+
           TextFormField(
             controller: _amountInputController,
             keyboardType: TextInputType.number,
@@ -901,7 +998,9 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                 Icons.currency_lira,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
@@ -911,21 +1010,27 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
               ),
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Add Button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: _addFinancialTransaction,
               icon: Icon(
-                _selectedTransactionType == 'income' ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                _selectedTransactionType == 'income'
+                    ? Icons.trending_up_rounded
+                    : Icons.trending_down_rounded,
                 size: 20,
               ),
-              label: Text('${_selectedTransactionType == 'income' ? 'Gelir' : 'Gider'} İşlemi Ekle'),
+              label: Text(
+                '${_selectedTransactionType == 'income' ? 'Gelir' : 'Gider'} İşlemi Ekle',
+              ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: _selectedTransactionType == 'income' ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                backgroundColor: _selectedTransactionType == 'income'
+                    ? const Color(0xFF059669)
+                    : const Color(0xFFDC2626),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -941,8 +1046,12 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
   }
 
   Widget _buildFinancialOverviewTab() {
-    final totalIncome = _financialTransactions.where((t) => t.type == 'income').fold(0.0, (sum, t) => sum + t.amount);
-    final totalExpense = _financialTransactions.where((t) => t.type == 'expense').fold(0.0, (sum, t) => sum + t.amount);
+    final totalIncome = _financialTransactions
+        .where((t) => t.type == 'income')
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final totalExpense = _financialTransactions
+        .where((t) => t.type == 'expense')
+        .fold(0.0, (sum, t) => sum + t.amount);
     final balance = totalIncome - totalExpense;
 
     return Padding(
@@ -950,11 +1059,11 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Summary Cards
+          // Summary Cards with improved design
           Row(
             children: [
               Expanded(
-                child: _buildSummaryCard(
+                child: _buildModernSummaryCard(
                   context,
                   'Gelir',
                   totalIncome,
@@ -965,7 +1074,7 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildSummaryCard(
+                child: _buildModernSummaryCard(
                   context,
                   'Gider',
                   totalExpense,
@@ -976,43 +1085,42 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
-          // Balance Card
+
+          // Compact Balance Card
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
+              color: Theme.of(
+                context,
+              ).colorScheme.surfaceVariant.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(12),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     Icons.account_balance_wallet_outlined,
-                    color: Colors.white,
-                    size: 24,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 20,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1020,14 +1128,18 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                       Text(
                         'Net Bakiye',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         balance.formatAsTurkishLira(),
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: balance >= 0 ? const Color(0xFF059669) : const Color(0xFFDC2626),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: balance >= 0
+                              ? const Color(0xFF059669)
+                              : const Color(0xFFDC2626),
                         ),
                       ),
                     ],
@@ -1036,16 +1148,45 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
               ],
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Financial Transactions List
           if (_financialTransactions.isNotEmpty) ...[
-            Text(
-              'Planlanan İşlemler (${_financialTransactions.length})',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
+            Row(
+              children: [
+                Icon(
+                  Icons.receipt_long_outlined,
+                  size: 16,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Planlanan İşlemler',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${_financialTransactions.length}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             Expanded(
@@ -1054,7 +1195,7 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                 itemCount: _financialTransactions.length,
                 itemBuilder: (context, index) {
                   final transaction = _financialTransactions[index];
-                  return _buildFinancialTransactionItem(transaction);
+                  return _buildEnhancedFinancialTransactionItem(transaction);
                 },
               ),
             ),
@@ -1067,20 +1208,26 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
                     Icon(
                       Icons.receipt_long_outlined,
                       size: 64,
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.3),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'Henüz planlanmış işlem yok',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'İşlem Ekle sekmesinden yeni işlem planlayabilirsiniz',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -1094,7 +1241,12 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
     );
   }
 
-  Widget _buildTransactionTypeButton(String type, String label, IconData icon, Color color) {
+  Widget _buildTransactionTypeButton(
+    String type,
+    String label,
+    IconData icon,
+    Color color,
+  ) {
     final isSelected = _selectedTransactionType == type;
     return GestureDetector(
       onTap: () {
@@ -1109,7 +1261,9 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
           color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? color : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+            color: isSelected
+                ? color
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -1118,14 +1272,22 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
           children: [
             Icon(
               icon,
-              color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              color: isSelected
+                  ? color
+                  : Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
               size: 20,
             ),
             const SizedBox(width: 8),
             Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: isSelected
+                    ? color
+                    : Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -1134,8 +1296,7 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
     );
   }
 
-
-  Widget _buildSummaryCard(
+  Widget _buildModernSummaryCard(
     BuildContext context,
     String title,
     double amount,
@@ -1144,14 +1305,11 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
     Color bgColor,
   ) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1159,48 +1317,46 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 20,
-                ),
+                child: Icon(icon, color: color, size: 16),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Text(
             amount.formatAsTurkishLira(),
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: color,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(color: color),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFinancialTransactionItem(FinancialTransactionItem transaction) {
-    final color = transaction.type == 'income' ? const Color(0xFF059669) : const Color(0xFFDC2626);
+  Widget _buildEnhancedFinancialTransactionItem(
+    FinancialTransactionItem transaction,
+  ) {
+    final color = transaction.type == 'income'
+        ? const Color(0xFF059669)
+        : const Color(0xFFDC2626);
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
           width: 1,
@@ -1209,19 +1365,21 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
       child: Row(
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 28,
+            height: 28,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(
-              transaction.type == 'income' ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+              transaction.type == 'income'
+                  ? Icons.trending_up_rounded
+                  : Icons.trending_down_rounded,
               color: color,
-              size: 16,
+              size: 14,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               transaction.category,
@@ -1232,17 +1390,20 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
           ),
           Text(
             transaction.amount.formatAsTurkishLira(),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: color,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: color),
           ),
           const SizedBox(width: 8),
           GestureDetector(
-            onTap: () => setState(() => _financialTransactions.remove(transaction)),
+            onTap: () =>
+                setState(() => _financialTransactions.remove(transaction)),
             child: Icon(
               Icons.close,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-              size: 18,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.4),
+              size: 16,
             ),
           ),
         ],
@@ -1283,19 +1444,21 @@ class _FinancialCalculatorBottomSheetState extends State<_FinancialCalculatorBot
   void _addFinancialTransaction() {
     final amountText = _amountInputController.text.trim();
     if (amountText.isEmpty || _selectedCategory == null) return;
-    
+
     // Formatlanmış değeri temizle ve sayıya çevir
     final cleanValue = amountText.replaceAll('.', '').replaceAll(',', '.');
     final amount = double.tryParse(cleanValue) ?? 0.0;
-    
+
     if (amount <= 0) return;
-    
+
     setState(() {
-      _financialTransactions.add(FinancialTransactionItem(
-        type: _selectedTransactionType,
-        category: _selectedCategory!.nameTr,
-        amount: amount,
-      ));
+      _financialTransactions.add(
+        FinancialTransactionItem(
+          type: _selectedTransactionType,
+          category: _selectedCategory!.nameTr,
+          amount: amount,
+        ),
+      );
       _amountInputController.clear();
     });
   }
