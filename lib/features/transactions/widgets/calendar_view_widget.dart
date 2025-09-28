@@ -41,7 +41,7 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
         .read(upcomingRemindersControllerProvider)
         .reminders;
     final dayString = _formatDateForAPI(day);
-
+    
     // Find the UpcomingReminderModel for this day
     final dayReminder = upcomingReminders
         .where((reminder) => reminder.date == dayString)
@@ -140,7 +140,7 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
   ) {
     // Create a map of dates with reminders for calendar markers
     final Map<DateTime, List<ReminderData>> remindersMap = {};
-
+    
     for (final dayReminder in upcomingReminders) {
       try {
         final date = DateTime.parse(dayReminder.date);
@@ -153,24 +153,24 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
 
     return Scaffold(
       body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Calendar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Calendar
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
+              border: Border.all(
                   color: Theme.of(
                     context,
                   ).colorScheme.primary.withValues(alpha: 0.2),
                   width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
+              ),
+              boxShadow: [
+                BoxShadow(
                     color: Theme.of(
                       context,
                     ).colorScheme.primary.withValues(alpha: 0.1),
@@ -179,37 +179,37 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                   ),
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
               child: TableCalendar<ReminderData>(
-                firstDay: DateTime.now(), // Sadece bugünden itibaren
+              firstDay: DateTime.now(), // Sadece bugünden itibaren
                 lastDay: DateTime.now().add(
                   const Duration(days: 15),
                 ), // 15 günlük sınır
-                focusedDay: _focusedDay,
-                calendarFormat: _calendarFormat,
+              focusedDay: _focusedDay,
+              calendarFormat: _calendarFormat,
                 eventLoader: (day) =>
                     remindersMap[DateTime(day.year, day.month, day.day)] ?? [],
-                startingDayOfWeek: StartingDayOfWeek.monday,
-                locale: 'tr_TR', // Türkçe lokalizasyon
-                calendarStyle: CalendarStyle(
-                  outsideDaysVisible: false,
-                  weekendTextStyle: TextStyle(
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              locale: 'tr_TR', // Türkçe lokalizasyon
+              calendarStyle: CalendarStyle(
+                outsideDaysVisible: false,
+                weekendTextStyle: TextStyle(
                     color: Theme.of(
                       context,
                     ).colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                  defaultTextStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                ),
+                defaultTextStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                   selectedTextStyle: const TextStyle(color: Colors.white),
-                  todayTextStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  selectedDecoration: BoxDecoration(
+                todayTextStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                selectedDecoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
                         Theme.of(context).colorScheme.primary,
@@ -220,7 +220,7 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    shape: BoxShape.circle,
+                  shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
                         color: Theme.of(
@@ -230,30 +230,30 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                         offset: const Offset(0, 3),
                       ),
                     ],
-                  ),
-                  todayDecoration: BoxDecoration(
+                ),
+                todayDecoration: BoxDecoration(
                     color: Theme.of(
                       context,
                     ).colorScheme.primary.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2,
-                    ),
-                  ),
-                  markerDecoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
                     color: Theme.of(context).colorScheme.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
+                    width: 2,
                   ),
-                  markersMaxCount: 3,
+                ),
+                markerDecoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                ),
+                markersMaxCount: 3,
                   markerSize: 7,
                   markerMargin: const EdgeInsets.symmetric(horizontal: 1.5),
-                ),
-                headerStyle: HeaderStyle(
-                  formatButtonVisible: false, // Format butonunu gizle
-                  titleCentered: true,
-                  formatButtonShowsNext: false,
+              ),
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false, // Format butonunu gizle
+                titleCentered: true,
+                formatButtonShowsNext: false,
                   leftChevronVisible: true, // Sol ok butonunu göster
                   rightChevronVisible: true, // Sağ ok butonunu göster
                   leftChevronIcon: Icon(
@@ -271,29 +271,29 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                         color: Theme.of(context).colorScheme.onSurface,
                       ) ??
                       TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                ),
-                onDaySelected: _onDaySelected,
-                onPageChanged: (focusedDay) {
-                  _focusedDay = focusedDay;
-                },
-                selectedDayPredicate: (day) {
-                  return isSameDay(_selectedDay, day);
-                },
               ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Selected Day Reminders
-            ValueListenableBuilder<List<ReminderData>>(
-              valueListenable: _selectedReminders,
-              builder: (context, selectedReminders, _) {
-                return _buildSelectedDayReminders(context, selectedReminders);
+              onDaySelected: _onDaySelected,
+              onPageChanged: (focusedDay) {
+                _focusedDay = focusedDay;
+              },
+              selectedDayPredicate: (day) {
+                return isSameDay(_selectedDay, day);
               },
             ),
-
-            const SizedBox(height: 20),
-          ],
+          ),
+          
+          const SizedBox(height: 20),
+          
+          // Selected Day Reminders
+            ValueListenableBuilder<List<ReminderData>>(
+            valueListenable: _selectedReminders,
+            builder: (context, selectedReminders, _) {
+              return _buildSelectedDayReminders(context, selectedReminders);
+            },
+          ),
+          
+          const SizedBox(height: 20),
+        ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -444,7 +444,7 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
               ],
             ),
           ),
-
+          
           // Reminders List
           Padding(
             padding: const EdgeInsets.all(16),
@@ -473,14 +473,14 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
     final amount = double.tryParse(amountString.replaceAll(',', '.')) ?? 0.0;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-          width: 1,
-        ),
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+              width: 1,
+            ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -491,43 +491,43 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
+          child: Row(
+            children: [
             // Compact Icon
-            Container(
+              Container(
               width: 32,
               height: 32,
-              decoration: BoxDecoration(
+                decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8),
                 border: Border.all(
                   color: iconColor.withValues(alpha: 0.2),
                   width: 1,
                 ),
-              ),
-              child: Icon(
+                ),
+                child: Icon(
                 isIncome
                     ? Icons.trending_up_rounded
                     : Icons.trending_down_rounded,
                 color: iconColor,
                 size: 16,
+                ),
               ),
-            ),
-
-            const SizedBox(width: 12),
-
+              
+              const SizedBox(width: 12),
+              
             // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                     reminder.category,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
+                    const SizedBox(height: 2),
                   Text(
                     reminder.recurringType,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -682,9 +682,9 @@ class _FinancialCalculatorBottomSheetState
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 children: [
-                  Container(
+                    Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
+                      decoration: BoxDecoration(
                       color: Theme.of(
                         context,
                       ).colorScheme.primary.withValues(alpha: 0.1),
@@ -731,18 +731,18 @@ class _FinancialCalculatorBottomSheetState
                         context,
                       ).colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
+                      ),
+                      child: Text(
                       '${_financialTransactions.length} işlem',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-
+              
             const SizedBox(height: 24),
 
             // Tab Bar
@@ -805,9 +805,7 @@ class _FinancialCalculatorBottomSheetState
                 indicatorSize: TabBarIndicatorSize.tab,
                 dividerColor: Colors.transparent,
                 labelColor: Colors.white,
-                unselectedLabelColor: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.5),
+                unselectedLabelColor: Colors.black,
                 labelStyle: const TextStyle(fontSize: 14),
                 unselectedLabelStyle: const TextStyle(fontSize: 14),
                 tabs: [
@@ -821,12 +819,7 @@ class _FinancialCalculatorBottomSheetState
                           child: const Icon(Icons.add_circle_outline, size: 18),
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'İşlem Ekle',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.copyWith(color: Colors.white),
-                        ),
+                        const Text('İşlem Ekle'),
                       ],
                     ),
                   ),
@@ -840,18 +833,13 @@ class _FinancialCalculatorBottomSheetState
                           child: const Icon(Icons.analytics_outlined, size: 18),
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'Bütçe Özeti',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodySmall?.copyWith(color: Colors.white),
-                        ),
+                        const Text('Bütçe Özeti'),
                       ],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
+          ),
+        ),
 
             const SizedBox(height: 24),
 
