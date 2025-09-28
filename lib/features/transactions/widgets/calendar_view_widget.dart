@@ -653,9 +653,9 @@ class _FinancialCalculatorBottomSheetState
       ),
       child: Padding(
         padding: EdgeInsets.only(
-          left: 24,
-          right: 24,
-          top: 24,
+          left: 16,
+          right: 16,
+          top: 16,
           bottom: MediaQuery.of(context).viewInsets.bottom + 24,
         ),
         child: Column(
@@ -821,7 +821,14 @@ class _FinancialCalculatorBottomSheetState
                           child: const Icon(Icons.add_circle_outline, size: 18),
                         ),
                         const SizedBox(width: 8),
-                        const Text('İşlem Ekle'),
+                        Text(
+                          'İşlem Ekle',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                fontSize: 18,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
                       ],
                     ),
                   ),
@@ -835,7 +842,14 @@ class _FinancialCalculatorBottomSheetState
                           child: const Icon(Icons.analytics_outlined, size: 18),
                         ),
                         const SizedBox(width: 8),
-                        const Text('Bütçe Özeti'),
+                        Text(
+                          'Bütçe Özeti',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                fontSize: 18,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                        ),
                       ],
                     ),
                   ),
@@ -989,7 +1003,7 @@ class _FinancialCalculatorBottomSheetState
               _formatAmountInput(value);
             },
             onFieldSubmitted: (value) {
-              FocusScope.of(context).unfocus();
+              FocusManager.instance.primaryFocus?.unfocus();
             },
             decoration: InputDecoration(
               hintText: '0,00',
@@ -1442,6 +1456,9 @@ class _FinancialCalculatorBottomSheetState
   }
 
   void _addFinancialTransaction() {
+    // Klavyeyi kapat
+    FocusManager.instance.primaryFocus?.unfocus();
+
     final amountText = _amountInputController.text.trim();
     if (amountText.isEmpty || _selectedCategory == null) return;
 
