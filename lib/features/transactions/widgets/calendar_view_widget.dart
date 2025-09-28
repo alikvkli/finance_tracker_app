@@ -145,14 +145,19 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
             margin: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
-                width: 1,
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -169,16 +174,20 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
               calendarStyle: CalendarStyle(
                 outsideDaysVisible: false,
                 weekendTextStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w500,
                 ),
                 defaultTextStyle: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
                 ),
                 selectedTextStyle: const TextStyle(
                   color: Colors.white,
+                  fontWeight: FontWeight.w700,
                 ),
                 todayTextStyle: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w700,
                 ),
                 selectedDecoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -192,18 +201,18 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
                 todayDecoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Theme.of(context).colorScheme.primary,
-                    width: 1.5,
+                    width: 2,
                   ),
                 ),
                 markerDecoration: BoxDecoration(
@@ -211,12 +220,12 @@ class _CalendarViewWidgetState extends ConsumerState<CalendarViewWidget> {
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors.white,
-                    width: 1,
+                    width: 1.5,
                   ),
                 ),
                 markersMaxCount: 3,
-                markerSize: 6,
-                markerMargin: const EdgeInsets.symmetric(horizontal: 1),
+                markerSize: 7,
+                markerMargin: const EdgeInsets.symmetric(horizontal: 1.5),
               ),
               headerStyle: HeaderStyle(
                 formatButtonVisible: false, // Format butonunu gizle
